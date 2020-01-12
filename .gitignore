@@ -1,0 +1,17 @@
+*~
+*_flymake*
+TAGS
+dist/
+dist-newstyle/
+.ghc.environment.*
+ghc/
+ghc-master/
+.vscode/
+.stack-work/
+*.hi
+.DS_Store
+*.tar.gz
+*_flymake*
+\#*
+\.#*
+cabal.project.local

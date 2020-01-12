@@ -1,0 +1,3 @@
+- extensions:
+  - default: false
+  - name: [LambdaCase, NamedFieldPuns]

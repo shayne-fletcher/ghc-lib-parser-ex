@@ -1,0 +1,42 @@
+# Build, run tests, deploy, and more: https://aka.ms/yaml.
+
+trigger:
+  batch: false
+  branches:
+    include:
+    - master
+
+# Enable PR triggers that target the master branch
+pr:
+  autoCancel: true # cancel previous builds on push
+  branches:
+    include:
+    - master
+
+strategy:
+  matrix:
+    linux-881:
+      image: "Ubuntu 16.04"
+      resolver: "nightly-2019-09-26"
+    windows-881:
+      image: "vs2017-win2016"
+      resolver: "nightly-2019-09-26"
+    mac-881:
+      image: "macOS-10.13"
+      resolver: "nightly-2019-09-26"
+
+pool: {vmImage: '$(image)'}
+
+steps:
+  # macOS
+  - bash: |
+      /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+      brew install autoconf automake gmp
+    condition: eq( variables['Agent.OS'], 'Darwin' )
+    displayName: Install brew
+
+  - script: |
+      curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s CI.hs
+      curl -sSL https://get.haskellstack.org/ | sh
+      stack --resolver $(resolver) setup > /dev/null
+      stack runhaskell --resolver $(resolver) --package extra --package optparse-applicative -- CI.hs --resolver $(resolver)

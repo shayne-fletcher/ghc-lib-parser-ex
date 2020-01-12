@@ -2,6 +2,8 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# LANGUAGE CPP #-}
+#include "ghclib_api.h"
+
 import Test.Tasty
 import Test.Tasty.HUnit
 import System.Directory as Directory
@@ -14,8 +16,6 @@ import DynFlags
 import Lexer
 import Outputable
 import ErrUtils
-
-#include "ghclib_api.h"
 
 main = defaultMain tests
 

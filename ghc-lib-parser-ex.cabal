@@ -1,6 +1,6 @@
 cabal-version: >= 1.18
 name:           ghc-lib-parser-ex
-version:        0.1.0.0
+version:       0.20200112
 description:    Please see the README on GitHub at <https://github.com/shayne-fletcher/ghc-lib-parser-ex#readme>
 homepage:       https://github.com/shayne-fletcher/ghc-lib-parser-ex#readme
 bug-reports:    https://github.com/shayne-fletcher/ghc-lib-parser-ex/issues
@@ -15,6 +15,8 @@ build-type:     Simple
 extra-source-files:
     README.md
     ChangeLog.md
+extra-source-files:
+   cbits/ghclib_api.h
 
 source-repository head
   type: git
@@ -28,6 +30,7 @@ flag ghc-lib
 library
   exposed-modules:
       Lib
+      Language.Haskell.GhclibParserEx.Parser
   other-modules:
       Paths_ghc_lib_parser_ex
   hs-source-dirs:
@@ -41,30 +44,30 @@ library
   else
       build-depends:
         ghc-lib-parser
-
-  default-language: Haskell2010
-
-executable ghc-lib-parser-ex-exe
-  main-is: Main.hs
-  other-modules:
-      Paths_ghc_lib_parser_ex
-  hs-source-dirs:
-      app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      base >=4.7 && <5
-    , ghc-lib-parser-ex
+  include-dirs:
+      cbits
+  install-includes:
+      cbits/ghclib_api.h
   default-language: Haskell2010
 
 test-suite ghc-lib-parser-ex-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is:
+      Test.hs
   other-modules:
       Paths_ghc_lib_parser_ex
   hs-source-dirs:
       test
+  include-dirs:
+      cbits
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , tasty >= 1.2.3
+    , tasty-hunit >= 0.10.0
+    , directory >= 1.3.3
+    , filepath >= 1.4.2
+    , extra >=1.6
+    , ghc-lib-parser
     , ghc-lib-parser-ex
   default-language: Haskell2010

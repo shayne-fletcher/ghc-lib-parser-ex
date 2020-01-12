@@ -36,7 +36,6 @@ steps:
     displayName: Install brew
 
   - script: |
-      curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s CI.hs
       curl -sSL https://get.haskellstack.org/ | sh
       stack --resolver $(resolver) setup > /dev/null
       stack runhaskell --resolver $(resolver) --package extra --package optparse-applicative -- CI.hs --resolver $(resolver)

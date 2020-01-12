@@ -15,3 +15,4 @@ ghc-master/
 \#*
 \.#*
 cabal.project.local
+ghc-lib-parser-ex

@@ -124,9 +124,10 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
     cmd "git checkout ghc-lib-parser-ex.cabal"
 
     -- Update stack.yaml to reference the newly extracted package.
-    writeFile (case stackYaml of Just stackYaml -> stackYaml; Nothing -> "stack.yaml") .
+    let config = fromMaybe "stack.yaml" stackYaml
+    writeFile config .
       replace "- ." "- ghc-lib-parser-ex"
-        =<< readFile' (case stackYaml of Just stackYaml -> stackYaml; Nothing -> "stack.yaml")
+        =<< readFile' config
 
     -- Build and test the package.
     stack $ "--no-terminal --interleaved-output " ++ "build " ++ ghcOptionsOpt ghcOptions  ++ " ghc-lib-parser-ex"

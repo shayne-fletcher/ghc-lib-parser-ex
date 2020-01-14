@@ -16,7 +16,7 @@ module Language.Haskell.GhclibParserEx.Parser(
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
-import "ghc-lib-parser" HsSyn
+import HsSyn
 #endif
 import Config
 import DynFlags
@@ -34,7 +34,6 @@ import HeaderInfo
 import GHC.Platform
 import ToolSettings
 #else
-import Bag
 import Platform
 #endif
 

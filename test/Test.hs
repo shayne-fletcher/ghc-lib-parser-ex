@@ -46,7 +46,7 @@ parserTests = testGroup "Parser tests"
 #endif
               POk s m -> do
                 let (wrns, errs) = getMessages s flags
-                when (not (null errs) || not (null wrns)) $ do
+                when (not (null errs) || not (null wrns)) $
                  assertFailure (report flags wrns ++ report flags errs)
       return ()
   ]

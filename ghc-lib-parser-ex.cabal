@@ -29,8 +29,7 @@ flag ghc-lib
 
 library
   exposed-modules:
-      Lib
-      Language.Haskell.GhclibParserEx.Parser
+      Language.Haskell.GhclibParserEx.Parse
   other-modules:
       Paths_ghc_lib_parser_ex
   hs-source-dirs:

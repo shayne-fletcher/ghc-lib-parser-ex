@@ -1,0 +1,12 @@
+resolver: nightly-2020-01-08 # ghc-8.8.1
+extra-deps: []
+ghc-options:
+    "$locals": -Wunused-imports -Worphans -Wunused-top-binds -Wunused-local-binds -Wincomplete-patterns
+flags:
+  ghc-lib-parser-ex:
+    ghc-lib: false
+
+# Packages MUST go at the end, since we append to it during execution
+# of CI.hs.
+packages:
+- .

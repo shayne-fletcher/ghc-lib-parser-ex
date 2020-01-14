@@ -15,6 +15,7 @@ import Data.List.Extra
 import Data.Time.Clock
 import Data.Time.Calendar
 import Data.Semigroup ((<>))
+import Data.Maybe
 import qualified Options.Applicative as Opts
 import qualified System.Environment as Env
 import qualified System.Exit as Exit
@@ -36,13 +37,19 @@ newtype Options = Options
     } deriving (Show)
 
 data StackOptions = StackOptions
-    { resolver :: Maybe String  -- If 'Just _', override stack.yaml.
+    { stackYaml :: Maybe String -- Optional config file
+    , resolver :: Maybe String  -- If 'Just _', override stack.yaml.
     , verbosity :: Maybe String -- If provided, pass '--verbosity=xxx' to 'stack build'. Valid values are "silent",  "error", "warn", "info" or "debug".
     , cabalVerbose :: Bool -- If enabled, pass '--cabal-verbose' to 'stack build'.
     , ghcOptions :: Maybe String -- If 'Just _', pass '--ghc-options="xxx"' to 'stack build' (for ghc verbose, try 'v3').
     } deriving (Show)
 
 -- Command line argument generators.
+
+stackYamlOpt :: Maybe String -> String
+stackYamlOpt = \case
+  Just file -> "--stack-yaml " ++ file
+  Nothing -> ""
 
 stackResolverOpt :: Maybe String -> String
 stackResolverOpt = \case
@@ -73,6 +80,10 @@ parseOptions = Options
 parseStackOptions :: Opts.Parser StackOptions
 parseStackOptions = StackOptions
     <$> Opts.optional ( Opts.strOption
+        ( Opts.long "stack-yaml"
+          <> Opts.help "If specified, the stack-yaml file to use"
+        ))
+    <*> Opts.optional ( Opts.strOption
         ( Opts.long "resolver"
        <> Opts.help "If specified, pass '--resolver=xxx' to stack"
         ))
@@ -90,7 +101,7 @@ parseStackOptions = StackOptions
         ))
 
 buildDist :: StackOptions -> IO String
-buildDist StackOptions {resolver, verbosity, cabalVerbose, ghcOptions} =
+buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions} =
   do
     -- Clear up any detritus left over from previous runs.
     toDelete <- (["ghc-lib-parser-ex"] ++) .
@@ -113,9 +124,9 @@ buildDist StackOptions {resolver, verbosity, cabalVerbose, ghcOptions} =
     cmd "git checkout ghc-lib-parser-ex.cabal"
 
     -- Update stack.yaml to reference the newly extracted package.
-    writeFile "stack.yaml" .
+    writeFile (case stackYaml of Just stackYaml -> stackYaml; Nothing -> "stack.yaml") .
       replace "- ." "- ghc-lib-parser-ex"
-        =<< readFile' "stack.yaml"
+        =<< readFile' (case stackYaml of Just stackYaml -> stackYaml; Nothing -> "stack.yaml")
 
     -- Build and test the package.
     stack $ "--no-terminal --interleaved-output " ++ "build " ++ ghcOptionsOpt ghcOptions  ++ " ghc-lib-parser-ex"
@@ -128,7 +139,8 @@ buildDist StackOptions {resolver, verbosity, cabalVerbose, ghcOptions} =
       stack :: String -> IO ()
       stack action = cmd $ "stack " ++
         concatMap (<> " ")
-                 [ stackResolverOpt resolver
+                 [ stackYamlOpt stackYaml
+                 , stackResolverOpt resolver
                  , stackVerbosityOpt verbosity
                  , cabalVerboseOpt cabalVerbose
                  ] ++

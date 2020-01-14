@@ -16,6 +16,9 @@ import DynFlags
 import Lexer
 import Outputable
 import ErrUtils
+#if defined (GHCLIB_API_808)
+import Bag
+#endif
 
 main = defaultMain tests
 

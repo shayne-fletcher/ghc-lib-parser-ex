@@ -15,15 +15,35 @@ pr:
 
 strategy:
   matrix:
-    linux-881:
+    linux-865-head:
       image: "Ubuntu 16.04"
-      resolver: "nightly-2019-09-26"
-    windows-881:
+      stack: "stack.yaml"
+    windows-865-head:
       image: "vs2017-win2016"
-      resolver: "nightly-2019-09-26"
-    mac-881:
+      stack: "stack.yaml"
+    mac-865-head:
       image: "macOS-10.13"
-      resolver: "nightly-2019-09-26"
+      stack: "stack.yaml"
+
+    linux-881-881:
+      image: "Ubuntu 16.04"
+      stack: "stack-808-808-ghc-lib.yaml"
+    windows-881-881:
+      image: "vs2017-win2016"
+      stack: "stack-808-808-ghc-lib.yaml"
+    mac-881-881:
+      image: "macOS-10.13"
+      stack: "stack-808-808-ghc-lib.yaml"
+
+    linux-881-881-no-ghc-lib:
+      image: "Ubuntu 16.04"
+      stack: "stack-808-808-no-ghc-lib.yaml"
+    windows-881-881-no-ghc-lib:
+      image: "vs2017-win2016"
+      stack: "stack-808-808-no-ghc-lib.yaml"
+    mac-881-881-no-ghc-lib:
+      image: "macOS-10.13"
+      stack: "stack-808-808-no-ghc-lib.yaml"
 
 pool: {vmImage: '$(image)'}
 
@@ -37,5 +57,5 @@ steps:
 
   - script: |
       curl -sSL https://get.haskellstack.org/ | sh
-      stack --resolver $(resolver) setup > /dev/null
-      stack runhaskell --resolver $(resolver) --package extra --package optparse-applicative -- CI.hs --resolver $(resolver)
+      stack --stack-yaml=$(stack) setup > /dev/null
+      stack runhaskell --stack-yaml=$(stack) --package extra --package optparse-applicative CI.hs -- --stack-yaml=$(stack)

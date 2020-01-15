@@ -1,7 +1,7 @@
 resolver: lts-14.20
 extra-deps: [ghc-lib-parser-0.20200102]
 ghc-options:
-    "$locals": -Wunused-imports -Worphans -Wunused-top-binds -Wunused-local-binds -Wincomplete-patterns
+    "$locals": -Wall -Wno-name-shadowing
 flags:
   ghc-lib-parser-ex:
     ghc-lib: true

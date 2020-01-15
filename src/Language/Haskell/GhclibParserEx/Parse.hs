@@ -1,20 +1,27 @@
 -- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
+-- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
+-- SPDX-License-Identifier: BSD-3-Clause.
+
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# LANGUAGE CPP #-}
 #include "ghclib_api.h"
 
-module Language.Haskell.GhclibParserEx.Parser(
-    fakeSettings
-  , fakeLlvmConfig
+module Language.Haskell.GhclibParserEx.Parse(
+    parse
+  , parseExpr
+  , parseImport
   , parseFile
   , parsePragmasIntoDynFlags
+  , fakeSettings
+  , fakeLlvmConfig
   )
   where
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
+import RdrHsSyn
 #else
 import HsSyn
 #endif
@@ -88,6 +95,24 @@ fakeLlvmConfig = LlvmConfig [] []
 fakeLlvmConfig :: (LlvmTargets, LlvmPasses)
 fakeLlvmConfig = ([], [])
 #endif
+
+parse :: P a -> String -> DynFlags -> ParseResult a
+parse p str flags =
+  Lexer.unP p parseState
+  where
+    location = mkRealSrcLoc (mkFastString "<string>") 1 1
+    buffer = stringToStringBuffer str
+    parseState = mkPState flags buffer location
+
+#if defined (GHCLIB_API_811)
+parseExpr :: String -> DynFlags -> ParseResult RdrHsSyn.ECP
+#else
+parseExpr :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
+#endif
+parseExpr = parse Parser.parseExpression
+
+parseImport :: String -> DynFlags -> ParseResult (LImportDecl GhcPs)
+parseImport = parse Parser.parseImport
 
 #if defined (GHC_API_811)
 parseFile :: String

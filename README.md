@@ -2,4 +2,4 @@
 Copyright © 2020, Shayne Fletcher. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 
-The `ghc-lib-parser-ex` package contains GHC API parse tree utilities. It works with or without [`ghc-lib-parser`](https://github.com/digital-asset/ghc-lib).
+The `ghc-lib-parser-ex` package contains GHC API parse tree utilities. You can use it with or without [`ghc-lib-parser`](https://github.com/digital-asset/ghc-lib).

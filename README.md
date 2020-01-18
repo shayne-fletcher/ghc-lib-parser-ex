@@ -13,7 +13,7 @@ The package `ghc-lib-parser-ex` is available on [Hackage](https://hackage.haskel
 
 ### Building `ghc-lib-parser-ex`
 
-You can build the library with `stack build` and test it with `stack test`. You can also produce the `ghc-lib-parser-ex` package by executing the CI script which incidentally builds and runs the tests.
+You can build with `stack build` and test with `stack test`. You can also produce `ghc-lib-parser-ex` package distributions by executing the CI script (which incidentally builds everything and runs the tests).
 ```bash
 # Setup
 git clone git@github.com:shayne-fletcher/ghc-lib-parser-ex.git

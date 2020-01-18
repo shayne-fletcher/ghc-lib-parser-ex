@@ -183,8 +183,8 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
       patchConstraint version file =
         writeFile file .
           replace
-          "      build-depends:\n        ghc-lib-parser"
-          ("      build-depends:\n       ghc-lib-parser == " ++ version)
+           "      build-depends:\n        ghc-lib-parser"
+          ("      build-depends:\n        ghc-lib-parser == " ++ version)
           =<< readFile' file
 
       removePath :: FilePath -> IO ()

@@ -1,0 +1,12 @@
+resolver: nightly-2020-01-08 # ghc-8.8.1
+extra-deps: [ghc-lib-parser-8.8.2]
+ghc-options:
+    "$locals": -Wall -Wno-name-shadowing
+flags:
+  ghc-lib-parser-ex:
+    ghc-lib: true
+
+# Packages MUST go at the end, since we append to it during execution
+# of CI.hs.
+packages:
+- ghc-lib-parser-ex

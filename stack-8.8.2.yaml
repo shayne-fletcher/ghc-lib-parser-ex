@@ -9,4 +9,4 @@ flags:
 # Packages MUST go at the end, since we append to it during execution
 # of CI.hs.
 packages:
-- ghc-lib-parser-ex
+- .

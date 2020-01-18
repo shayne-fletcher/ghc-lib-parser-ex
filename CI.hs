@@ -181,7 +181,7 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
 
       patchConstraint :: String -> FilePath -> IO ()
       patchConstraint version file =
-        when (isJust versionTag) $ do
+        when (isJust versionTag) $
           writeFile file .
             replace
             "      build-depends:\n        ghc-lib-parser"

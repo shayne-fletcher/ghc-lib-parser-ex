@@ -42,6 +42,7 @@ data StackOptions = StackOptions
     , verbosity :: Maybe String -- If provided, pass '--verbosity=xxx' to 'stack build'. Valid values are "silent",  "error", "warn", "info" or "debug".
     , cabalVerbose :: Bool -- If enabled, pass '--cabal-verbose' to 'stack build'.
     , ghcOptions :: Maybe String -- If 'Just _', pass '--ghc-options="xxx"' to 'stack build' (for ghc verbose, try 'v3').
+    , versionTag :: Maybe String -- If 'Just _' use this as the version (e.g. "8.8.1.20191204")
     } deriving (Show)
 
 -- Command line argument generators.
@@ -99,9 +100,13 @@ parseStackOptions = StackOptions
         ( Opts.long "ghc-options"
        <> Opts.help "If specified, pass '--ghc-options=\"xxx\"' to stack"
         ))
+    <*> Opts.optional ( Opts.strOption
+        ( Opts.long "version-tag"
+       <> Opts.help "If specified, set this as the version in ghc-lib-parser-ex.cabal"
+        ))
 
 buildDist :: StackOptions -> IO String
-buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions} =
+buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions, versionTag} =
   do
     -- Clear up any detritus left over from previous runs.
     toDelete <- (["ghc-lib-parser-ex"] ++) .
@@ -119,9 +124,10 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
 
     -- Make an sdist of the package and extract it.
     patchVersion version "ghc-lib-parser-ex.cabal"
+    patchConstraint version "ghc-lib-parser-ex.cabal"
     mkTarball pkg_ghclib_parser_ex
     renameDirectory pkg_ghclib_parser_ex "ghc-lib-parser-ex"
-    cmd "git checkout ghc-lib-parser-ex.cabal"
+    -- cmd "git checkout ghc-lib-parser-ex.cabal"
 
     -- Update stack.yaml to reference the newly extracted package.
     let config = fromMaybe "stack.yaml" stackYaml
@@ -161,14 +167,24 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
         cmd $ "tar -xvf " ++ target ++ ".tar.gz"
 
       tag :: IO String
-      tag = do
-        UTCTime day _ <- getCurrentTime
-        return $ genVersionStr day
+      tag = case versionTag of
+          Just t -> return t
+          _ -> do
+            UTCTime day _ <- getCurrentTime
+            return $ genVersionStr day
 
       patchVersion :: String -> FilePath -> IO ()
       patchVersion version file =
         writeFile file .
-          replace "version:        0.1.0.0" ("version:       " ++ version)
+          replace "version:        0.1.0" ("version:        " ++ version)
+          =<< readFile' file
+
+      patchConstraint :: String -> FilePath -> IO ()
+      patchConstraint version file =
+        writeFile file .
+          replace
+          "      build-depends:\n        ghc-lib-parser"
+          ("      build-depends:\n       ghc-lib-parser == " ++ version)
           =<< readFile' file
 
       removePath :: FilePath -> IO ()

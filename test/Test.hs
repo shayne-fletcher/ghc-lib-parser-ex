@@ -8,26 +8,41 @@
 import Test.Tasty
 import Test.Tasty.HUnit
 import System.Directory as Directory
+import System.Environment
 import qualified System.FilePath as FilePath
 import System.IO.Extra
 import Control.Monad
 
 import Language.Haskell.GhclibParserEx.Parse
+import Language.Haskell.GhclibParserEx.Dump
+import Language.Haskell.GhclibParserEx.Fixity
+
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+import GHC.Hs
+#else
+import HsSyn
+#endif
 import DynFlags
 import Lexer
 import Outputable
 import ErrUtils
+import RdrHsSyn
 #if defined (GHCLIB_API_808)
 import Bag
 #endif
 
-main = defaultMain tests
+main :: IO ()
+main = do
+  setEnv "TASTY_NUM_THREADS" "1"
+  setUnsafeGlobalDynFlags (defaultDynFlags fakeSettings fakeLlvmConfig)
+  defaultMain tests
 
 tests :: TestTree
-tests = testGroup " All tests" [parseTests]
+tests = testGroup " All tests" [parseTests, fixityTests]
 
+chkParseResult :: (DynFlags -> WarningMessages -> String) -> DynFlags -> ParseResult a -> IO ()
 chkParseResult report flags = \case
-    POk s m -> do
+    POk s _ -> do
       let (wrns, errs) = getMessages s flags
       when (not (null errs) || not (null wrns)) $
         assertFailure (report flags wrns ++ report flags errs)
@@ -37,17 +52,26 @@ chkParseResult report flags = \case
     PFailed _ loc err -> assertFailure (report flags $ unitBag $ mkPlainErrMsg flags loc err)
 #endif
 
+parseTests :: TestTree
 parseTests = testGroup "Parse tests"
   [
-    testCase "Parse expression" $ do
+    testCase "Expression" $ do
       let flags = defaultDynFlags fakeSettings fakeLlvmConfig
       chkParseResult report flags $
         parseExpr "unfoldr $ listToMaybe . concatMap reads . tails" flags
-  , testCase "Parse import" $ do
+  , testCase "Import" $ do
       let flags = defaultDynFlags fakeSettings fakeLlvmConfig
       chkParseResult report flags $
         parseImport "import qualified \"foo-lib\" Foo as Bar hiding ((<.>))" flags
-  , testCase "Parse trivial module" $ do
+  , testCase "Declaration" $ do
+      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+      chkParseResult report flags $
+        parseDeclaration (
+        unlines   [
+             "fact :: Int -> Int"
+           , "fact n = if n <= 1 then 1 else n * fact (n - 1)"
+           ]) flags
+  , testCase "File" $ do
       foo <- makeFile "Foo.hs" $ unlines
         [ "module Foo (readMany) where"
         , "import Data.List"
@@ -62,6 +86,34 @@ parseTests = testGroup "Parse tests"
   ]
   where
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
+
+fixityTests :: TestTree
+fixityTests = testGroup "Fixity tests"
+  [
+    testCase "Expression" $ do
+      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+      case parseExpr "1 + 2 * 3" flags of
+        POk s e ->
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+          case unP (runECP_P e >>= \e -> return e) s :: ParseResult (LHsExpr GhcPs) of
+            POk _  e ->
+#endif
+              assertBool "parse tree not affected" $
+                showSDocUnsafe (showAstData BlankSrcSpan e) /=
+                showSDocUnsafe (showAstData BlankSrcSpan (applyFixities [] e))
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+            PFailed{} -> assertFailure "ecp failure"
+#endif
+        PFailed{} -> assertFailure "parse error"
+  , testCase "Pattern" $ do
+      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+      case parseDeclaration "f (1 : 2 :[]) = 1" flags of
+        POk _ d ->
+          assertBool "parse tree not affected" $
+          showSDocUnsafe (showAstData BlankSrcSpan d) /=
+          showSDocUnsafe (showAstData BlankSrcSpan (applyFixities [] d))
+        PFailed{} -> assertFailure "parse error"
+  ]
 
 makeFile :: FilePath -> String -> IO FilePath
 makeFile relPath contents = do

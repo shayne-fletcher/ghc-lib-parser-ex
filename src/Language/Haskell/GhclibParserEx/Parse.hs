@@ -1,9 +1,6 @@
 -- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
--- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
--- SPDX-License-Identifier: BSD-3-Clause.
-
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# LANGUAGE CPP #-}
 #include "ghclib_api.h"
@@ -12,6 +9,7 @@ module Language.Haskell.GhclibParserEx.Parse(
     parse
   , parseExpr
   , parseImport
+  , parseDeclaration
   , parseFile
   , parsePragmasIntoDynFlags
   , fakeSettings
@@ -113,6 +111,9 @@ parseExpr = parse Parser.parseExpression
 
 parseImport :: String -> DynFlags -> ParseResult (LImportDecl GhcPs)
 parseImport = parse Parser.parseImport
+
+parseDeclaration :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
+parseDeclaration = parse Parser.parseDeclaration
 
 #if defined (GHC_API_811)
 parseFile :: String

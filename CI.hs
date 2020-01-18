@@ -1,4 +1,4 @@
--- Copyright (c) 2019-2020, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 -- CI script, compatible with all of Travis, Appveyor and Azure.
@@ -181,11 +181,12 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
 
       patchConstraint :: String -> FilePath -> IO ()
       patchConstraint version file =
-        writeFile file .
-          replace
-           "      build-depends:\n        ghc-lib-parser"
-          ("      build-depends:\n        ghc-lib-parser == " ++ version)
-          =<< readFile' file
+        when (isJust versionTag) $ do
+          writeFile file .
+            replace
+            "      build-depends:\n        ghc-lib-parser"
+            ("      build-depends:\n        ghc-lib-parser == " ++ version)
+            =<< readFile' file
 
       removePath :: FilePath -> IO ()
       removePath p =

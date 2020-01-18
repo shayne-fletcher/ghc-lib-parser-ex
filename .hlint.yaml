@@ -1,3 +1,4 @@
 - extensions:
   - default: false
-  - name: [CPP, LambdaCase, NamedFieldPuns]
+  - name: [CPP, LambdaCase, NamedFieldPuns, ViewPatterns]
+  - {name: TupleSections, within: [Language.Haskell.GhclibParserEx.Fixity]}

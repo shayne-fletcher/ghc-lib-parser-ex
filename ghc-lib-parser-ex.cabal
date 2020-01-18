@@ -30,12 +30,17 @@ flag ghc-lib
 library
   exposed-modules:
       Language.Haskell.GhclibParserEx.Parse
+      Language.Haskell.GhclibParserEx.Outputable
+      Language.Haskell.GhclibParserEx.Dump
+      Language.Haskell.GhclibParserEx.Fixity
   other-modules:
       Paths_ghc_lib_parser_ex
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      base >=4.7 && <5,
+      uniplate >= 1.5,
+      bytestring >= 0.10.8.2
   if !flag(ghc-lib) && impl(ghc >= 8.8.0) && impl(ghc < 8.9.0)
       build-depends:
         ghc == 8.8.*,

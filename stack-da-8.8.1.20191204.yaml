@@ -1,0 +1,13 @@
+resolver: lts-13.21 # ghc-8.6.5
+extra-deps:
+  - archive: https://digitalassetsdk.bintray.com/ghc-lib/ghc-lib-parser-8.8.1.20191204.tar.gz
+ghc-options:
+    "$locals": -Wall -Wno-name-shadowing
+flags:
+  ghc-lib-parser-ex:
+    ghc-lib: true
+
+# Packages MUST go at the end, since we append to it during execution
+# of CI.hs.
+packages:
+- .

@@ -1,0 +1,17 @@
+- package:
+  - name: ghc-lib-parser-ex
+  - section:
+    - name: library
+    - message:
+      - name: Redundant build-depends entry
+      - depends:
+        - ghc
+        - ghc-boot-th
+  - section:
+    - name: test:ghc-lib-parser-ex-test
+    - message:
+      - name: Redundant build-depends entry
+      - depends:
+        - ghc
+        - ghc-boot-th
+

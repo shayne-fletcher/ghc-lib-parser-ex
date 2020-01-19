@@ -25,15 +25,16 @@ main = do
     let opts =
           Opts.info (parseOptions Opts.<**> Opts.helper)
           ( Opts.fullDesc
-            <> Opts.progDesc "Build  and test ghc-lib-parser-ex."
+            <> Opts.progDesc "Build and test ghc-lib-parser-ex."
             <> Opts.header "CI - CI script for ghc-lib-parser-ex"
           )
-    Options { stackOptions } <- Opts.execParser opts
-    _ <- buildDist stackOptions
-    return ()
+    Options { upload, stackOptions } <- Opts.execParser opts
+    version <- buildDist stackOptions
+    when upload $ bintrayUpload version
 
-newtype Options = Options
-    { stackOptions :: StackOptions
+data Options = Options
+    { upload :: Bool
+    , stackOptions :: StackOptions
     } deriving (Show)
 
 data StackOptions = StackOptions
@@ -76,7 +77,10 @@ genVersionStr day = "0." ++ replace "-" "" (showGregorian day)
 
 parseOptions :: Opts.Parser Options
 parseOptions = Options
-    <$> parseStackOptions
+    <$> Opts.switch
+        ( Opts.long "upload-to-bintray"
+       <> Opts.help "If specified, will try uploading the sdists to Bintray, using credentials in BINTRAY_BASIC_AUTH env var.")
+    <*> parseStackOptions
 
 parseStackOptions :: Opts.Parser StackOptions
 parseStackOptions = StackOptions
@@ -104,6 +108,39 @@ parseStackOptions = StackOptions
         ( Opts.long "version-tag"
        <> Opts.help "If specified, set this as the version in ghc-lib-parser-ex.cabal"
         ))
+
+bintrayUpload :: String -> IO ()
+bintrayUpload version = do
+    credentials <- Env.lookupEnv "BINTRAY_BASIC_AUTH"
+    case credentials of
+      Nothing ->
+        Exit.die $ unlines [
+          "Error: Cannot upload without BINTRAY_BASIC_AUTH.",
+          "To set the environment variable, run:",
+          "    BINTRAY_BASIC_AUTH=<creds> ./CI.hs --upload-to-bintray",
+          "where <creds> should be of the form:",
+          "  fname.lname@digitalassetsdk:0123456789abcdef0123456789abcdef01234567",
+          "You can find your API key (the part after the colon) at:",
+          "  https://bintray.com/profile/edit",
+          "after logging in. (The username is also displayed on that page.)"]
+      Just creds -> do
+        cmd $ concat [
+            "curl -T ./ghc-lib-parser-ex-", version, ".tar.gz",
+            " -u", creds,
+            " https://api.bintray.com/content/digitalassetsdk/ghc-lib-parser-ex/da-ghc-lib-parser-ex/", version, "/ghc-lib-parser-ex-", version, ".tar.gz"]
+        cmd $ concat [
+            "curl -X POST",
+            " -u", creds,
+            " https://api.bintray.com/content/digitalassetsdk/ghc-lib-parser-ex/da-ghc-lib-parser-ex/", version, "/publish"]
+        where
+          cmd :: String -> IO ()
+          cmd x = do
+            let c = replace creds "***:***" x
+            putStrLn $ "\n\n# Running: " ++ c
+            hFlush stdout
+            (t, _) <- duration $ callCommand x
+            putStrLn $ "# Completed in " ++ showDuration t ++ ": " ++ c ++ "\n"
+            hFlush stdout
 
 buildDist :: StackOptions -> IO String
 buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions, versionTag} =

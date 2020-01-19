@@ -24,6 +24,6 @@ Run `stack runhaskell --package extra --package optparse-applicative CI.hs -- --
 
 To run [`hlint`](https://github.com/ndmitchell/hlint) on this repository, a suitable command is `hlint --cpp-include cbits --cpp-define GHCLIB_API_XXX .` (where `XXX` at this time is one of `808`, `810` or `811`).
 
-## Releasing `ghc-lib` (notes for maintainers)
+## Releasing `ghc-lib-parser-ex` (notes for maintainers)
 
 Build `ghc-lib-parser-ex` using the [above instructions](#building-ghc-lib-parser-ex)  and upload the resulting `.tar.gz` files to [Hackage](https://hackage.haskell.org/upload).

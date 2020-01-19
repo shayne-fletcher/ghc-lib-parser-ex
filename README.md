@@ -11,7 +11,7 @@ The package `ghc-lib-parser-ex` is available on [Hackage](https://hackage.haskel
 * Version 8.10.1 will be the `ghc-lib-parser-ex` for use against `ghc-lib-parser-8.10.1`(or the released GHC 8.10.1);
 * Version 0.20190204 is for use against [`ghc-lib-parser-0.20190204`](http://hackage.haskell.org/package/ghc-lib-0.20190204).
 
-### Building `ghc-lib-parser-ex`
+## Building `ghc-lib-parser-ex`
 
 You can build with `stack build` and test with `stack test`. You can also produce `ghc-lib-parser-ex` package distributions by executing the CI script (which incidentally builds everything and runs the tests).
 ```bash

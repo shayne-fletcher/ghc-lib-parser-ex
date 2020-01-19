@@ -12,11 +12,11 @@ license-file:   LICENSE
 category:       Development
 synopsis:       Algorithms on GHC parse trees
 build-type:     Simple
+tested-with:    GHC==8.8.1, GHC==8.6.5, GHC==8.4.4
 extra-source-files:
     README.md
     ChangeLog.md
-extra-source-files:
-   cbits/ghclib_api.h
+    cbits/ghclib_api.h
 
 source-repository head
   type: git

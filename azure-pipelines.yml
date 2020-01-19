@@ -34,6 +34,15 @@ strategy:
     mac-881-881:
       image: "macOS-10.13"
       stack: "stack-808-808-ghc-lib.yaml"
+    linux-881-881-da:
+      image: "Ubuntu 16.04"
+      stack: "stack-da-8.8.1.20191204.yaml"
+    windows-881-881-da:
+      image: "vs2017-win2016"
+      stack: "stack-da-8.8.1.20191204.yaml"
+    mac-881-881-da:
+      image: "macOS-10.13"
+      stack: "stack-da-8.8.1.20191204.yaml"
 
     linux-881-881-no-ghc-lib:
       image: "Ubuntu 16.04"

@@ -68,8 +68,7 @@ parseTests = testGroup "Parse tests"
       chkParseResult report flags $
         parseDeclaration (
         unlines   [
-             "fact :: Int -> Int"
-           , "fact n = if n <= 1 then 1 else n * fact (n - 1)"
+           "fact n = if n <= 1 then 1 else n * fact (n - 1)"
            ]) flags
   , testCase "File" $ do
       foo <- makeFile "Foo.hs" $ unlines

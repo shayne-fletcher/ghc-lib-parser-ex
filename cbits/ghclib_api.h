@@ -6,7 +6,7 @@ reserved. SPDX-License-Identifier: BSD-3-Clause.
 #if !defined(GHCLIB_API_H)
 #  define GHCLIB_API_H
 
-#  if !defined(GHCLIB_API_811) && !defined(GHCLIBAPI_810) && !defined(GHCLIB_API_808)
+#  if !defined(GHCLIB_API_811) && !defined(GHCLIB_API_810) && !defined(GHCLIB_API_808)
 #    if defined(MIN_VERSION_ghc_lib_parser)
 #       if !MIN_VERSION_ghc_lib_parser(1,  0,  0)
 #         define GHCLIB_API_811

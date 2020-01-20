@@ -6,23 +6,23 @@ The `ghc-lib-parser-ex` package contains GHC API parse tree utilities. It works 
 
 ## Using `ghc-lib-parser-ex`
 
-The package `ghc-lib-parser-ex` is available on [Hackage](https://hackage.haskell.org/package/ghc-lib-parser-ex) e.g. `cabal install ghc-lib-parser-ex`. There are two release streams within the `ghc-lib-parser-ex` name (tracking released `ghc-lib-parser` versions exactly):
+Package `ghc-lib-parser-ex` is on [Hackage](https://hackage.haskell.org/package/ghc-lib-parser-ex) e.g. `cabal install ghc-lib-parser-ex`. There are two release streams within the `ghc-lib-parser-ex` name (tracking `ghc-lib-parser`):
 
-* Version 8.10.1 will be the `ghc-lib-parser-ex` for use against `ghc-lib-parser-8.10.1`(or the released GHC 8.10.1);
-* Version 0.20190204 is for use against [`ghc-lib-parser-0.20190204`](http://hackage.haskell.org/package/ghc-lib-0.20190204).
+* Version 8.10.1 will be `ghc-lib-parser-ex` for use with `ghc-lib-parser-8.10.1`(or the released GHC 8.10.1);
+* Version 0.20190204 is for use with [`ghc-lib-parser-0.20190204`](http://hackage.haskell.org/package/ghc-lib-0.20190204).
 
 ## Building `ghc-lib-parser-ex`
 
-You can build with `stack build` and test with `stack test`. You can also produce `ghc-lib-parser-ex` package distributions by executing the CI script (which incidentally builds everything and runs the tests).
+You can build with `stack build` and test with `stack test`. Produce `ghc-lib-parser-ex` package distributions by executing the CI script:
 ```bash
 # Setup
 git clone git@github.com:shayne-fletcher/ghc-lib-parser-ex.git
 cd ghc-lib-parser-ex
 stack runhaskell --package extra --package optparse-applicative CI.hs
 ```
-Run `stack runhaskell --package extra --package optparse-applicative CI.hs -- --help` for more configurability options.
+Run `stack runhaskell --package extra --package optparse-applicative CI.hs -- --help` for more options.
 
-To run [`hlint`](https://github.com/ndmitchell/hlint) on this repository, a suitable command is `hlint --cpp-include cbits --cpp-define GHCLIB_API_XXX .` (where `XXX` at this time is one of `808`, `810` or `811`).
+To run [`hlint`](https://github.com/ndmitchell/hlint) on this repository, `hlint --cpp-include cbits --cpp-define GHCLIB_API_XXX .` (where `XXX` at this time is one of `808`, `810` or `811`).
 
 ## Releasing `ghc-lib-parser-ex` (notes for maintainers)
 

@@ -124,7 +124,7 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
 
     -- Make an sdist of the package and extract it.
     patchVersion version "ghc-lib-parser-ex.cabal"
-    patchConstraint version "ghc-lib-parser-ex.cabal"
+    -- patchConstraint version "ghc-lib-parser-ex.cabal"
     mkTarball pkg_ghclib_parser_ex
     renameDirectory pkg_ghclib_parser_ex "ghc-lib-parser-ex"
     -- cmd "git checkout ghc-lib-parser-ex.cabal"

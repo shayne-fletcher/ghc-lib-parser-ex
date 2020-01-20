@@ -19,14 +19,12 @@ import Language.Haskell.GhclibParserEx.Fixity
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
-#else
-import HsSyn
+import RdrHsSyn
 #endif
 import DynFlags
 import Lexer
 import Outputable
 import ErrUtils
-import RdrHsSyn
 #if defined (GHCLIB_API_808)
 import Bag
 #endif
@@ -55,16 +53,39 @@ chkParseResult report flags = \case
 parseTests :: TestTree
 parseTests = testGroup "Parse tests"
   [
-    testCase "Expression" $ do
-      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+    testCase "Module" $
       chkParseResult report flags $
-        parseExpr "unfoldr $ listToMaybe . concatMap reads . tails" flags
-  , testCase "Import" $ do
-      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+        parseModule (unlines
+          [ "module Foo (readMany) where"
+          , "import Data.List"
+          , "import Data.Maybe"
+          , "readMany = unfoldr $ listToMaybe . concatMap reads . tails"
+          ]) flags
+  , testCase "Signature" $
+      chkParseResult report flags $
+        parseSignature (unlines
+          [ "signature Str where"
+          , "data Str"
+          , "empty :: Str"
+          , "append :: Str -> Str -> Str"
+          ]) flags
+  , testCase "Import" $
       chkParseResult report flags $
         parseImport "import qualified \"foo-lib\" Foo as Bar hiding ((<.>))" flags
-  , testCase "Declaration" $ do
-      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+  , testCase "Statement" $
+      chkParseResult report flags $
+        parseStatement "Foo foo <- bar" flags
+  , testCase "Backpack" $
+      chkParseResult report flags $
+        parseBackpack (unlines
+          [ "unit main where"
+          , "  module Main where"
+          , "    main = putStrLn \"Hello world!\""
+          ]) flags
+  , testCase "Expression" $
+      chkParseResult report flags $
+        parseExpression "unfoldr $ listToMaybe . concatMap reads . tails" flags
+  , testCase "Declaration" $
       chkParseResult report flags $
         parseDeclaration (
         unlines   [
@@ -72,18 +93,19 @@ parseTests = testGroup "Parse tests"
            ]) flags
   , testCase "File" $ do
       foo <- makeFile "Foo.hs" $ unlines
-        [ "module Foo (readMany) where"
+        ["{-# LANGUAGE ScopedTypeVariables #-}"
+        , "module Foo (readMany) where"
         , "import Data.List"
         , "import Data.Maybe"
         , "readMany = unfoldr $ listToMaybe . concatMap reads . tails"
         ]
       s <- readFile' foo
-      parsePragmasIntoDynFlags (defaultDynFlags fakeSettings fakeLlvmConfig) foo s >>= \case
+      parsePragmasIntoDynFlags flags foo s >>= \case
         Left msg -> assertFailure msg
-        Right flags ->
-          chkParseResult report flags $ parseFile foo (flags `gopt_set` Opt_KeepRawTokenStream) s
+        Right flags -> chkParseResult report flags $ parseFile foo flags s
   ]
   where
+    flags = unsafeGlobalDynFlags
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 
 fixityTests :: TestTree
@@ -91,8 +113,12 @@ fixityTests = testGroup "Fixity tests"
   [
     testCase "Expression" $ do
       let flags = defaultDynFlags fakeSettings fakeLlvmConfig
-      case parseExpr "1 + 2 * 3" flags of
+      case parseExpression "1 + 2 * 3" flags of
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
         POk s e ->
+#else
+        POk _ e ->
+#endif
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
           case unP (runECP_P e >>= \e -> return e) s :: ParseResult (LHsExpr GhcPs) of
             POk _  e ->

@@ -67,7 +67,7 @@ mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
   | associate_right = ConPatIn op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
 #else
-  | associate_right = let new_p = mkConOpPat fs op2 fix2 p12 p2 in ConPatIn op1 (InfixCon p11 (cL loc new_p))
+  | associate_right = ConPatIn op1 (InfixCon p11 (cL loc (mkConOpPat fs op2 fix2 p12 p2)))
 #endif
   | otherwise = ConPatIn op2 (InfixCon p1 p2)
   where
@@ -109,7 +109,7 @@ getIdent :: LHsExpr GhcPs -> String
 getIdent (unLoc -> HsVar _ (L _ n)) = occNameString . rdrNameOcc $ n
 getIdent _ = error "Must be HsVar"
 
--- If there are no fixities provided, give 'baseFixities.
+-- If there are no fixities, give 'baseFixities'.
 getFixities :: [(String, Fixity)] -> [(String, Fixity)]
 getFixities fixities = if null fixities then baseFixities else fixities
 

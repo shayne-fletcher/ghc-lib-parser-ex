@@ -9,7 +9,8 @@ The `ghc-lib-parser-ex` package contains GHC API parse tree utilities. It works 
 Package `ghc-lib-parser-ex` is on [Hackage](https://hackage.haskell.org/package/ghc-lib-parser-ex) e.g. `cabal install ghc-lib-parser-ex`. There are two release streams within the `ghc-lib-parser-ex` name (tracking `ghc-lib-parser`):
 
 * Version 8.10.1 will be `ghc-lib-parser-ex` for use with `ghc-lib-parser-8.10.1`(or the released GHC 8.10.1);
-* Version 0.20190204 is for use with [`ghc-lib-parser-0.20190204`](http://hackage.haskell.org/package/ghc-lib-0.20190204).
+* Version 0.20190204 is for use with [`ghc-lib-parser-0.20190204`](http://hackage.haskell.org/package/ghc-lib-0.20190204);
+* Version 0.201902042 (note the trailing '2') is for use with [`ghc-lib-parser-0.20190204`](http://hackage.haskell.org/package/ghc-lib-0.20190204) (a second release of `ghc-lib-parser-ex` for that `ghc-lib-parser`).
 
 ## Building `ghc-lib-parser-ex`
 

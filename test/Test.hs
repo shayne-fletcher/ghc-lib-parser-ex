@@ -87,10 +87,7 @@ parseTests = testGroup "Parse tests"
         parseExpression "unfoldr $ listToMaybe . concatMap reads . tails" flags
   , testCase "Declaration" $
       chkParseResult report flags $
-        parseDeclaration (
-        unlines   [
-           "fact n = if n <= 1 then 1 else n * fact (n - 1)"
-           ]) flags
+        parseDeclaration "fact n = if n <= 1 then 1 else n * fact (n - 1)" flags
   , testCase "File" $ do
       foo <- makeFile "Foo.hs" $ unlines
         ["{-# LANGUAGE ScopedTypeVariables #-}"

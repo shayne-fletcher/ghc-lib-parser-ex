@@ -6,14 +6,24 @@
 #include "ghclib_api.h"
 
 module Language.Haskell.GhclibParserEx.Parse(
-    parse
-  , parseExpr
-  , parseImport
-  , parseDeclaration
-  , parseFile
-  , parsePragmasIntoDynFlags
-  , fakeSettings
+    fakeSettings
   , fakeLlvmConfig
+  , parsePragmasIntoDynFlags
+  , parseFile
+  , parseModule
+  , parseSignature
+  , parseImport
+  , parseStatement
+  , parseBackpack
+  , parseDeclaration
+  , parseExpression
+  , parsePattern
+  , parseTypeSignature
+  , parseStmt
+  , parseIdentifier
+  , parseType
+  , parseHeader
+  , parse
   )
   where
 
@@ -34,6 +44,9 @@ import SrcLoc
 import Panic
 import HscTypes
 import HeaderInfo
+import BkpSyn
+import PackageConfig
+import RdrName
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Platform
@@ -102,18 +115,48 @@ parse p str flags =
     buffer = stringToStringBuffer str
     parseState = mkPState flags buffer location
 
-#if defined (GHCLIB_API_811)
-parseExpr :: String -> DynFlags -> ParseResult RdrHsSyn.ECP
-#else
-parseExpr :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
-#endif
-parseExpr = parse Parser.parseExpression
+parseModule :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
+parseModule = parse Parser.parseModule
+
+parseSignature :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
+parseSignature = parse Parser.parseSignature
 
 parseImport :: String -> DynFlags -> ParseResult (LImportDecl GhcPs)
 parseImport = parse Parser.parseImport
 
+parseStatement :: String -> DynFlags -> ParseResult (LStmt GhcPs (LHsExpr GhcPs))
+parseStatement = parse Parser.parseStatement
+
+parseBackpack :: String -> DynFlags -> ParseResult [LHsUnit PackageName]
+parseBackpack = parse Parser.parseBackpack
+
 parseDeclaration :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
 parseDeclaration = parse Parser.parseDeclaration
+
+#if defined (GHCLIB_API_811)
+parseExpression :: String -> DynFlags -> ParseResult RdrHsSyn.ECP
+#else
+parseExpression :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
+#endif
+parseExpression = parse Parser.parseExpression
+
+parsePattern :: String -> DynFlags -> ParseResult (LPat GhcPs)
+parsePattern = parse Parser.parsePattern
+
+parseTypeSignature :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
+parseTypeSignature = parse Parser.parseTypeSignature
+
+parseStmt :: String -> DynFlags -> ParseResult (Maybe (LStmt GhcPs (LHsExpr GhcPs)))
+parseStmt = parse Parser.parseStmt
+
+parseIdentifier :: String -> DynFlags -> ParseResult (Located RdrName)
+parseIdentifier = parse Parser.parseIdentifier
+
+parseType :: String -> DynFlags -> ParseResult (LHsType GhcPs)
+parseType = parse Parser.parseType
+
+parseHeader :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
+parseHeader = parse Parser.parseHeader
 
 #if defined (GHC_API_811)
 parseFile :: String

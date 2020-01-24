@@ -22,7 +22,7 @@ strategy:
       image: "vs2017-win2016"
       stack: "stack.yaml"
     mac-865-head:
-      image: "macOS-10.13"
+      image: "macOS-10.14"
       stack: "stack.yaml"
 
     linux-881-881:
@@ -32,7 +32,7 @@ strategy:
       image: "vs2017-win2016"
       stack: "stack-808-808-ghc-lib.yaml"
     mac-881-881:
-      image: "macOS-10.13"
+      image: "macOS-10.14"
       stack: "stack-808-808-ghc-lib.yaml"
     linux-881-881-da:
       image: "Ubuntu 16.04"
@@ -41,7 +41,7 @@ strategy:
       image: "vs2017-win2016"
       stack: "stack-da-8.8.1.20200122.yaml"
     mac-881-881-da:
-      image: "macOS-10.13"
+      image: "macOS-10.14"
       stack: "stack-da-8.8.1.20200122.yaml"
 
     linux-881-881-no-ghc-lib:
@@ -51,7 +51,7 @@ strategy:
       image: "vs2017-win2016"
       stack: "stack-808-808-no-ghc-lib.yaml"
     mac-881-881-no-ghc-lib:
-      image: "macOS-10.13"
+      image: "macOS-10.14"
       stack: "stack-808-808-no-ghc-lib.yaml"
 
 pool: {vmImage: '$(image)'}

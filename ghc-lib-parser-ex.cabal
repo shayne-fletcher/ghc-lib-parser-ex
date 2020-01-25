@@ -29,6 +29,8 @@ flag ghc-lib
 
 library
   exposed-modules:
+      Language.Haskell.GhclibParserEx.Config
+      Language.Haskell.GhclibParserEx.DynFlags
       Language.Haskell.GhclibParserEx.Parse
       Language.Haskell.GhclibParserEx.Outputable
       Language.Haskell.GhclibParserEx.Dump

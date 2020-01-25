@@ -13,6 +13,8 @@ import qualified System.FilePath as FilePath
 import System.IO.Extra
 import Control.Monad
 
+import Language.Haskell.GhclibParserEx.Config
+import Language.Haskell.GhclibParserEx.DynFlags
 import Language.Haskell.GhclibParserEx.Parse
 import Language.Haskell.GhclibParserEx.Dump
 import Language.Haskell.GhclibParserEx.Fixity
@@ -97,7 +99,7 @@ parseTests = testGroup "Parse tests"
         , "readMany = unfoldr $ listToMaybe . concatMap reads . tails"
         ]
       s <- readFile' foo
-      parsePragmasIntoDynFlags flags foo s >>= \case
+      parsePragmasIntoDynFlags flags ([], []) foo s >>= \case
         Left msg -> assertFailure msg
         Right flags -> chkParseResult report flags $ parseFile foo flags s
   ]

@@ -4,6 +4,7 @@
 -- CI script, compatible with all of Travis, Appveyor and Azure.
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE CPP #-}
 import Control.Monad.Extra
 import System.Directory
 import System.FilePath
@@ -135,9 +136,23 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
       replace "- ." "- ghc-lib-parser-ex"
         =<< readFile' config
 
+    -- Feedback on the compiler.
+    stack "exec -- ghc --version"
+
     -- Build and test the package.
     stack $ "--no-terminal --interleaved-output " ++ "build " ++ ghcOptionsOpt ghcOptions  ++ " ghc-lib-parser-ex"
     stack $ "--no-terminal --interleaved-output " ++ "test " ++ ghcOptionsOpt ghcOptions  ++ " ghc-lib-parser-ex"
+
+#if __GLASGOW_HASKELL__ == 808 && \
+    (__GLASGOW_HASKELL_PATCHLEVEL1__ == 1 || __GLASGOW_HASKELL_PATCHLEVEL1__ == 2) && \
+    defined (mingw32_HOST_OS)
+    -- Skip these tests on ghc-8.8.1 and 8.8.2 (exclusively). See
+    -- https://gitlab.haskell.org/ghc/ghc/issues/17599.
+#else
+    -- Test everything loads in GHCi, see
+    -- https://github.com/digital-asset/ghc-lib/issues/27
+    stack "--no-terminal exec -- ghc -ignore-dot-ghci -package=ghc-lib-parser-ex -e \"print 1\""
+#endif
 
     -- Something like, "0.20200112".
     tag  -- The return value of type 'IO string'.

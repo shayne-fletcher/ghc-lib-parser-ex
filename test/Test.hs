@@ -87,9 +87,12 @@ parseTests = testGroup "Parse tests"
   , testCase "Expression" $
       chkParseResult report flags $
         parseExpression "unfoldr $ listToMaybe . concatMap reads . tails" flags
-  , testCase "Declaration" $
+  , testCase "Declaration (1)" $
       chkParseResult report flags $
         parseDeclaration "fact n = if n <= 1 then 1 else n * fact (n - 1)" flags
+  , testCase "Declaration (2)" $ -- Example from https://github.com/ndmitchell/hlint/issues/842.
+      chkParseResult report flags $
+        parseDeclaration "infixr 4 <%@~" flags
   , testCase "File" $ do
       foo <- makeFile "Foo.hs" $ unlines
         ["{-# LANGUAGE ScopedTypeVariables #-}"

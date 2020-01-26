@@ -29,4 +29,4 @@ To run [`hlint`](https://github.com/ndmitchell/hlint) on this repository, `hlint
 
 ## Releasing `ghc-lib-parser-ex` (notes for maintainers)
 
-Build `ghc-lib-parser-ex` using the [above instructions](#building-ghc-lib-parser-ex)  and upload the resulting `.tar.gz` files to [Hackage](https://hackage.haskell.org/upload).
+Update the [changelog](./ChangeLog.md), `git tag <version> && git push origin <version>` then build via the [above instructions](#building-ghc-lib-parser-ex) and upload the resulting `.tar.gz` files to [Hackage](https://hackage.haskell.org/upload).

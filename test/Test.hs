@@ -15,6 +15,7 @@ import Control.Monad
 
 import Language.Haskell.GhclibParserEx.Config
 import Language.Haskell.GhclibParserEx.DynFlags
+import Language.Haskell.GhclibParserEx.HsExtendInstances
 import Language.Haskell.GhclibParserEx.Parse
 import Language.Haskell.GhclibParserEx.Dump
 import Language.Haskell.GhclibParserEx.Fixity
@@ -38,7 +39,7 @@ main = do
   defaultMain tests
 
 tests :: TestTree
-tests = testGroup " All tests" [parseTests, fixityTests]
+tests = testGroup " All tests" [parseTests, fixityTests, extendInstancesTests]
 
 chkParseResult :: (DynFlags -> WarningMessages -> String) -> DynFlags -> ParseResult a -> IO ()
 chkParseResult report flags = \case
@@ -147,3 +148,34 @@ makeFile relPath contents = do
     Directory.createDirectoryIfMissing True $ FilePath.takeDirectory relPath
     writeFile relPath contents
     return relPath
+
+extendInstancesTests :: TestTree
+extendInstancesTests = testGroup "Extend instances tests"
+  [
+    testCase "Eq, Ord" $ do
+      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+      case parseExpression "1 + 2 * 3" flags of
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+        POk s e ->
+#else
+        POk _ e ->
+#endif
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+          case unP (runECP_P e >>= \e -> return e) s :: ParseResult (LHsExpr GhcPs) of
+            POk _  e ->
+#endif
+              do
+                e' <- return $ applyFixities [] e
+                assertBool "astEq" $ astEq e e
+                assertBool "astEq" $ not (astEq e e')
+                e  <- return $ extendInstances e
+                e' <- return $ extendInstances e'
+                assertBool "==" $ e == e
+                assertBool "/=" $ e /= e'
+                assertBool "< " $ e' < e
+                assertBool ">=" $ e  >= e'
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+            _ -> assertFailure "ecp failure"
+#endif
+        _ -> assertFailure "parse error"
+  ]

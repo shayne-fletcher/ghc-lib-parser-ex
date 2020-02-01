@@ -1,8 +1,10 @@
 # Changelog for ghc-lib-parser-ex
 
 ## Unreleased changes
+
+## 0.20200201 released 2020-02-01
 - New modules:
-  - `Language.Haskell.GhclibparserEx.HsExtendInstances`;
+  - `Language.Haskell.GhclibparserEx.HsExtendInstances`.
 
 ## 8.8.3.0 released 2020-01-25
 - Change in versioning scheme;

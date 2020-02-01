@@ -30,12 +30,13 @@ flag ghc-lib
 library
   exposed-modules:
       Language.Haskell.GhclibParserEx.Config
+      Language.Haskell.GhclibParserEx.Dump
       Language.Haskell.GhclibParserEx.DynFlags
-      Language.Haskell.GhclibParserEx.HsExtendInstances
+      Language.Haskell.GhclibParserEx.Fixity
+      Language.Haskell.GhclibParserEx.GHC.Hs.Expr
+      Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
       Language.Haskell.GhclibParserEx.Parse
       Language.Haskell.GhclibParserEx.Outputable
-      Language.Haskell.GhclibParserEx.Dump
-      Language.Haskell.GhclibParserEx.Fixity
   other-modules:
       Paths_ghc_lib_parser_ex
   hs-source-dirs:

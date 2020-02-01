@@ -15,10 +15,10 @@ import Control.Monad
 
 import Language.Haskell.GhclibParserEx.Config
 import Language.Haskell.GhclibParserEx.DynFlags
-import Language.Haskell.GhclibParserEx.HsExtendInstances
 import Language.Haskell.GhclibParserEx.Parse
 import Language.Haskell.GhclibParserEx.Dump
 import Language.Haskell.GhclibParserEx.Fixity
+import Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs

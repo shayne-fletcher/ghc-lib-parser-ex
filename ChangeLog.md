@@ -2,7 +2,7 @@
 
 ## Unreleased changes
 
-## 0.20200201 released 2020-02-01
+## 0.20200201.1.0 released 2020-02-01
 - New modules:
   - `Language.Haskell.GhclibparserEx.HsExtendInstances`.
 

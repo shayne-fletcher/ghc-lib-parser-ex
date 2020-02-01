@@ -37,7 +37,11 @@ import qualified Parser
 import FastString
 import SrcLoc
 import BkpSyn
+#if defined (GHCLIB_API_811)
+import UnitInfo
+#else
 import PackageConfig
+#endif
 import RdrName
 
 parse :: P a -> String -> DynFlags -> ParseResult a
@@ -48,10 +52,18 @@ parse p str flags =
     buffer = stringToStringBuffer str
     parseState = mkPState flags buffer location
 
+#if defined (GHCLIB_API_811)
+parseModule :: String -> DynFlags -> ParseResult (Located HsModule)
+#else
 parseModule :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
+#endif
 parseModule = parse Parser.parseModule
 
+#if defined (GHCLIB_API_811)
+parseSignature :: String -> DynFlags -> ParseResult (Located HsModule)
+#else
 parseSignature :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
+#endif
 parseSignature = parse Parser.parseSignature
 
 parseImport :: String -> DynFlags -> ParseResult (LImportDecl GhcPs)
@@ -88,10 +100,14 @@ parseIdentifier = parse Parser.parseIdentifier
 parseType :: String -> DynFlags -> ParseResult (LHsType GhcPs)
 parseType = parse Parser.parseType
 
+#if defined(GHCLIB_API_811)
+parseHeader :: String -> DynFlags -> ParseResult (Located HsModule)
+#else
 parseHeader :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
+#endif
 parseHeader = parse Parser.parseHeader
 
-#if defined (GHC_API_811)
+#if defined (GHCLIB_API_811)
 parseFile :: String
           -> DynFlags
           -> String

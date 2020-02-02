@@ -11,12 +11,8 @@
 
 module Language.Haskell.GhclibParserEx.Fixity(applyFixities) where
 
+import Compat.GHC.Hs
 import BasicTypes
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-import GHC.Hs
-#else
-import HsSyn
-#endif
 import RdrName
 import OccName
 import SrcLoc

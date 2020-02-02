@@ -17,11 +17,7 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   fromChar
   ) where
 
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-import GHC.Hs
-#else
-import HsSyn
-#endif
+import Compat.GHC.Hs
 import SrcLoc
 import RdrName
 import OccName

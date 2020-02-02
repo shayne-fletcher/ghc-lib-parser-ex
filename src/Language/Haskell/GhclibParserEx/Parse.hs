@@ -24,11 +24,9 @@ module Language.Haskell.GhclibParserEx.Parse(
   )
   where
 
+import Compat.GHC.Hs
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-import GHC.Hs
 import RdrHsSyn
-#else
-import HsSyn
 #endif
 import DynFlags
 import StringBuffer

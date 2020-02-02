@@ -33,12 +33,12 @@ library
       Language.Haskell.GhclibParserEx.Dump
       Language.Haskell.GhclibParserEx.DynFlags
       Language.Haskell.GhclibParserEx.Fixity
-      Language.Haskell.GhclibParserEx.Compat.GHC.Hs
       Language.Haskell.GhclibParserEx.GHC.Hs.Expr
       Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
       Language.Haskell.GhclibParserEx.Parse
       Language.Haskell.GhclibParserEx.Outputable
   other-modules:
+      Compat.GHC.Hs
       Paths_ghc_lib_parser_ex
   hs-source-dirs:
       src

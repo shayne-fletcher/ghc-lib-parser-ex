@@ -18,11 +18,9 @@ The implementation is reproduced here until that time.
 (c) The GRASP/AQUA Project, Glasgow University, 1992-1998
 -}
 {- HLINT ignore -} -- Not our code.
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-#include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.Dump(
     showAstData
   , BlankSrcSpan(..),
@@ -31,6 +29,8 @@ module Language.Haskell.GhclibParserEx.Dump(
 import Prelude as X hiding ((<>))
 
 import Data.Data hiding (Fixity)
+
+import Compat.GHC.Hs
 import Bag
 import BasicTypes
 import FastString
@@ -38,11 +38,6 @@ import NameSet
 import Name
 import DataCon
 import SrcLoc
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-import GHC.Hs
-#else
-import HsSyn
-#endif
 import OccName hiding (occName)
 import Var
 import Module

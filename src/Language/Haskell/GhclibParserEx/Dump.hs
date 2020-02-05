@@ -1,19 +1,6 @@
 -- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 {-
-Currently 'showAstData' is only available in ghc-lib. I intend to
-move it to ghc-lib-parser. Then, we'll be able to get at it with
-something like,
-
-  #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-    import GHC.Hs.Dump
-  #else
-   import HsDumpAst
-   #endif
-
-The implementation is reproduced here until that time.
--}
-{-
 (c) The University of Glasgow 2006
 (c) The GRASP/AQUA Project, Glasgow University, 1992-1998
 -}
@@ -28,6 +15,21 @@ module Language.Haskell.GhclibParserEx.Dump(
   , BlankSrcSpan(..),
 ) where
 
+#if !defined(MIN_VERSION_ghc_lib_parser)
+-- Using native ghc.
+#  if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+import GHC.Hs.Dump
+#  else
+import HsDumpAst
+#  endif
+#else
+-- Using ghc-lib-parser. Recent versions will include
+-- GHC.Hs.Dump (it got moved in from ghc-lib on 2020-02-05).
+# if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+import GHC.Hs.Dump
+#  else
+-- For simplicity, just assume it's missing from 8.8 ghc-lib-parser
+-- builds and reproduce the implementation.
 import Prelude as X hiding ((<>))
 
 import Data.Data hiding (Fixity)
@@ -233,3 +235,5 @@ ext2 :: (Data a, Typeable t)
      -> (forall d1 d2. (Data d1, Data d2) => c (t d1 d2))
      -> c a
 ext2 def ext = maybe def id (dataCast2 ext)
+#  endif
+#endif

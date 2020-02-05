@@ -7,6 +7,7 @@
       - depends:
         - ghc
         - ghc-boot-th
+        - bytestring
   - section:
     - name: test:ghc-lib-parser-ex-test
     - message:
@@ -14,4 +15,3 @@
       - depends:
         - ghc
         - ghc-boot-th
-

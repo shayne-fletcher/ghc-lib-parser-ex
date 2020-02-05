@@ -1,5 +1,5 @@
 - extensions:
   - default: false
   - name: [CPP, LambdaCase, NamedFieldPuns, ViewPatterns]
-  - {name: GeneralizedNewtypeDeriving, within: [Language.Haskell.GhclibParserEx.HsExtendInstances]}
+  - {name: GeneralizedNewtypeDeriving, within: [Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances]}
   - {name: TupleSections, within: [Language.Haskell.GhclibParserEx.Fixity]}

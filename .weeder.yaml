@@ -7,6 +7,7 @@
       - depends:
         - ghc
         - ghc-boot-th
+        - ghc-boot
         - bytestring
   - section:
     - name: test:ghc-lib-parser-ex-test

@@ -2,6 +2,9 @@
 
 ## Unreleased changes
 
+## 8.8.5.0 released 2020-02-07
+- Expose `impliedGFlags` and friends from `DynFlags` (https://github.com/shayne-fletcher/ghc-lib-parser-ex/issues/19).
+
 ## 8.8.4.0 released 2020-02-01
 - New modules:
   - `Language.Haskell.GhclibparserEx.GHC.Hs.Expr`

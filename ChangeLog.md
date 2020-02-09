@@ -2,6 +2,9 @@
 
 ## Unreleased changes
 
+## 8.8.5.1 released 2020-02-09
+- Expression predicate tests.
+
 ## 8.8.5.0 released 2020-02-07
 - Expose `impliedGFlags` and friends from `DynFlags` (https://github.com/shayne-fletcher/ghc-lib-parser-ex/issues/19).
 

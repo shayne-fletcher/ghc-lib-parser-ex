@@ -127,8 +127,8 @@ parseTests = testGroup "Parse tests"
     flags = unsafeGlobalDynFlags
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 
-parseExpressionTest :: String -> DynFlags -> (LHsExpr GhcPs -> IO ()) -> IO ()
-parseExpressionTest s flags test =
+exprTest :: String -> DynFlags -> (LHsExpr GhcPs -> IO ()) -> IO ()
+exprTest s flags test =
       case parseExpression s flags of
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
         POk s e ->
@@ -147,10 +147,9 @@ parseExpressionTest s flags test =
 
 fixityTests :: TestTree
 fixityTests = testGroup "Fixity tests"
-  [
-    testCase "Expression" $ do
+  [ testCase "Expression" $ do
       let flags = defaultDynFlags fakeSettings fakeLlvmConfig
-      parseExpressionTest "1 + 2 * 3" flags
+      exprTest "1 + 2 * 3" flags
         (\e ->
             assertBool "parse tree not affected" $
               showSDocUnsafe (showAstData BlankSrcSpan e) /=
@@ -168,10 +167,9 @@ fixityTests = testGroup "Fixity tests"
 
 extendInstancesTests :: TestTree
 extendInstancesTests = testGroup "Extend instances tests"
-  [
-    testCase "Eq, Ord" $ do
+  [ testCase "Eq, Ord" $ do
       let flags = defaultDynFlags fakeSettings fakeLlvmConfig
-      parseExpressionTest "1 + 2 * 3" flags
+      exprTest "1 + 2 * 3" flags
         (\e -> do
              e' <- return $ applyFixities [] e
              assertBool "astEq" $ astEq e e
@@ -187,46 +185,44 @@ extendInstancesTests = testGroup "Extend instances tests"
 
 expressionPredicateTests :: TestTree
 expressionPredicateTests = testGroup "Expression predicate tests"
-  [
-    testCase "isTag" $ parseExpressionTest "foo" flags $ assertBool "isTag" . isTag "foo"
-  , testCase "isDol" $ parseExpressionTest "f $ x" flags
-    (\e -> case e of
-        L _ (OpApp _ _ op _) -> assertBool "" $ isDol op
-        _ -> assertFailure "unexpected" )
-  , testCase "isDot" $ parseExpressionTest "f . g" flags
-    (\e -> case e of
-         L _ (OpApp _ _ op _) -> assertBool "" $ isDot op
-         _ -> assertFailure "unexpected" )
-  , testCase "isReturn" $ parseExpressionTest "return x" flags
-    (\e -> case e of
-         L _ (HsApp _ f _) -> assertBool "" $ isReturn f
-         _ -> assertFailure "unexpected" )
-  , testCase "isReturn" $ parseExpressionTest "pure x" flags
-    (\e -> case e of
-         L _ (HsApp _ f _) -> assertBool "" $ isReturn f
-         _ -> assertFailure "unexpected" )
-  , testCase "isSection" $ parseExpressionTest "(1 +)" flags
-    (\e -> case e of
-         L _ (HsPar _ x) -> assertBool "" $ isSection x
-         _ -> assertFailure "unexpected" )
-  , testCase "isSection" $ parseExpressionTest "(+ 1)" flags
-    (\e -> case e of
-         L _ (HsPar _ x) -> assertBool "" $ isSection x
-         _ -> assertFailure "unexpected" )
-  , testCase "isRecConstr" $ parseExpressionTest "Foo {bar=1}" flags $ assertBool "" . isRecConstr
-  , testCase "isRecUpdate" $ parseExpressionTest "foo{bar=1}" flags $ assertBool "" . isRecUpdate
-  , testCase "isVar" $ parseExpressionTest "foo" flags $ assertBool "" . isVar
-  , testCase "isPar" $ parseExpressionTest "(foo)" flags $ assertBool "" . isPar
-  , testCase "isApp" $ parseExpressionTest "f x" flags $ assertBool "" . isApp
-  , testCase "isOpApp" $ parseExpressionTest "l `op` r" flags $ assertBool "" . isOpApp
-  , testCase "isAnyApp" $ parseExpressionTest "l `op` r" flags $ assertBool "" . isAnyApp
-  , testCase "isAnyApp" $ parseExpressionTest "f x" flags $ assertBool "" . isAnyApp
-  , testCase "isLexeme" $ parseExpressionTest "foo" flags $ assertBool "" . isLexeme
-  , testCase "isLexeme" $ parseExpressionTest "3" flags $ assertBool "" . isLexeme
-  , testCase "isLambda" $ parseExpressionTest "\\_ -> 12" flags $ assertBool "" . isLambda
-  , testCase "isDotApp" $ parseExpressionTest "f . g" flags $ assertBool "" . isDotApp
-  , testCase "isTypeApp" $ parseExpressionTest "f @ Int" flags $ assertBool "" . isTypeApp
+  [ testCase "isTag" $ exprTest "foo" flags $ assert' . isTag "foo"
+  , testCase "isTag" $ exprTest "bar" flags $ assert' . not . isTag "foo"
+  , testCase "isDol" $ exprTest "f $ x" flags $ \case L _ (OpApp _ _ op _) -> assert' $ isDol op; _ -> assertFailure "unexpected"
+  , testCase "isDot" $ exprTest "f . g" flags $ \case L _ (OpApp _ _ op _) -> assert' $ isDot op; _ -> assertFailure "unexpected"
+  , testCase "isReturn" $ exprTest "return x" flags $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
+  , testCase "isReturn" $ exprTest "pure x" flags $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
+  , testCase "isSection" $ exprTest "(1 +)" flags $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+  , testCase "isSection" $ exprTest "(+ 1)" flags $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+  , testCase "isRecConstr" $ exprTest "Foo {bar=1}" flags $ assert' . isRecConstr
+  , testCase "isRecUpdate" $ exprTest "foo {bar=1}" flags $ assert' . isRecUpdate
+  , testCase "isVar" $ exprTest "foo" flags $ assert' . isVar
+  , testCase "isVar" $ exprTest "3" flags $ assert' . not. isVar
+  , testCase "isPar" $ exprTest "(foo)" flags $ assert' . isPar
+  , testCase "isPar" $ exprTest "foo" flags $ assert' . not. isPar
+  , testCase "isApp" $ exprTest "f x" flags $ assert' . isApp
+  , testCase "isApp" $ exprTest "x" flags $ assert' . not . isApp
+  , testCase "isOpApp" $ exprTest "l `op` r" flags $ assert' . isOpApp
+  , testCase "isOpApp" $ exprTest "op l r" flags $ assert' . not . isOpApp
+  , testCase "isAnyApp" $ exprTest "l `op` r" flags $ assert' . isAnyApp
+  , testCase "isAnyApp" $ exprTest "f x" flags $ assert' . isAnyApp
+  , testCase "isAnyApp" $ exprTest "f x y" flags $ assert' . isAnyApp
+  , testCase "isAnyApp" $ exprTest "(f x y)" flags $ assert' . not . isAnyApp
+  , testCase "isLexeme" $ exprTest "foo" flags $ assert' . isLexeme
+  , testCase "isLexeme" $ exprTest "3" flags $ assert' . isLexeme
+  , testCase "isLexeme" $ exprTest "f x" flags $ assert' . not . isLexeme
+  , testCase "isLambda" $ exprTest "\\x -> 12" flags $ assert' . isLambda
+  , testCase "isLambda" $ exprTest "foo" flags $ assert' . not . isLambda
+  , testCase "isDotApp" $ exprTest "f . g" flags $ assert' . isDotApp
+  , testCase "isDotApp" $ exprTest "f $ g" flags $ assert' . not . isDotApp
+  , testCase "isTypeApp" $ exprTest "f @Int" flags $ assert' . isTypeApp
+  , testCase "isTypeApp" $ exprTest "f" flags $ assert' . not . isTypeApp
+#if defined (GHCLIB_API_808)
+  , testCase "isTypeApp" $ exprTest "f @ Int" flags $ assert' . isTypeApp
+#else
+  , testCase "isTypeApp" $ exprTest "f @ Int" flags $ assert' . not . isTypeApp
+#endif
   ]
   where
+    assert' = assertBool ""
     flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
       [TypeApplications]

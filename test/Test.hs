@@ -12,6 +12,7 @@ import System.Environment
 import qualified System.FilePath as FilePath
 import System.IO.Extra
 import Control.Monad
+import Data.List
 
 import Language.Haskell.GhclibParserEx.Config
 import Language.Haskell.GhclibParserEx.DynFlags
@@ -33,7 +34,6 @@ import Lexer
 import Outputable
 import ErrUtils
 import GHC.LanguageExtensions.Type
-import Data.List
 #if defined (GHCLIB_API_808)
 import Bag
 #endif
@@ -185,44 +185,71 @@ extendInstancesTests = testGroup "Extend instances tests"
 
 expressionPredicateTests :: TestTree
 expressionPredicateTests = testGroup "Expression predicate tests"
-  [ testCase "isTag" $ exprTest "foo" flags $ assert' . isTag "foo"
-  , testCase "isTag" $ exprTest "bar" flags $ assert' . not . isTag "foo"
-  , testCase "isDol" $ exprTest "f $ x" flags $ \case L _ (OpApp _ _ op _) -> assert' $ isDol op; _ -> assertFailure "unexpected"
-  , testCase "isDot" $ exprTest "f . g" flags $ \case L _ (OpApp _ _ op _) -> assert' $ isDot op; _ -> assertFailure "unexpected"
-  , testCase "isReturn" $ exprTest "return x" flags $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
-  , testCase "isReturn" $ exprTest "pure x" flags $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
-  , testCase "isSection" $ exprTest "(1 +)" flags $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
-  , testCase "isSection" $ exprTest "(+ 1)" flags $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
-  , testCase "isRecConstr" $ exprTest "Foo {bar=1}" flags $ assert' . isRecConstr
-  , testCase "isRecUpdate" $ exprTest "foo {bar=1}" flags $ assert' . isRecUpdate
-  , testCase "isVar" $ exprTest "foo" flags $ assert' . isVar
-  , testCase "isVar" $ exprTest "3" flags $ assert' . not. isVar
-  , testCase "isPar" $ exprTest "(foo)" flags $ assert' . isPar
-  , testCase "isPar" $ exprTest "foo" flags $ assert' . not. isPar
-  , testCase "isApp" $ exprTest "f x" flags $ assert' . isApp
-  , testCase "isApp" $ exprTest "x" flags $ assert' . not . isApp
-  , testCase "isOpApp" $ exprTest "l `op` r" flags $ assert' . isOpApp
-  , testCase "isOpApp" $ exprTest "op l r" flags $ assert' . not . isOpApp
-  , testCase "isAnyApp" $ exprTest "l `op` r" flags $ assert' . isAnyApp
-  , testCase "isAnyApp" $ exprTest "f x" flags $ assert' . isAnyApp
-  , testCase "isAnyApp" $ exprTest "f x y" flags $ assert' . isAnyApp
-  , testCase "isAnyApp" $ exprTest "(f x y)" flags $ assert' . not . isAnyApp
-  , testCase "isLexeme" $ exprTest "foo" flags $ assert' . isLexeme
-  , testCase "isLexeme" $ exprTest "3" flags $ assert' . isLexeme
-  , testCase "isLexeme" $ exprTest "f x" flags $ assert' . not . isLexeme
-  , testCase "isLambda" $ exprTest "\\x -> 12" flags $ assert' . isLambda
-  , testCase "isLambda" $ exprTest "foo" flags $ assert' . not . isLambda
-  , testCase "isDotApp" $ exprTest "f . g" flags $ assert' . isDotApp
-  , testCase "isDotApp" $ exprTest "f $ g" flags $ assert' . not . isDotApp
-  , testCase "isTypeApp" $ exprTest "f @Int" flags $ assert' . isTypeApp
-  , testCase "isTypeApp" $ exprTest "f" flags $ assert' . not . isTypeApp
+  [ testCase "isTag" $ test "foo" $ assert' . isTag "foo"
+  , testCase "isTag" $ test "bar" $ assert' . not . isTag "foo"
+  , testCase "isDol" $ test "f $ x" $ \case L _ (OpApp _ _ op _) -> assert' $ isDol op; _ -> assertFailure "unexpected"
+  , testCase "isDot" $ test "f . g" $ \case L _ (OpApp _ _ op _) -> assert' $ isDot op; _ -> assertFailure "unexpected"
+  , testCase "isReturn" $ test "return x" $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
+  , testCase "isReturn" $ test "pure x" $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
+  , testCase "isSection" $ test "(1 +)" $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+  , testCase "isSection" $ test "(+ 1)" $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+  , testCase "isRecConstr" $ test "Foo {bar=1}" $ assert' . isRecConstr
+  , testCase "isRecUpdate" $ test "foo {bar=1}" $ assert' . isRecUpdate
+  , testCase "isVar" $ test "foo" $ assert' . isVar
+  , testCase "isVar" $ test "3" $ assert' . not. isVar
+  , testCase "isPar" $ test "(foo)" $ assert' . isPar
+  , testCase "isPar" $ test "foo" $ assert' . not. isPar
+  , testCase "isApp" $ test "f x" $ assert' . isApp
+  , testCase "isApp" $ test "x" $ assert' . not . isApp
+  , testCase "isOpApp" $ test "l `op` r" $ assert' . isOpApp
+  , testCase "isOpApp" $ test "op l r" $ assert' . not . isOpApp
+  , testCase "isAnyApp" $ test "l `op` r" $ assert' . isAnyApp
+  , testCase "isAnyApp" $ test "f x" $ assert' . isAnyApp
+  , testCase "isAnyApp" $ test "f x y" $ assert' . isAnyApp
+  , testCase "isAnyApp" $ test "(f x y)" $ assert' . not . isAnyApp
+  , testCase "isLexeme" $ test "foo" $ assert' . isLexeme
+  , testCase "isLexeme" $ test "3" $ assert' . isLexeme
+  , testCase "isLexeme" $ test "f x" $ assert' . not . isLexeme
+  , testCase "isLambda" $ test "\\x -> 12" $ assert' . isLambda
+  , testCase "isLambda" $ test "foo" $ assert' . not . isLambda
+  , testCase "isDotApp" $ test "f . g" $ assert' . isDotApp
+  , testCase "isDotApp" $ test "f $ g" $ assert' . not . isDotApp
+  , testCase "isTypeApp" $ test "f @Int" $ assert' . isTypeApp
 #if defined (GHCLIB_API_808)
-  , testCase "isTypeApp" $ exprTest "f @ Int" flags $ assert' . isTypeApp
+  , testCase "isTypeApp" $ test "f @ Int" $ assert' . isTypeApp
 #else
-  , testCase "isTypeApp" $ exprTest "f @ Int" flags $ assert' . not . isTypeApp
+  , testCase "isTypeApp" $ test "f @ Int" $ assert' . not . isTypeApp
 #endif
+  , testCase "isTypeApp" $ test "f" $ assert' . not . isTypeApp
+  , testCase "isWHNF" $ test "[]" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "[1, 2]" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "'f'" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "foo" $ assert' . not . isWHNF
+  , testCase "isWHNF" $ test "42" $ assert' . not . isWHNF
+  , testCase "isWHNF" $ test "\\foo -> []" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "(\\foo -> [])" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "(\\foo -> []) x" $ assert' . not . isWHNF
+  , testCase "isWHNF" $ test "(42, \"foo\")" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "(42, \"foo\") :: (Int, String)" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "(\\x -> x * x) 3 :: Int" $ assert' . not . isWHNF
+  , testCase "isWHNF" $ test "Just foo" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "Left foo" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "Right foo" $ assert' . isWHNF
+  , testCase "isWHNF" $ test "POk s" $ assert' . not . isWHNF
+  , testCase "isLCase" $ test "\\case _ -> False" $ assert' . isLCase
+  , testCase "isLCase" $ test "case x of _ -> False" $ assert' . not . isLCase
+  , testCase "isSpliceDecl" $ test "$x" $ assert' . isSpliceDecl . unLoc
+  , testCase "isSpliceDecl" $ test "f$x" $ assert' . not . isSpliceDecl . unLoc
+  , testCase "isSpliceDecl" $ test "$(a + b)" $ assert' . isSpliceDecl . unLoc
+  , testCase "isQuasiQuote" $ test "[expr|1 + 2|]" $ assert' . isQuasiQuote
+  , testCase "isQuasiQuote" $ test "[expr(1 + 2)]" $ assert' . not . isQuasiQuote
+  , testCase "strToVar" $ assert' . isVar . strToVar $ "foo"
+  , testCase "varToStr" $ test "[]" $ assert' . (== "[]") . varToStr
+  , testCase "varToStr" $ test "foo" $ assert' . (== "foo") . varToStr
+  , testCase "varToStr" $ test "3" $ assert' . null . varToStr
   ]
   where
     assert' = assertBool ""
+    test s = exprTest s flags
     flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
-      [TypeApplications]
+              [ TemplateHaskell, QuasiQuotes, TypeApplications, LambdaCase ]

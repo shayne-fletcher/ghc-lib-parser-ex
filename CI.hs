@@ -12,6 +12,7 @@ import System.IO.Extra
 import System.Info.Extra
 import System.Process.Extra
 import System.Time.Extra
+import System.Console.ANSI
 import Data.List.Extra
 import Data.Time.Clock
 import Data.Time.Calendar
@@ -110,14 +111,14 @@ buildDist :: StackOptions -> IO String
 buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions, versionTag} =
   do
     -- Clear up any detritus left over from previous runs.
+    cmd "git checkout *.cabal *.yaml"
     toDelete <- (["ghc-lib-parser-ex"] ++) .
       filter (isExtensionOf ".tar.gz") <$> getDirectoryContents "."
     forM_ toDelete removePath
-    cmd "git checkout stack.yaml"
 
     -- Get packages missing on Windows needed by hadrian.
     when isWindows $
-        stack "exec -- pacman -S autoconf automake-wrapper make patch python tar --noconfirm"
+      stack "exec -- pacman -S autoconf automake-wrapper make patch python tar --noconfirm"
 
     -- Calculate verison and package names.
     version <- tag
@@ -128,16 +129,12 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
     -- patchConstraint version "ghc-lib-parser-ex.cabal"
     mkTarball pkg_ghclib_parser_ex
     renameDirectory pkg_ghclib_parser_ex "ghc-lib-parser-ex"
-    -- cmd "git checkout ghc-lib-parser-ex.cabal"
 
     -- Update stack.yaml to reference the newly extracted package.
     let config = fromMaybe "stack.yaml" stackYaml
     writeFile config .
       replace "- ." "- ghc-lib-parser-ex"
         =<< readFile' config
-
-    -- Feedback on the compiler.
-    stack "exec -- ghc --version"
 
     -- Build and test the package.
     stack $ "--no-terminal --interleaved-output " ++ "build " ++ ghcOptionsOpt ghcOptions  ++ " ghc-lib-parser-ex"
@@ -158,6 +155,17 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
     tag  -- The return value of type 'IO string'.
 
     where
+      cmd :: String -> IO ()
+      cmd x = do
+        setSGR [SetColor Foreground Dull Cyan]
+        putStrLn x
+        hFlush stdout
+        (t, _) <- duration $ system_ x
+        setSGR [SetColor Foreground Dull Cyan]
+        putStrLn $ "Completed " ++ showDuration t ++ ": " ++ x ++ "\n"
+        hFlush stdout
+        setSGR [Reset]
+
       stack :: String -> IO ()
       stack action = cmd $ "stack " ++
         concatMap (<> " ")
@@ -167,14 +175,6 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
                  , cabalVerboseOpt cabalVerbose
                  ] ++
         action
-
-      cmd :: String -> IO ()
-      cmd x = do
-        putStrLn $ "\n\n# Running: " ++ x
-        hFlush stdout
-        (t, _) <- duration $ system_ x
-        putStrLn $ "# Completed in " ++ showDuration t ++ ": " ++ x ++ "\n"
-        hFlush stdout
 
       mkTarball :: String -> IO ()
       mkTarball target = do
@@ -206,5 +206,7 @@ buildDist StackOptions {stackYaml, resolver, verbosity, cabalVerbose, ghcOptions
       removePath :: FilePath -> IO ()
       removePath p =
         whenM (doesPathExist p) $ do
-          putStrLn $ "# Removing " ++ p
+          setSGR [SetColor Foreground Dull Cyan]
+          putStrLn $ "Removing " ++ p
           removePathForcibly p
+          setSGR [Reset]

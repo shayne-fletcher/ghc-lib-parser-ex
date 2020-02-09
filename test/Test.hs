@@ -19,15 +19,21 @@ import Language.Haskell.GhclibParserEx.Parse
 import Language.Haskell.GhclibParserEx.Dump
 import Language.Haskell.GhclibParserEx.Fixity
 import Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
+import Language.Haskell.GhclibParserEx.GHC.Hs.Expr
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
 import RdrHsSyn
+#else
+import HsSyn
 #endif
+import SrcLoc
 import DynFlags
 import Lexer
 import Outputable
 import ErrUtils
+import GHC.LanguageExtensions.Type
+import Data.List
 #if defined (GHCLIB_API_808)
 import Bag
 #endif
@@ -39,7 +45,18 @@ main = do
   defaultMain tests
 
 tests :: TestTree
-tests = testGroup " All tests" [parseTests, fixityTests, extendInstancesTests]
+tests = testGroup " All tests"
+  [ parseTests
+  , fixityTests
+  , extendInstancesTests
+  , expressionPredicateTests
+  ]
+
+makeFile :: FilePath -> String -> IO FilePath
+makeFile relPath contents = do
+    Directory.createDirectoryIfMissing True $ FilePath.takeDirectory relPath
+    writeFile relPath contents
+    return relPath
 
 chkParseResult :: (DynFlags -> WarningMessages -> String) -> DynFlags -> ParseResult a -> IO ()
 chkParseResult report flags = \case
@@ -55,8 +72,7 @@ chkParseResult report flags = \case
 
 parseTests :: TestTree
 parseTests = testGroup "Parse tests"
-  [
-    testCase "Module" $
+  [ testCase "Module" $
       chkParseResult report flags $
         parseModule (unlines
           [ "module Foo (readMany) where"
@@ -111,12 +127,9 @@ parseTests = testGroup "Parse tests"
     flags = unsafeGlobalDynFlags
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 
-fixityTests :: TestTree
-fixityTests = testGroup "Fixity tests"
-  [
-    testCase "Expression" $ do
-      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
-      case parseExpression "1 + 2 * 3" flags of
+exprTest :: String -> DynFlags -> (LHsExpr GhcPs -> IO ()) -> IO ()
+exprTest s flags test =
+      case parseExpression s flags of
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
         POk s e ->
 #else
@@ -126,13 +139,22 @@ fixityTests = testGroup "Fixity tests"
           case unP (runECP_P e >>= \e -> return e) s :: ParseResult (LHsExpr GhcPs) of
             POk _  e ->
 #endif
-              assertBool "parse tree not affected" $
-                showSDocUnsafe (showAstData BlankSrcSpan e) /=
-                showSDocUnsafe (showAstData BlankSrcSpan (applyFixities [] e))
+              test e
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-            PFailed{} -> assertFailure "ecp failure"
+            _ -> assertFailure "parse error"
 #endif
-        PFailed{} -> assertFailure "parse error"
+        _ -> assertFailure "parse error"
+
+fixityTests :: TestTree
+fixityTests = testGroup "Fixity tests"
+  [ testCase "Expression" $ do
+      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+      exprTest "1 + 2 * 3" flags
+        (\e ->
+            assertBool "parse tree not affected" $
+              showSDocUnsafe (showAstData BlankSrcSpan e) /=
+              showSDocUnsafe (showAstData BlankSrcSpan (applyFixities [] e))
+        )
   , testCase "Pattern" $ do
       let flags = defaultDynFlags fakeSettings fakeLlvmConfig
       case parseDeclaration "f (1 : 2 :[]) = 1" flags of
@@ -143,39 +165,64 @@ fixityTests = testGroup "Fixity tests"
         PFailed{} -> assertFailure "parse error"
   ]
 
-makeFile :: FilePath -> String -> IO FilePath
-makeFile relPath contents = do
-    Directory.createDirectoryIfMissing True $ FilePath.takeDirectory relPath
-    writeFile relPath contents
-    return relPath
-
 extendInstancesTests :: TestTree
 extendInstancesTests = testGroup "Extend instances tests"
-  [
-    testCase "Eq, Ord" $ do
+  [ testCase "Eq, Ord" $ do
       let flags = defaultDynFlags fakeSettings fakeLlvmConfig
-      case parseExpression "1 + 2 * 3" flags of
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-        POk s e ->
-#else
-        POk _ e ->
-#endif
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-          case unP (runECP_P e >>= \e -> return e) s :: ParseResult (LHsExpr GhcPs) of
-            POk _  e ->
-#endif
-              do
-                e' <- return $ applyFixities [] e
-                assertBool "astEq" $ astEq e e
-                assertBool "astEq" $ not (astEq e e')
-                e  <- return $ extendInstances e
-                e' <- return $ extendInstances e'
-                assertBool "==" $ e == e
-                assertBool "/=" $ e /= e'
-                assertBool "< " $ e' < e
-                assertBool ">=" $ e  >= e'
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-            _ -> assertFailure "ecp failure"
-#endif
-        _ -> assertFailure "parse error"
+      exprTest "1 + 2 * 3" flags
+        (\e -> do
+             e' <- return $ applyFixities [] e
+             assertBool "astEq" $ astEq e e
+             assertBool "astEq" $ not (astEq e e')
+             e  <- return $ extendInstances e
+             e' <- return $ extendInstances e'
+             assertBool "==" $ e == e
+             assertBool "/=" $ e /= e'
+             assertBool "< " $ e' < e
+             assertBool ">=" $ e  >= e'
+          )
   ]
+
+expressionPredicateTests :: TestTree
+expressionPredicateTests = testGroup "Expression predicate tests"
+  [ testCase "isTag" $ exprTest "foo" flags $ assert' . isTag "foo"
+  , testCase "isTag" $ exprTest "bar" flags $ assert' . not . isTag "foo"
+  , testCase "isDol" $ exprTest "f $ x" flags $ \case L _ (OpApp _ _ op _) -> assert' $ isDol op; _ -> assertFailure "unexpected"
+  , testCase "isDot" $ exprTest "f . g" flags $ \case L _ (OpApp _ _ op _) -> assert' $ isDot op; _ -> assertFailure "unexpected"
+  , testCase "isReturn" $ exprTest "return x" flags $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
+  , testCase "isReturn" $ exprTest "pure x" flags $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
+  , testCase "isSection" $ exprTest "(1 +)" flags $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+  , testCase "isSection" $ exprTest "(+ 1)" flags $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+  , testCase "isRecConstr" $ exprTest "Foo {bar=1}" flags $ assert' . isRecConstr
+  , testCase "isRecUpdate" $ exprTest "foo {bar=1}" flags $ assert' . isRecUpdate
+  , testCase "isVar" $ exprTest "foo" flags $ assert' . isVar
+  , testCase "isVar" $ exprTest "3" flags $ assert' . not. isVar
+  , testCase "isPar" $ exprTest "(foo)" flags $ assert' . isPar
+  , testCase "isPar" $ exprTest "foo" flags $ assert' . not. isPar
+  , testCase "isApp" $ exprTest "f x" flags $ assert' . isApp
+  , testCase "isApp" $ exprTest "x" flags $ assert' . not . isApp
+  , testCase "isOpApp" $ exprTest "l `op` r" flags $ assert' . isOpApp
+  , testCase "isOpApp" $ exprTest "op l r" flags $ assert' . not . isOpApp
+  , testCase "isAnyApp" $ exprTest "l `op` r" flags $ assert' . isAnyApp
+  , testCase "isAnyApp" $ exprTest "f x" flags $ assert' . isAnyApp
+  , testCase "isAnyApp" $ exprTest "f x y" flags $ assert' . isAnyApp
+  , testCase "isAnyApp" $ exprTest "(f x y)" flags $ assert' . not . isAnyApp
+  , testCase "isLexeme" $ exprTest "foo" flags $ assert' . isLexeme
+  , testCase "isLexeme" $ exprTest "3" flags $ assert' . isLexeme
+  , testCase "isLexeme" $ exprTest "f x" flags $ assert' . not . isLexeme
+  , testCase "isLambda" $ exprTest "\\x -> 12" flags $ assert' . isLambda
+  , testCase "isLambda" $ exprTest "foo" flags $ assert' . not . isLambda
+  , testCase "isDotApp" $ exprTest "f . g" flags $ assert' . isDotApp
+  , testCase "isDotApp" $ exprTest "f $ g" flags $ assert' . not . isDotApp
+  , testCase "isTypeApp" $ exprTest "f @Int" flags $ assert' . isTypeApp
+  , testCase "isTypeApp" $ exprTest "f" flags $ assert' . not . isTypeApp
+#if defined (GHCLIB_API_808)
+  , testCase "isTypeApp" $ exprTest "f @ Int" flags $ assert' . isTypeApp
+#else
+  , testCase "isTypeApp" $ exprTest "f @ Int" flags $ assert' . not . isTypeApp
+#endif
+  ]
+  where
+    assert' = assertBool ""
+    flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
+      [TypeApplications]

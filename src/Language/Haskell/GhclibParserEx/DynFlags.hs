@@ -5,9 +5,11 @@
 #include "ghclib_api.h"
 
 module Language.Haskell.GhclibParserEx.DynFlags(
+      readExtension
+    , extensionImplications
     -- Copied from DynFlags (see
     -- https://gitlab.haskell.org/ghc/ghc/merge_requests/2654).
-      TurnOnFlag, turnOn, turnOff, impliedGFlags, impliedOffGFlags, impliedXFlags
+    , TurnOnFlag, turnOn, turnOff, impliedGFlags, impliedOffGFlags, impliedXFlags
     --
     , parsePragmasIntoDynFlags
   ) where
@@ -20,6 +22,23 @@ import StringBuffer
 import HscTypes
 import GHC.LanguageExtensions.Type
 import Data.List
+import Data.Maybe
+import qualified Data.Map as Map
+
+-- | Parse a GHC extension.
+readExtension :: String -> Maybe Extension
+readExtension = (`Map.lookup` exts)
+  where exts = Map.fromList [(show x, x) | x <- [minBound .. maxBound]]
+
+-- | Implicitly enabled/disabled extensions.
+extensionImplications :: [(Extension, ([Extension], [Extension]))]
+extensionImplications = map f $ Map.toList implicationsMap
+  where
+    f (e, ps) = (fromJust (readExtension e), ps)
+    implicationsMap :: Map.Map String ([Extension], [Extension])
+    implicationsMap = Map.fromListWith (<>)
+      [(show a, ([c | b], [c | not b]))
+        | (a, flag, c) <- impliedXFlags, let b = flag == turnOn]
 
 -- Copied from 'ghc/compiler/main/DynFlags.hs'.
 

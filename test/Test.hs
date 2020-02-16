@@ -50,6 +50,7 @@ tests = testGroup " All tests"
   , fixityTests
   , extendInstancesTests
   , expressionPredicateTests
+  , dynFlagsTests
   ]
 
 makeFile :: FilePath -> String -> IO FilePath
@@ -253,3 +254,11 @@ expressionPredicateTests = testGroup "Expression predicate tests"
     test s = exprTest s flags
     flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
               [ TemplateHaskell, QuasiQuotes, TypeApplications, LambdaCase ]
+
+dynFlagsTests :: TestTree
+dynFlagsTests = testGroup "DynFlags tests"
+  [ testCase "extensionImplications" $ do
+      Just (_, (es, ds)) <- return $ find (\(e, _) -> e == DeriveTraversable) extensionImplications
+      assertBool "no extensions disabled" (null ds)
+      assertBool "two extensions enabled" $ DeriveFunctor `elem` es && DeriveFoldable `elem` es
+  ]

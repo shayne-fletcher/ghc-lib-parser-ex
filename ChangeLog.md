@@ -1,6 +1,7 @@
 # Changelog for ghc-lib-parser-ex
 
 ## Unreleased changes
+- New `DynFlags` functions `readExtension, `extensionImplications`.
 
 ## 8.8.5.1 released 2020-02-09
 - Expression predicate tests.

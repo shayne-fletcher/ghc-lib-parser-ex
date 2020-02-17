@@ -257,7 +257,9 @@ expressionPredicateTests = testGroup "Expression predicate tests"
 
 dynFlagsTests :: TestTree
 dynFlagsTests = testGroup "DynFlags tests"
-  [ testCase "extensionImplications" $ do
+  [ testCase "readExtension" $ assertBool "parse DeriveTraversable" (readExtension "DeriveTraversable" == Just DeriveTraversable)
+  , testCase "readExtension" $ assertBool "parse DeriveTravresable" (readExtension "DeriveTravresable" == Nothing)
+  , testCase "extensionImplications" $ do
       Just (_, (es, ds)) <- return $ find (\(e, _) -> e == DeriveTraversable) extensionImplications
       assertBool "no extensions disabled" (null ds)
       assertBool "two extensions enabled" $ DeriveFunctor `elem` es && DeriveFoldable `elem` es

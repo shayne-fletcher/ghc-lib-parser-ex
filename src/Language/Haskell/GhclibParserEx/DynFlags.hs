@@ -22,13 +22,14 @@ import StringBuffer
 import HscTypes
 import GHC.LanguageExtensions.Type
 import Data.List
+import Data.List.Extra
 import Data.Maybe
 import qualified Data.Map as Map
 
 -- | Parse a GHC extension.
 readExtension :: String -> Maybe Extension
 readExtension = (`Map.lookup` exts)
-  where exts = Map.fromList [(show x, x) | x <- [minBound .. maxBound]]
+  where exts = Map.fromList [(show x, x) | x <- enumerate]
 
 -- | Implicitly enabled/disabled extensions.
 extensionImplications :: [(Extension, ([Extension], [Extension]))]

@@ -13,6 +13,7 @@ import qualified System.FilePath as FilePath
 import System.IO.Extra
 import Control.Monad
 import Data.List
+import Data.Maybe
 
 import Language.Haskell.GhclibParserEx.Config
 import Language.Haskell.GhclibParserEx.DynFlags
@@ -258,7 +259,7 @@ expressionPredicateTests = testGroup "Expression predicate tests"
 dynFlagsTests :: TestTree
 dynFlagsTests = testGroup "DynFlags tests"
   [ testCase "readExtension" $ assertBool "parse DeriveTraversable" (readExtension "DeriveTraversable" == Just DeriveTraversable)
-  , testCase "readExtension" $ assertBool "parse DeriveTravresable" (readExtension "DeriveTravresable" == Nothing)
+  , testCase "readExtension" $ assertBool "parse DeriveTravresable" (isNothing $ readExtension "DeriveTravresable")
   , testCase "extensionImplications" $ do
       Just (_, (es, ds)) <- return $ find (\(e, _) -> e == DeriveTraversable) extensionImplications
       assertBool "no extensions disabled" (null ds)

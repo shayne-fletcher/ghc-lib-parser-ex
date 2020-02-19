@@ -7,6 +7,7 @@
 
 import Test.Tasty
 import Test.Tasty.HUnit
+import System.FilePath
 import System.Directory as Directory
 import System.Environment
 import qualified System.FilePath as FilePath
@@ -112,8 +113,8 @@ parseTests = testGroup "Parse tests"
   , testCase "Declaration (2)" $ -- Example from https://github.com/ndmitchell/hlint/issues/842.
       chkParseResult report flags $
         parseDeclaration "infixr 4 <%@~" flags
-  , testCase "File" $ do
-      foo <- makeFile "Foo.hs" $ unlines
+  , testCase "File" $ withTempDir $ \tmpDir -> do
+      foo <- makeFile (tmpDir </> "Foo.hs") $ unlines
         ["{-# LANGUAGE ScopedTypeVariables #-}"
         , "module Foo (readMany) where"
         , "import Data.List"

@@ -34,6 +34,7 @@ library
       Language.Haskell.GhclibParserEx.DynFlags
       Language.Haskell.GhclibParserEx.Fixity
       Language.Haskell.GhclibParserEx.GHC.Hs.Expr
+      Language.Haskell.GhclibParserEx.GHC.Hs.Pat
       Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
       Language.Haskell.GhclibParserEx.Parse
       Language.Haskell.GhclibParserEx.Outputable

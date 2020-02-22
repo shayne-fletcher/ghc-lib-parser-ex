@@ -23,6 +23,7 @@ import Language.Haskell.GhclibParserEx.Dump
 import Language.Haskell.GhclibParserEx.Fixity
 import Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
 import Language.Haskell.GhclibParserEx.GHC.Hs.Expr
+import Language.Haskell.GhclibParserEx.GHC.Hs.Pat
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
@@ -52,6 +53,7 @@ tests = testGroup " All tests"
   , fixityTests
   , extendInstancesTests
   , expressionPredicateTests
+  , patternPredicateTests
   , dynFlagsTests
   ]
 
@@ -146,6 +148,17 @@ exprTest s flags test =
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
             _ -> assertFailure "parse error"
 #endif
+        _ -> assertFailure "parse error"
+
+patTest :: String -> DynFlags -> (LPat GhcPs -> IO ()) -> IO ()
+patTest s flags test =
+      case parsePattern s flags of
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+        POk _ e ->
+#else
+        POk _ e ->
+#endif
+              test e
         _ -> assertFailure "parse error"
 
 fixityTests :: TestTree
@@ -254,6 +267,21 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   where
     assert' = assertBool ""
     test s = exprTest s flags
+    flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
+              [ TemplateHaskell, QuasiQuotes, TypeApplications, LambdaCase ]
+
+patternPredicateTests :: TestTree
+patternPredicateTests = testGroup "Pattern predicate tests"
+  [ testCase "patToStr" $ test "True" $ assert' . (== "True") . patToStr
+  , testCase "patToStr" $ test "False" $ assert' . (== "False") . patToStr
+  , testCase "patToStr" $ test "[]" $ assert' . (== "[]") . patToStr
+  , testCase "strToPat" $ assert' . (== "True") . patToStr . noLoc . strToPat $ "True"
+  , testCase "strToPat" $ assert' . (== "False") . patToStr . noLoc . strToPat $ "False"
+  , testCase "strToPat" $ assert' . (== "[]") . patToStr . noLoc . strToPat $ "[]"
+  ]
+  where
+    assert' = assertBool ""
+    test s = patTest s flags
     flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
               [ TemplateHaskell, QuasiQuotes, TypeApplications, LambdaCase ]
 

@@ -29,11 +29,6 @@ import Name
 import BasicTypes
 import TysWiredIn
 
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-noExt :: NoExtField
-noExt = noExtField
-#endif
-
 -- 'True' if the provided expression is a variable with name 'tag'.
 isTag :: String -> LHsExpr GhcPs -> Bool
 isTag tag = \case (L _ (HsVar _ (L _ s))) -> occNameString (rdrNameOcc s) == tag; _ -> False
@@ -133,7 +128,11 @@ varToStr (L _ (HsVar _ (L _ n)))
 varToStr _ = ""
 
 strToVar :: String -> LHsExpr GhcPs
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+strToVar x = noLoc $ HsVar noExtField (noLoc $ mkRdrUnqual (mkVarOcc x))
+#else
 strToVar x = noLoc $ HsVar noExt (noLoc $ mkRdrUnqual (mkVarOcc x))
+#endif
 
 fromChar :: LHsExpr GhcPs -> Maybe Char
 fromChar = \case (L _ (HsLit _ (HsChar _ x))) -> Just x; _ -> Nothing

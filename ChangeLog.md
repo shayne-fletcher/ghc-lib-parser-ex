@@ -2,6 +2,12 @@
 
 ## Unreleased changes
 
+## 8.8.5.3 released 2020-02-25
+- New modules:
+  - `Language.Haskell.GhclibParserEx.Pat`
+  - `Language.Haskell.GhclibParserEx.Types`
+  - `Language.Haskell.GhclibParserEx.Decls`
+
 ## 8.8.5.2 released 2020-02-16
 - New `DynFlags` functions `readExtension`, `extensionImplications`.
 

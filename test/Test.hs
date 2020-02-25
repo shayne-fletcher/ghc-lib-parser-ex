@@ -278,6 +278,8 @@ patternPredicateTests = testGroup "Pattern predicate tests"
   , testCase "strToPat" $ assert' . (== "True") . patToStr . noLoc . strToPat $ "True"
   , testCase "strToPat" $ assert' . (== "False") . patToStr . noLoc . strToPat $ "False"
   , testCase "strToPat" $ assert' . (== "[]") . patToStr . noLoc . strToPat $ "[]"
+  , testCase "fromPChar" $ test "'a'" $ assert' . (== Just 'a') . fromPChar
+  , testCase "fromPChar" $ test "\"a\"" $ assert' . isNothing . fromPChar
   ]
   where
     assert' = assertBool ""

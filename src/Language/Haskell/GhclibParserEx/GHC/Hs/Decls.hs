@@ -2,7 +2,6 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE ViewPatterns #-}
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.Decls(
     isNewType, isForD, isDerivD, isClsDefSig

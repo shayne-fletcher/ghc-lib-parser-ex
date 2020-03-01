@@ -30,13 +30,21 @@ import RdrHsSyn
 #else
 import HsSyn
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Driver.Session
+#else
 import DynFlags
+#endif
 import StringBuffer
 import Lexer
 import qualified Parser
 import FastString
 import SrcLoc
+#if defined (GHCLIB_API_811)
+import GHC.Driver.Backpack.Syntax
+#else
 import BkpSyn
+#endif
 #if defined (GHCLIB_API_811)
 import UnitInfo
 #else

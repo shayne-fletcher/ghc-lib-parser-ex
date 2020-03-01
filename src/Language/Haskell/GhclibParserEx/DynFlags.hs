@@ -14,12 +14,17 @@ module Language.Haskell.GhclibParserEx.DynFlags(
     , parsePragmasIntoDynFlags
   ) where
 
-import DynFlags
 import qualified GHC.LanguageExtensions as LangExt
 import Panic
 import HeaderInfo
 import StringBuffer
+#if defined(GHCLIB_API_811)
+import GHC.Driver.Session
+import GHC.Driver.Types
+#else
+import DynFlags
 import HscTypes
+#endif
 import GHC.LanguageExtensions.Type
 import Data.List
 import Data.List.Extra

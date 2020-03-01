@@ -1,6 +1,6 @@
 resolver: lts-14.20 # ghc-8.6.5
 extra-deps:
-  - ghc-lib-parser-0.20200205
+  - ghc-lib-parser-0.20200301
   - extra-1.6.19
 ghc-options:
     "$locals": -ddump-to-file -ddump-hi -Wall -Wno-name-shadowing

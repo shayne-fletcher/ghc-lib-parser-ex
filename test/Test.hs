@@ -32,7 +32,11 @@ import RdrHsSyn
 import HsSyn
 #endif
 import SrcLoc
+#if defined (GHCLIB_API_811)
+import GHC.Driver.Session
+#else
 import DynFlags
+#endif
 import Lexer
 import Outputable
 import ErrUtils
@@ -268,7 +272,7 @@ expressionPredicateTests = testGroup "Expression predicate tests"
     assert' = assertBool ""
     test s = exprTest s flags
     flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
-              [ TemplateHaskell, QuasiQuotes, TypeApplications, LambdaCase ]
+              [ TemplateHaskell, TemplateHaskellQuotes, QuasiQuotes, TypeApplications, LambdaCase ]
 
 patternPredicateTests :: TestTree
 patternPredicateTests = testGroup "Pattern predicate tests"

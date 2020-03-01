@@ -12,7 +12,11 @@ module Language.Haskell.GhclibParserEx.Config(
   where
 
 import Config
+#if defined (GHCLIB_API_811)
+import GHC.Driver.Session
+#else
 import DynFlags
+#endif
 import Fingerprint
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)

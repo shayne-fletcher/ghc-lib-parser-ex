@@ -9,7 +9,10 @@
 {-# LANGUAGE TupleSections #-}
 #include "ghclib_api.h"
 
-module Language.Haskell.GhclibParserEx.Fixity(applyFixities) where
+module Language.Haskell.GhclibParserEx.Fixity(
+    applyFixities
+  , preludeFixities, baseFixities, lensFixities, otherFixities
+  ) where
 
 import BasicTypes
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
@@ -163,6 +166,48 @@ baseFixities = preludeFixities ++ concat
     , infixl_ 0 ["on"]
     , infixr_ 0 ["par","pseq"]
     ]
+
+lensFixities :: [(String, Fixity)]
+lensFixities = concat
+    -- List as provided at https://github.com/ndmitchell/hlint/issues/416
+    [infixr_ 4 ["%%@~","<%@~","%%~","<+~","<*~","<-~","<//~","<^~","<^^~","<**~"]
+    ,infix_ 4 ["%%@=","<%@=","%%=","<+=","<*=","<-=","<//=","<^=","<^^=","<**="]
+    ,infixr_ 2 ["<<~"]
+    ,infixr_ 9 ["#."]
+    ,infixl_ 8 [".#"]
+    ,infixr_ 8 ["^!","^@!"]
+    ,infixl_ 1 ["&","<&>","??"]
+    ,infixl_ 8 ["^.","^@."]
+    ,infixr_ 9 ["<.>","<.",".>"]
+    ,infixr_ 4 ["%@~",".~","+~","*~","-~","//~","^~","^^~","**~","&&~","<>~","||~","%~"]
+    ,infix_ 4 ["%@=",".=","+=","*=","-=","//=","^=","^^=","**=","&&=","<>=","||=","%="]
+    ,infixr_ 2 ["<~"]
+    ,infixr_ 2 ["`zoom`","`magnify`"]
+    ,infixl_ 8 ["^..","^?","^?!","^@..","^@?","^@?!"]
+    ,infixl_ 8 ["^#"]
+    ,infixr_ 4 ["<#~","#~","#%~","<#%~","#%%~"]
+    ,infix_ 4 ["<#=","#=","#%=","<#%=","#%%="]
+    ,infixl_ 9 [":>"]
+    ,infixr_ 4 ["</>~","<</>~","<.>~","<<.>~"]
+    ,infix_ 4 ["</>=","<</>=","<.>=","<<.>="]
+    ,infixr_ 4 [".|.~",".&.~","<.|.~","<.&.~"]
+    ,infix_ 4 [".|.=",".&.=","<.|.=","<.&.="]
+    ]
+
+otherFixities :: [(String, Fixity)]
+otherFixities = concat
+  -- hspec
+  [ infix_ 1 ["`shouldBe`","`shouldSatisfy`","`shouldStartWith`","`shouldEndWith`","`shouldContain`","`shouldMatchList`"
+             ,"`shouldReturn`","`shouldNotBe`","`shouldNotSatisfy`","`shouldNotContain`","`shouldNotReturn`","`shouldThrow`"]
+  -- quickcheck
+  , infixr_ 0 ["==>"]
+  , infix_ 4 ["==="]
+  -- esqueleto
+  , infix_ 4 ["==."]
+  -- lattices
+  , infixr_ 5 ["\\/"]
+  , infixr_ 6 ["/\\"]
+  ]
 
 infixr_, infixl_, infix_ :: Int -> [String] -> [(String,Fixity)]
 infixr_ = fixity InfixR

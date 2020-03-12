@@ -2,6 +2,11 @@
 
 ## Unreleased changes
 
+## 8.8.5.5 released 2020-03-12
+- Remove from `Language.Haskell.GhclibParserEx.Fixity`:
+   - `preludeFixities`
+   - `baseFixities`
+
 ## 8.8.5.4 released 2020-03-11
 - Expose from `Language.Haskell.GhclibParserEx.Fixity`:
    - `preludeFixities`

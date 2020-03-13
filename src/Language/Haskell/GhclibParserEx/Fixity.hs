@@ -12,6 +12,7 @@
 module Language.Haskell.GhclibParserEx.Fixity(
     applyFixities
   , preludeFixities, baseFixities
+  , infixr_, infixl_, infix_, fixity
   ) where
 
 import BasicTypes

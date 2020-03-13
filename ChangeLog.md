@@ -2,6 +2,10 @@
 
 ## Unreleased changes
 
+## 8.8.5.6 released 2020-03-13
+- From `Language.Haskell.GhclibParserEx.Fixity`:
+  - Expose `infixr_`, `infixl_`, `infix_` and `fixity`
+
 ## 8.8.5.5 released 2020-03-12
 - Remove from `Language.Haskell.GhclibParserEx.Fixity`:
    - `preludeFixities`

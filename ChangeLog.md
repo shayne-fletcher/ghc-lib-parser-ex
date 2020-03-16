@@ -1,6 +1,10 @@
 # Changelog for ghc-lib-parser-ex
 
-## Unreleased changes
+## 8.8.5.7 released 2020-03-16
+- From `Language.Haskell.GhclibParserEx.Fixity`:
+  - Supply missing fixities (https://github.com/ndmitchell/hlint/issues/913)
+- In `Language.Haskell.GhclibParserEx.DynFlags`:
+  - Give `Extension` an `Ord` instance
 
 ## 8.8.5.6 released 2020-03-13
 - From `Language.Haskell.GhclibParserEx.Fixity`:

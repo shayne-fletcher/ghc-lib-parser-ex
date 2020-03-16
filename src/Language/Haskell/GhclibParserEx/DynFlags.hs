@@ -2,6 +2,7 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -Wno-orphans #-} -- Yes, I know.
 #include "ghclib_api.h"
 
 module Language.Haskell.GhclibParserEx.DynFlags(
@@ -29,7 +30,13 @@ import GHC.LanguageExtensions.Type
 import Data.List
 import Data.List.Extra
 import Data.Maybe
+import Data.Function
 import qualified Data.Map as Map
+
+-- Oprhan instance until
+-- https://gitlab.haskell.org/ghc/ghc/merge_requests/2707 lands.
+instance Ord Extension where
+  compare = compare `on` fromEnum
 
 -- | Parse a GHC extension.
 readExtension :: String -> Maybe Extension

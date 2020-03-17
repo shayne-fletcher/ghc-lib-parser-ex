@@ -1,5 +1,10 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.8.5.8 released 2020-03-17
+- New module `Language.Haskell.GhclibParserEx.GHC.Driver.Flags`
+  - Export `Bounded` instance for `Language`
+    (https://github.com/shayne-fletcher/ghc-lib-parser-ex/issues/30)
+
 ## 8.8.5.7 released 2020-03-16
 - From `Language.Haskell.GhclibParserEx.Fixity`:
   - Supply missing fixities (https://github.com/ndmitchell/hlint/issues/913)

@@ -3,6 +3,7 @@
 
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE TypeApplications #-}
 #include "ghclib_api.h"
 
 import Test.Tasty
@@ -13,7 +14,7 @@ import System.Environment
 import qualified System.FilePath as FilePath
 import System.IO.Extra
 import Control.Monad
-import Data.List
+import Data.List.Extra
 import Data.Maybe
 
 import Language.Haskell.GhclibParserEx.Config
@@ -24,6 +25,7 @@ import Language.Haskell.GhclibParserEx.Fixity
 import Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
 import Language.Haskell.GhclibParserEx.GHC.Hs.Expr
 import Language.Haskell.GhclibParserEx.GHC.Hs.Pat
+import Language.Haskell.GhclibParserEx.GHC.Driver.Flags()
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
@@ -299,4 +301,6 @@ dynFlagsTests = testGroup "DynFlags tests"
       Just (_, (es, ds)) <- return $ find (\(e, _) -> e == DeriveTraversable) extensionImplications
       assertBool "no extensions disabled" (null ds)
       assertBool "two extensions enabled" $ DeriveFunctor `elem` es && DeriveFoldable `elem` es
+  , testCase "check instance Bounded Language" $ assertBool "compile time test" (not (null (enumerate @Language)))
+  , testCase "check instace Ord Extension'" $ assertBool "compile time test" (minBound @Extension < maxBound @Extension)
   ]

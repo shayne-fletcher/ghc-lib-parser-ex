@@ -1,6 +1,6 @@
 - extensions:
   - default: false
-  - name: [CPP, LambdaCase, RecordWildCards, NamedFieldPuns, ViewPatterns]
+  - name: [CPP, LambdaCase, RecordWildCards, NamedFieldPuns, ViewPatterns, TypeApplications]
   - {name: GeneralizedNewtypeDeriving, within: [Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances]}
   - {name: TupleSections, within: [CI, Language.Haskell.GhclibParserEx.Fixity]}
 - ignore: {name: Unused LANGUAGE pragma, within: [Language.Haskell.GhclibParserEx.GHC.Hs.Pat]}

@@ -301,6 +301,6 @@ dynFlagsTests = testGroup "DynFlags tests"
       Just (_, (es, ds)) <- return $ find (\(e, _) -> e == DeriveTraversable) extensionImplications
       assertBool "no extensions disabled" (null ds)
       assertBool "two extensions enabled" $ DeriveFunctor `elem` es && DeriveFoldable `elem` es
-  , testCase "check instance Bounded Language" $ assertBool "compile time test" (not (null (enumerate @Language)))
-  , testCase "check instace Ord Extension'" $ assertBool "compile time test" (minBound @Extension < maxBound @Extension)
+  , testCase "check instance Bounded Language" $ assertBool "enumerate is null" (not (null (enumerate @Language)))
+  , testCase "check instace Ord Extension" $ assertBool "minBound >= maxBound" (minBound @Extension < maxBound @Extension)
   ]

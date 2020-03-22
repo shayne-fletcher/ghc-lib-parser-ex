@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## Unreleased changes
+- `Language.Haskell.GhclibParserEx.DynFlags` is now `Language.Haskell.GhclibParserEx.GHC.Driver.Session`
+
 ## 8.8.5.8 released 2020-03-17
 - New module `Language.Haskell.GhclibParserEx.GHC.Driver.Flags`
   - Export `Bounded` instance for `Language`

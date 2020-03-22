@@ -2,7 +2,7 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# LANGUAGE CPP #-}
-{-# OPTIONS_GHC -Wno-orphans #-} -- Yes, I know.
+{-# OPTIONS_GHC -Wno-orphans #-}
 #include "ghclib_api.h"
 
 module Language.Haskell.GhclibParserEx.GHC.Driver.Session(

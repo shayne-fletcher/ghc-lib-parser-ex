@@ -15,13 +15,13 @@ pr:
 
 strategy:
   matrix:
-    linux-865-head:
+    linux-head-88:
       image: "Ubuntu 16.04"
       stack: "stack.yaml"
-    windows-865-head:
+    windows-head-88:
       image: "vs2017-win2016"
       stack: "stack.yaml"
-    mac-865-head:
+    mac-head-88:
       image: "macOS-10.14"
       stack: "stack.yaml"
 
@@ -44,15 +44,15 @@ strategy:
       image: "macOS-10.14"
       stack: "stack-da-8.8.1.20200122.yaml"
 
-    linux-881-88-no-ghc-lib:
+    linux-810-88-no-ghc-lib:
       image: "Ubuntu 16.04"
-      stack: "stack-808-808-no-ghc-lib.yaml"
-    windows-881-88-no-ghc-lib:
+      stack: "stack-810-808-no-ghc-lib.yaml"
+    windows-810-88-no-ghc-lib:
       image: "vs2017-win2016"
-      stack: "stack-808-808-no-ghc-lib.yaml"
-    mac-881-88-no-ghc-lib:
+      stack: "stack-810-808-no-ghc-lib.yaml"
+    mac-810-88-no-ghc-lib:
       image: "macOS-10.14"
-      stack: "stack-808-808-no-ghc-lib.yaml"
+      stack: "stack-810-808-no-ghc-lib.yaml"
 
 pool: {vmImage: '$(image)'}
 

@@ -108,8 +108,10 @@ isSpliceDecl = \case HsSpliceE{} -> True; _ -> False
 -- Field has a '_' as in '{foo=_} or is punned e.g. '{foo}'.
 isFieldWildcard :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 isFieldWildcard = \case
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_811)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
+#elif defined (GHCLIB_API_810)
+  (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ _))}) -> True
 #else
   (L _ HsRecField {hsRecFieldArg=(L _ (EWildPat _))}) -> True
 #endif

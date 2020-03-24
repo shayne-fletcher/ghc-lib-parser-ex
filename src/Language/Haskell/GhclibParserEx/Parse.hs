@@ -86,7 +86,7 @@ parseBackpack = parse Parser.parseBackpack
 parseDeclaration :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
 parseDeclaration = parse Parser.parseDeclaration
 
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 parseExpression :: String -> DynFlags -> ParseResult RdrHsSyn.ECP
 #else
 parseExpression :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)

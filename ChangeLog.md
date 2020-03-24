@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.0 released 2020-03-24
+- First release of the ghc-8.10 series
+
 ## 8.8.6.0 released 2020-03-22
 - `Language.Haskell.GhclibParserEx.DynFlags` is now `Language.Haskell.GhclibParserEx.GHC.Driver.Session`
 

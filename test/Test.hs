@@ -237,7 +237,7 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isDotApp" $ test "f . g" $ assert' . isDotApp
   , testCase "isDotApp" $ test "f $ g" $ assert' . not . isDotApp
   , testCase "isTypeApp" $ test "f @Int" $ assert' . isTypeApp
-#if defined (GHCLIB_API_808)
+#if defined (GHCLIB_API_808) || defined (GHCLIB_API_810)
   , testCase "isTypeApp" $ test "f @ Int" $ assert' . isTypeApp
 #else
   , testCase "isTypeApp" $ test "f @ Int" $ assert' . not . isTypeApp

@@ -56,7 +56,7 @@ fromPChar (dL -> L _ (LitPat _ (HsChar _ x))) = Just x
 fromPChar _ = Nothing
 
 -- Contains a '..' as in 'Foo{..}'
-hasPFieldsDotDot :: HsRecFields GhcPs (Pat GhcPs) -> Bool
+hasPFieldsDotDot :: HsRecFields GhcPs (LPat GhcPs) -> Bool
 hasPFieldsDotDot HsRecFields {rec_dotdot=Just _} = True
 hasPFieldsDotDot _ = False
 

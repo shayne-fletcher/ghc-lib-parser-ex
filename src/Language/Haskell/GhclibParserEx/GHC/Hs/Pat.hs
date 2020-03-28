@@ -61,13 +61,13 @@ hasPFieldsDotDot HsRecFields {rec_dotdot=Just _} = True
 hasPFieldsDotDot _ = False
 
 -- Field has a '_' as in '{foo=_} or is punned e.g. '{foo}'.
-isPFieldWildcard :: LHsRecField GhcPs (Pat GhcPs) -> Bool
+isPFieldWildcard :: LHsRecField GhcPs (LPat GhcPs) -> Bool
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-isPFieldWildcard (L _ HsRecField {hsRecFieldArg=WildPat _}) = True
+isPFieldWildcard (L _ HsRecField {hsRecFieldArg=L _ WildPat {}}) = True
 isPFieldWildcard (L _ HsRecField {hsRecPun=True}) = True
 isPFieldWildcard (L _ HsRecField {}) = False
 #else
-isPFieldWildcard (dL -> L _ HsRecField {hsRecFieldArg=WildPat _}) = True
+isPFieldWildcard (dL -> L _ HsRecField {hsRecFieldArg=LL _ WildPat {}}) = True
 isPFieldWildcard (dL -> L _ HsRecField {hsRecPun=True}) = True
 isPFieldWildcard (dL -> L _ HsRecField {}) = False
 #endif

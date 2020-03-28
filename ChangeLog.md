@@ -4,6 +4,8 @@
 - Unless the Cabal flag `ghc-lib` is `true` link native ghc-libs (without regard for the compiler version)
 - Change the signature of `hasPFieldsDotDot`
   - This has no impact on 8.8 parse trees but matters when it comes to >= 8.10
+- Change the signature of `isPFieldWildcard`
+  - This has no impact on 8.8 parse trees but matters when it comes to >= 8.10
 
 ## 8.10.0.0 released 2020-03-24
 - First release of the ghc-8.10 series

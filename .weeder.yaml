@@ -9,6 +9,7 @@
         - ghc-boot-th
         - ghc-boot
         - bytestring
+        - ghc-lib-parser
   - section:
     - name: test:ghc-lib-parser-ex-test
     - message:
@@ -16,3 +17,4 @@
       - depends:
         - ghc
         - ghc-boot-th
+        - ghc-lib-parser

@@ -22,10 +22,10 @@ source-repository head
   type: git
   location: https://github.com/shayne-fletcher/ghc-lib-parser-ex
 
-flag ghc-lib
+flag no-ghc-lib
   default: False
   manual: True
-  description: Force dependency on ghc-lib-parser even if GHC API in the ghc package is supported
+  description: Force dependency on native ghc-libs
 
 library
   exposed-modules:
@@ -50,15 +50,14 @@ library
       uniplate >= 1.5,
       bytestring >= 0.10.8.2,
       containers >= 0.5.8.1
-  -- Unless explicitly told to link ghc-lib-parser, assume ghc native.
-  if !flag(ghc-lib)
-      build-depends:
-        ghc,
-        ghc-boot-th,
-        ghc-boot
+  if flag(no-ghc-lib)
+    build-depends:
+      ghc,
+      ghc-boot-th,
+      ghc-boot
   else
-      build-depends:
-        ghc-lib-parser
+    build-depends:
+      ghc-lib-parser
   include-dirs:
       cbits
   install-includes:
@@ -84,9 +83,9 @@ test-suite ghc-lib-parser-ex-test
     , filepath >= 1.4.2
     , extra >=1.6
     , ghc-lib-parser-ex
-  if !flag(ghc-lib) && impl(ghc >= 8.10.0) && impl(ghc < 8.11.0)
+  if flag(no-ghc-lib)
       build-depends:
-        ghc == 8.10.*,
+        ghc,
         ghc-boot-th
   else
       build-depends:

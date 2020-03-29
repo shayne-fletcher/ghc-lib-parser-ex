@@ -6,6 +6,7 @@ ghc-options:
     "$locals": -Wall -Wno-name-shadowing
 flags:
   ghc-lib-parser-ex:
+    auto: false
     no-ghc-lib: false
 
 # Packages MUST go at the end, since we append to it during execution

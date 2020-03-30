@@ -1,5 +1,9 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.2 released 2020-03-30
+- Rework cabal flags; allow full configurability with a good default:
+  - Have two flags `auto` and `no-ghc-lib`. Default behavior exactly as `hlint` linking `ghc-lib-parser-8.10.*` if not on `ghc-8.10.*` and `ghc-8.10.*` otherwise.
+
 ## 8.10.0.1 released 2020-03-28
 - Unless the Cabal flag `ghc-lib` is `true` link native ghc-libs (without regard for the compiler version)
 - Change the signature of `hasPFieldsDotDot`

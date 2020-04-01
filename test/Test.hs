@@ -33,7 +33,11 @@ import RdrHsSyn
 #else
 import HsSyn
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.SrcLoc
+#else
 import SrcLoc
+#endif
 #if defined (GHCLIB_API_811)
 import GHC.Driver.Session
 #else

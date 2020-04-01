@@ -22,11 +22,27 @@ import GHC.Hs
 #else
 import HsSyn
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.SrcLoc
+#else
 import SrcLoc
+#endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.Name.Reader
+#else
 import RdrName
+#endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.Name
+#else
 import OccName
 import Name
+#endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.Basic
+#else
 import BasicTypes
+#endif
 import TysWiredIn
 
 -- 'True' if the provided expression is a variable with name 'tag'.

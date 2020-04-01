@@ -12,7 +12,11 @@ import GHC.Hs
 #else
 import HsSyn
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.SrcLoc
+#else
 import SrcLoc
+#endif
 
 isNewType :: NewOrData -> Bool
 isNewType NewType = True

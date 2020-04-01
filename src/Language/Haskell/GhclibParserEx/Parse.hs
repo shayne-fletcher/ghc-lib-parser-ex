@@ -39,7 +39,11 @@ import StringBuffer
 import Lexer
 import qualified Parser
 import FastString
+#if defined (GHCLIB_API_811)
+import GHC.Types.SrcLoc
+#else
 import SrcLoc
+#endif
 #if defined (GHCLIB_API_811)
 import GHC.Driver.Backpack.Syntax
 #else
@@ -50,7 +54,11 @@ import UnitInfo
 #else
 import PackageConfig
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.Name.Reader
+#else
 import RdrName
+#endif
 
 parse :: P a -> String -> DynFlags -> ParseResult a
 parse p str flags =

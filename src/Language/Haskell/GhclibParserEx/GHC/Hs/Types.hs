@@ -13,7 +13,11 @@ import GHC.Hs
 #else
 import HsSyn
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.SrcLoc
+#else
 import SrcLoc
+#endif
 
 fromTyParen :: LHsType GhcPs -> LHsType GhcPs
 fromTyParen (L _ (HsParTy _ x)) = x

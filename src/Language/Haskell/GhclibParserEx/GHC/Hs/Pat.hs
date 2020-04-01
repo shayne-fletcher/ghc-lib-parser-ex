@@ -16,10 +16,19 @@ import GHC.Hs
 #else
 import HsSyn
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.SrcLoc
+#else
 import SrcLoc
+#endif
 import TysWiredIn
+#if defined (GHCLIB_API_811)
+import GHC.Types.Name.Reader
+import GHC.Types.Name
+#else
 import RdrName
 import OccName
+#endif
 import FastString
 
 patToStr :: LPat GhcPs -> String

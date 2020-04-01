@@ -15,15 +15,31 @@ module Language.Haskell.GhclibParserEx.Fixity(
   , infixr_, infixl_, infix_, fixity
   ) where
 
+#if defined (GHCLIB_API_811)
+import GHC.Types.Basic
+#else
 import BasicTypes
+#endif
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.Name.Reader
+#else
 import RdrName
+#endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.Name
+#else
 import OccName
+#endif
+#if defined (GHCLIB_API_811)
+import GHC.Types.SrcLoc
+#else
 import SrcLoc
+#endif
 import Data.Maybe
 import Data.Data hiding (Fixity)
 import Data.Generics.Uniplate.Data

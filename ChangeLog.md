@@ -1,5 +1,9 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.3 released 2020-04-03
+- `strToPat` now returns an `LPat GhcPs`
+- `parseExpression` now returns an `ParseResult (LHsExpr GhcPs)` (>= ghc-8.10)
+
 ## 0.20200401 released 2020-04-01
 
 ## 8.10.0.2 released 2020-03-30

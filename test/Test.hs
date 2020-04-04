@@ -29,7 +29,6 @@ import Language.Haskell.GhclibParserEx.GHC.Driver.Session
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
-import RdrHsSyn
 #else
 import HsSyn
 #endif
@@ -145,30 +144,13 @@ parseTests = testGroup "Parse tests"
 exprTest :: String -> DynFlags -> (LHsExpr GhcPs -> IO ()) -> IO ()
 exprTest s flags test =
       case parseExpression s flags of
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-        POk s e ->
-#else
-        POk _ e ->
-#endif
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-          case unP (runECP_P e >>= \e -> return e) s :: ParseResult (LHsExpr GhcPs) of
-            POk _  e ->
-#endif
-              test e
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-            _ -> assertFailure "parse error"
-#endif
+        POk _ e -> test e
         _ -> assertFailure "parse error"
 
 patTest :: String -> DynFlags -> (LPat GhcPs -> IO ()) -> IO ()
 patTest s flags test =
       case parsePattern s flags of
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-        POk _ e ->
-#else
-        POk _ e ->
-#endif
-              test e
+        POk _ e -> test e
         _ -> assertFailure "parse error"
 
 fixityTests :: TestTree
@@ -285,9 +267,9 @@ patternPredicateTests = testGroup "Pattern predicate tests"
   [ testCase "patToStr" $ test "True" $ assert' . (== "True") . patToStr
   , testCase "patToStr" $ test "False" $ assert' . (== "False") . patToStr
   , testCase "patToStr" $ test "[]" $ assert' . (== "[]") . patToStr
-  , testCase "strToPat" $ assert' . (== "True") . patToStr . noLoc . strToPat $ "True"
-  , testCase "strToPat" $ assert' . (== "False") . patToStr . noLoc . strToPat $ "False"
-  , testCase "strToPat" $ assert' . (== "[]") . patToStr . noLoc . strToPat $ "[]"
+  , testCase "strToPat" $ assert' . (== "True") . patToStr . strToPat $ "True"
+  , testCase "strToPat" $ assert' . (== "False") . patToStr . strToPat $ "False"
+  , testCase "strToPat" $ assert' . (== "[]") . patToStr . strToPat $ "[]"
   , testCase "fromPChar" $ test "'a'" $ assert' . (== Just 'a') . fromPChar
   , testCase "fromPChar" $ test "\"a\"" $ assert' . isNothing . fromPChar
   ]

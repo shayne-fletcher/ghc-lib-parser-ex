@@ -94,12 +94,16 @@ parseBackpack = parse Parser.parseBackpack
 parseDeclaration :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
 parseDeclaration = parse Parser.parseDeclaration
 
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-parseExpression :: String -> DynFlags -> ParseResult RdrHsSyn.ECP
-#else
 parseExpression :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
+parseExpression s flags =
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+  case parse Parser.parseExpression s flags of
+    POk s e ->
+       unP (runECP_P e >>= return) s :: ParseResult (LHsExpr GhcPs)
+    PFailed ps -> PFailed ps
+#else
+  parse Parser.parseExpression s flags
 #endif
-parseExpression = parse Parser.parseExpression
 
 parsePattern :: String -> DynFlags -> ParseResult (LPat GhcPs)
 parsePattern = parse Parser.parsePattern

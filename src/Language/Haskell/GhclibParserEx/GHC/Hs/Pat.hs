@@ -44,14 +44,26 @@ patToStr (dL -> L _ (ConPatIn (L _ x) (PrefixCon []))) | occNameString (rdrNameO
 patToStr _ = ""
 #endif
 
-strToPat :: String -> Pat GhcPs
+strToPat :: String -> LPat GhcPs
 strToPat z
-  | z == "True"  = ConPatIn (noLoc true_RDR) (PrefixCon [])
-  | z == "False" = ConPatIn (noLoc false_RDR) (PrefixCon [])
-  | z == "[]"    = ConPatIn (noLoc $ nameRdrName nilDataConName) (PrefixCon [])
+  | z == "True"  =
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+  noLoc $
+#endif
+    ConPatIn (noLoc true_RDR) (PrefixCon [])
+  | z == "False" =
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+  noLoc $
+#endif
+    ConPatIn (noLoc false_RDR) (PrefixCon [])
+  | z == "[]"    =
+#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+  noLoc $
+#endif
+    ConPatIn (noLoc $ nameRdrName nilDataConName) (PrefixCon [])
   | otherwise =
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-      VarPat noExtField (noLoc $ mkVarUnqual (fsLit z))
+      noLoc $ VarPat noExtField (noLoc $ mkVarUnqual (fsLit z))
 #else
       VarPat noExt (noLoc $ mkVarUnqual (fsLit z))
 #endif

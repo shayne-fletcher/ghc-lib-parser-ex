@@ -251,6 +251,8 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isSpliceDecl" $ test "$(a + b)" $ assert' . isSpliceDecl . unLoc
   , testCase "isQuasiQuote" $ test "[expr|1 + 2|]" $ assert' . isQuasiQuote
   , testCase "isQuasiQuote" $ test "[expr(1 + 2)]" $ assert' . not . isQuasiQuote
+  , testCase "isWholeFrac" $ test "3.2e1" $ assert' . isWholeFrac . unLoc
+  , testCase "isWholeFrac" $ test "3.22e1" $ assert' . not . isWholeFrac . unLoc
   , testCase "strToVar" $ assert' . isVar . strToVar $ "foo"
   , testCase "varToStr" $ test "[]" $ assert' . (== "[]") . varToStr
   , testCase "varToStr" $ test "foo" $ assert' . (== "foo") . varToStr

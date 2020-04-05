@@ -27,32 +27,32 @@ strategy:
 
     linux-881-88:
       image: "Ubuntu 16.04"
-      stack: "stack-808-808-ghc-lib.yaml"
+      stack: "stack-yaml/stack-808-808-ghc-lib.yaml"
     windows-881-88:
       image: "vs2017-win2016"
-      stack: "stack-808-808-ghc-lib.yaml"
+      stack: "stack-yaml/stack-808-808-ghc-lib.yaml"
     mac-881-88:
       image: "macOS-10.14"
-      stack: "stack-808-808-ghc-lib.yaml"
+      stack: "stack-yaml/stack-808-808-ghc-lib.yaml"
     linux-881-88-da:
       image: "Ubuntu 16.04"
-      stack: "stack-da-8.8.1.20200122.yaml"
+      stack: "stack-yaml/stack-da-8.8.1.20200122.yaml"
     windows-881-88-da:
       image: "vs2017-win2016"
-      stack: "stack-da-8.8.1.20200122.yaml"
+      stack: "stack-yaml/stack-da-8.8.1.20200122.yaml"
     mac-881-88-da:
       image: "macOS-10.14"
-      stack: "stack-da-8.8.1.20200122.yaml"
+      stack: "stack-yaml/stack-da-8.8.1.20200122.yaml"
 
     linux-810-88-no-ghc-lib:
       image: "Ubuntu 16.04"
-      stack: "stack-810-808-no-ghc-lib.yaml"
+      stack: "stack-yaml/stack-810-808-no-ghc-lib.yaml"
     windows-810-88-no-ghc-lib:
       image: "vs2017-win2016"
-      stack: "stack-810-808-no-ghc-lib.yaml"
+      stack: "stack-yaml/stack-810-808-no-ghc-lib.yaml"
     mac-810-88-no-ghc-lib:
       image: "macOS-10.14"
-      stack: "stack-810-808-no-ghc-lib.yaml"
+      stack: "stack-yaml/stack-810-808-no-ghc-lib.yaml"
 
 pool: {vmImage: '$(image)'}
 

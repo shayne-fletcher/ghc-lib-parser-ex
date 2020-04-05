@@ -101,7 +101,7 @@ isPWildcard (dL -> L _ (WildPat _)) = True
 #endif
 isPWildcard _ = False
 
-isPFieldPun :: LHsRecField GhcPs (Pat GhcPs) -> Bool
+isPFieldPun :: LHsRecField GhcPs (LPat GhcPs) -> Bool
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 isPFieldPun (L _ HsRecField {hsRecPun=True}) = True
 #else

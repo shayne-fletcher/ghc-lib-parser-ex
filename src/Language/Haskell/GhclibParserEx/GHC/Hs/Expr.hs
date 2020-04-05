@@ -10,8 +10,8 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   isTag, isDol, isDot, isReturn, isSection, isRecConstr, isRecUpdate,
   isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isLambda, isQuasiQuote,
   isDotApp, isTypeApp, isWHNF, isLCase,
-  isFieldPun, isRecStmt, isParComp, isMDo, isTupleSection, isString, isPrimLiteral,
-  isSpliceDecl, isFieldWildcard, isUnboxed,
+  isFieldPun, isFieldPunUpdate, isRecStmt, isParComp, isMDo, isTupleSection, isString, isPrimLiteral,
+  isSpliceDecl, isFieldWildcard, isUnboxed, isWholeFrac, isStrictMatch, isMultiIf, isProc, isTransStmt,
   hasFieldsDotDot,
   varToStr, strToVar,
   fromChar
@@ -44,6 +44,7 @@ import GHC.Types.Basic
 import BasicTypes
 #endif
 import TysWiredIn
+import Data.Ratio
 
 -- 'True' if the provided expression is a variable with name 'tag'.
 isTag :: String -> LHsExpr GhcPs -> Bool
@@ -83,9 +84,18 @@ isWHNF = \case
   _ -> False
 isLCase = \case (L _ HsLamCase{}) -> True; _ -> False
 
+isStrictMatch :: HsMatchContext RdrName -> Bool
+isStrictMatch FunRhs{mc_strictness=SrcStrict} = True
+isStrictMatch _ = False
+
 -- Field is punned e.g. '{foo}'.
 isFieldPun :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 isFieldPun = \case (L _ HsRecField {hsRecPun=True}) -> True; _ -> False
+
+-- Field puns in updates have a different type to field puns in
+-- constructions.
+isFieldPunUpdate :: HsRecField' (AmbiguousFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
+isFieldPunUpdate = \case HsRecField {hsRecPun=True} -> True; _ -> False
 
 -- Contains a '..' as in 'Foo{..}'
 hasFieldsDotDot :: HsRecFields GhcPs (LHsExpr GhcPs) -> Bool
@@ -121,6 +131,15 @@ isPrimLiteral = \case
 isSpliceDecl :: HsExpr GhcPs -> Bool
 isSpliceDecl = \case HsSpliceE{} -> True; _ -> False
 
+isMultiIf :: HsExpr GhcPs -> Bool
+isMultiIf = \case HsMultiIf{} -> True; _ -> False
+
+isProc :: HsExpr GhcPs -> Bool
+isProc = \case HsProc{} -> True; _ -> False
+
+isTransStmt :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
+isTransStmt = \case TransStmt{} -> True; _ -> False
+
 -- Field has a '_' as in '{foo=_} or is punned e.g. '{foo}'.
 isFieldWildcard :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 isFieldWildcard = \case
@@ -136,6 +155,11 @@ isFieldWildcard = \case
 
 isUnboxed :: Boxity -> Bool
 isUnboxed = \case Unboxed -> True; _ -> False
+
+isWholeFrac :: HsExpr GhcPs -> Bool
+isWholeFrac (HsLit _ (HsRat _ (FL _ _ v) _)) = denominator v == 1
+isWholeFrac (HsOverLit _ (OverLit _ (HsFractional (FL _ _ v)) _)) = denominator v == 1
+isWholeFrac _ = False
 
 varToStr :: LHsExpr GhcPs -> String
 varToStr (L _ (HsVar _ (L _ n)))

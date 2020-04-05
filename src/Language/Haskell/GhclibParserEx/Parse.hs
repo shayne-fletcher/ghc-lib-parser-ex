@@ -99,7 +99,7 @@ parseExpression s flags =
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
   case parse Parser.parseExpression s flags of
     POk s e ->
-       unP (runECP_P e >>= return) s :: ParseResult (LHsExpr GhcPs)
+       unP (runECP_P e) s :: ParseResult (LHsExpr GhcPs)
     PFailed ps -> PFailed ps
 #else
   parse Parser.parseExpression s flags

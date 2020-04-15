@@ -10,7 +10,7 @@ extra-deps:
   - syb-0.7.1
   - uniplate-1.6.12
   - unordered-containers-0.2.10.0
-  # Addtional dependencies for the test.
+  # Addtional dependencies for the test:
   - ansi-terminal-0.10.3
   - ansi-wl-pprint-0.6.9
   - async-2.2.2

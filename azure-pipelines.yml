@@ -6,53 +6,106 @@ trigger:
     include:
     - master
 
-# Enable PR triggers that target the master branch
+# Enable PR triggers that target the master branch.
 pr:
-  autoCancel: true # cancel previous builds on push
+  autoCancel: true # Cancel previous builds on push.
   branches:
     include:
     - master
 
 strategy:
   matrix:
-    linux-head-88:
+    # Notes:
+    #  Tags are encoded in the following way:
+    #        <os> '-' <ghc-lib> '-' <compiler>
+    #  Not every combination is tested
+    #  - We do sampling to keep the number of builds reasonable.
+
+    # +---------+-----------------+------------+
+    # | OS      | ghc-lib flavour | GHC        |
+    # +=========+=================+============+
+    # | linux   | ghc-8.10.1      | ghc-8.10.1 |
+    # | windows | ghc-8.10.1      | ghc-8.10.1 |
+    # | macOS   | ghc-8.10.1      | ghc-8.10.1 |
+    # +---------+-----------------+------------+
+    linux-8.10.1-8.10.1:
+      image: "Ubuntu 16.04"
+      stack: "stack-exact.yaml"
+    windows-8.10.1-8.10.1:
+      image: "vs2017-win2016"
+      stack: "stack-exact.yaml"
+    mac-8.10.1-8.10.1:
+      image: "macOS-10.14"
+      stack: "stack-exact.yaml"
+
+    # +---------+-----------------+------------+
+    # | OS      | ghc-lib flavour | GHC        |
+    # +=========+=================+============+
+    # | linux   | ghc-8.10.1      | ghc-8.8.2  |
+    # | windows | ghc-8.10.1      | ghc-8.8.2  |
+    # | macOS   | ghc-8.10.1      | ghc-8.8.2  |
+    # +---------+-----------------+------------+
+    linux-8.10.1-8.8.2:
+      image: "Ubuntu 16.04"
+      stack: "stack-810-808-ghc-lib.yaml"
+    windows-8.10.1-8.8.2:
+      image: "vs2017-win2016"
+      stack: "stack-810-808-ghc-lib.yaml"
+    mac-8.10.1-8.8.2:
+      image: "macOS-10.14"
+      stack: "stack-810-808-ghc-lib.yaml"
+
+    # +---------+-----------------+------------+
+    # | OS      | ghc-lib flavour | GHC        |
+    # +=========+=================+============+
+    # | linux   | ghc-8.8.2       | ghc-8.8.2  |
+    # | windows | ghc-8.8.2       | ghc-8.8.2  |
+    # | macOS   | ghc-8.8.2       | ghc-8.8.2  |
+    # +---------+-----------------+------------+
+    # Note : These builds use native ghc libs, not ghc-lib-parser!
+    linux-8.8.2-8.8.2-no-ghc-lib:
+      image: "Ubuntu 16.04"
+      stack: "stack-808-808-no-ghc-lib.yaml"
+    windows-8.8.2-8.8.2-no-ghc-lib:
+      image: "vs2017-win2016"
+      stack: "stack-808-808-no-ghc-lib.yaml"
+    mac-8.8.2-8.8.2-no-ghc-lib:
+      image: "macOS-10.14"
+      stack: "stack-808-808-no-ghc-lib.yaml"
+
+    # +---------+-----------------+------------+
+    # | OS      | ghc-lib flavour | GHC        |
+    # +=========+=================+============+
+    # | linux   | ghc-master      | ghc-8.8.2  |
+    # | windows | ghc-master      | ghc-8.8.2  |
+    # | macOS   | ghc-master      | ghc-8.8.2  |
+    # +---------+-----------------+------------+
+    linux-master-8.8.2:
       image: "Ubuntu 16.04"
       stack: "stack.yaml"
-    windows-head-88:
+    windows-master-8.8.2:
       image: "vs2017-win2016"
       stack: "stack.yaml"
-    mac-head-88:
+    mac-master--8.8.2:
       image: "macOS-10.14"
       stack: "stack.yaml"
 
-    linux-881-88:
-      image: "Ubuntu 16.04"
-      stack: "stack-808-808-ghc-lib.yaml"
-    windows-881-88:
-      image: "vs2017-win2016"
-      stack: "stack-808-808-ghc-lib.yaml"
-    mac-881-88:
-      image: "macOS-10.14"
-      stack: "stack-808-808-ghc-lib.yaml"
-    linux-881-88-da:
+    # +---------+-----------------+------------+
+    # | OS      | ghc-lib flavour | GHC        |
+    # +=========+=================+============+
+    # | linux   | da-ghc-8.8.1    | ghc-8.8.1  |
+    # | windows | da-ghc-8.8.1    | ghc-8.8.1  |
+    # | macOS   | da-ghc-8.8.1    | ghc-8.8.1  |
+    # +---------+-----------------+------------+
+    linux-da-8.8.1-8.8.1:
       image: "Ubuntu 16.04"
       stack: "stack-da-8.8.1.20200122.yaml"
-    windows-881-88-da:
+    windows-da-8.8.1-8.8.1:
       image: "vs2017-win2016"
       stack: "stack-da-8.8.1.20200122.yaml"
-    mac-881-88-da:
+    mac-da-8.8.1-8.8.1:
       image: "macOS-10.14"
       stack: "stack-da-8.8.1.20200122.yaml"
-
-    linux-810-88-no-ghc-lib:
-      image: "Ubuntu 16.04"
-      stack: "stack-810-808-no-ghc-lib.yaml"
-    windows-810-88-no-ghc-lib:
-      image: "vs2017-win2016"
-      stack: "stack-810-808-no-ghc-lib.yaml"
-    mac-810-88-no-ghc-lib:
-      image: "macOS-10.14"
-      stack: "stack-810-808-no-ghc-lib.yaml"
 
 pool: {vmImage: '$(image)'}
 

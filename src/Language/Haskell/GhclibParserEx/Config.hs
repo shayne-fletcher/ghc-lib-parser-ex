@@ -4,29 +4,26 @@
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# LANGUAGE CPP #-}
 #include "ghclib_api.h"
-
 module Language.Haskell.GhclibParserEx.Config(
     fakeSettings
   , fakeLlvmConfig
   )
-  where
+where
 
 import Config
 #if defined (GHCLIB_API_811)
 import GHC.Driver.Session
 import GHC.Utils.Fingerprint
-#else
-import DynFlags
-import Fingerprint
-#endif
-
-#if defined (GHCLIB_API_811)
 import GHC.Platform
 import GHC.Settings
 #elif defined (GHCLIB_API_810)
+import DynFlags
+import Fingerprint
 import GHC.Platform
 import ToolSettings
 #else
+import DynFlags
+import Fingerprint
 import Platform
 #endif
 

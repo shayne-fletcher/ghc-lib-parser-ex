@@ -18,24 +18,15 @@ import HsSyn
 #endif
 #if defined (GHCLIB_API_811)
 import GHC.Types.SrcLoc
-#else
-import SrcLoc
-#endif
-#if defined (GHCLIB_API_811)
 import GHC.Builtin.Types
-#else
-import TysWiredIn
-#endif
-#if defined (GHCLIB_API_811)
 import GHC.Types.Name.Reader
 import GHC.Types.Name
-#else
-import RdrName
-import OccName
-#endif
-#if defined (GHCLIB_API_811)
 import GHC.Data.FastString
 #else
+import SrcLoc
+import TysWiredIn
+import RdrName
+import OccName
 import FastString
 #endif
 

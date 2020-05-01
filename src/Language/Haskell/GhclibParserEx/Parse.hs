@@ -26,7 +26,11 @@ module Language.Haskell.GhclibParserEx.Parse(
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
+#if defined (GHCLIB_API_811)
+import GHC.Parser.PostProcess
+#else
 import RdrHsSyn
+#endif
 #else
 import HsSyn
 #endif
@@ -35,10 +39,27 @@ import GHC.Driver.Session
 #else
 import DynFlags
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Data.StringBuffer
+#else
 import StringBuffer
+#endif
+#if defined (GHCLIB_API_811)
+import GHC.Parser.Lexer
+import qualified GHC.Parser.Lexer as Lexer
+#else
 import Lexer
+#endif
+#if defined (GHCLIB_API_811)
+import qualified GHC.Parser as Parser
+#else
 import qualified Parser
+#endif
+#if defined (GHCLIB_API_811)
+import GHC.Data.FastString
+#else
 import FastString
+#endif
 #if defined (GHCLIB_API_811)
 import GHC.Types.SrcLoc
 #else
@@ -50,7 +71,7 @@ import GHC.Driver.Backpack.Syntax
 import BkpSyn
 #endif
 #if defined (GHCLIB_API_811)
-import UnitInfo
+import GHC.Unit.Info
 #else
 import PackageConfig
 #endif

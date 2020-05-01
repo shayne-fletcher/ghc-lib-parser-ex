@@ -21,7 +21,11 @@ import GHC.Types.SrcLoc
 #else
 import SrcLoc
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Builtin.Types
+#else
 import TysWiredIn
+#endif
 #if defined (GHCLIB_API_811)
 import GHC.Types.Name.Reader
 import GHC.Types.Name
@@ -29,10 +33,19 @@ import GHC.Types.Name
 import RdrName
 import OccName
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Data.FastString
+#else
 import FastString
+#endif
 
 patToStr :: LPat GhcPs -> String
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_811)
+patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "True" = "True"
+patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "False" = "False"
+patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "[]" = "[]"
+patToStr _ = ""
+#elif defined (GHCLIB_API_810)
 patToStr (L _ (ConPatIn (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "True" = "True"
 patToStr (L _ (ConPatIn (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "False" = "False"
 patToStr (L _ (ConPatIn (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "[]" = "[]"
@@ -50,17 +63,29 @@ strToPat z
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
   noLoc $
 #endif
+#if defined (GHCLIB_API_811)
+    ConPat noExtField (noLoc true_RDR) (PrefixCon [])
+#else
     ConPatIn (noLoc true_RDR) (PrefixCon [])
+#endif
   | z == "False" =
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
   noLoc $
 #endif
+#if defined (GHCLIB_API_811)
+    ConPat noExtField (noLoc false_RDR) (PrefixCon [])
+#else
     ConPatIn (noLoc false_RDR) (PrefixCon [])
+#endif
   | z == "[]"    =
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
   noLoc $
 #endif
+#if defined (GHCLIB_API_811)
+    ConPat noExtField (noLoc $ nameRdrName nilDataConName) (PrefixCon [])
+#else
     ConPatIn (noLoc $ nameRdrName nilDataConName) (PrefixCon [])
+#endif
   | otherwise =
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
       noLoc $ VarPat noExtField (noLoc $ mkVarUnqual (fsLit z))

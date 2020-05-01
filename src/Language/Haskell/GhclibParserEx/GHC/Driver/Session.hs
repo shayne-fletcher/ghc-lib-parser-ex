@@ -16,9 +16,21 @@ module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
   ) where
 
 import qualified GHC.LanguageExtensions as LangExt
+#if defined(GHCLIB_API_811)
+import GHC.Utils.Panic
+#else
 import Panic
+#endif
+#if defined(GHCLIB_API_811)
+import GHC.Parser.Header
+#else
 import HeaderInfo
+#endif
+#if defined(GHCLIB_API_811)
+import GHC.Data.StringBuffer
+#else
 import StringBuffer
+#endif
 #if defined(GHCLIB_API_811)
 import GHC.Driver.Session
 import GHC.Driver.Types
@@ -29,13 +41,19 @@ import HscTypes
 import GHC.LanguageExtensions.Type
 import Data.List
 import Data.Maybe
+#if !defined(GHCLIB_API_811)
 import Data.Function
+#endif
 import qualified Data.Map as Map
 
+#if !defined(GHCLIB_API_811)
 -- Oprhan instance until
 -- https://gitlab.haskell.org/ghc/ghc/merge_requests/2707 lands.
 instance Ord Extension where
   compare = compare `on` fromEnum
+#else
+-- Update : It's landed.
+#endif
 
 -- | Parse a GHC extension.
 readExtension :: String -> Maybe Extension

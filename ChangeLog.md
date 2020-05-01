@@ -1,5 +1,7 @@
 # Changelog for ghc-lib-parser-ex
 
+## 0.20200501 released 2020-05-01
+
 ## 8.10.0.4 released 2020-04-04
 - Add expression predicates `isWholeFrac`, `isFieldPunUpdate`, `isStrictMatch`, `isMultiIf`, `isProc`, `isTransStmt`;
 - Add pattern predicate `isPFieldPun`.

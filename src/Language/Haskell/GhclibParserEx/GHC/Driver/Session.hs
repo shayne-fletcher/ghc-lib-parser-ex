@@ -4,7 +4,6 @@
 {-# LANGUAGE CPP #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 #include "ghclib_api.h"
-
 module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
       readExtension
     , extensionImplications
@@ -16,37 +15,25 @@ module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
   ) where
 
 import qualified GHC.LanguageExtensions as LangExt
-#if defined(GHCLIB_API_811)
+#if defined (GHCLIB_API_811)
 import GHC.Utils.Panic
-#else
-import Panic
-#endif
-#if defined(GHCLIB_API_811)
 import GHC.Parser.Header
-#else
-import HeaderInfo
-#endif
-#if defined(GHCLIB_API_811)
 import GHC.Data.StringBuffer
-#else
-import StringBuffer
-#endif
-#if defined(GHCLIB_API_811)
 import GHC.Driver.Session
 import GHC.Driver.Types
 #else
+import Panic
+import HeaderInfo
+import StringBuffer
 import DynFlags
 import HscTypes
 #endif
 import GHC.LanguageExtensions.Type
 import Data.List
 import Data.Maybe
-#if !defined(GHCLIB_API_811)
-import Data.Function
-#endif
 import qualified Data.Map as Map
-
 #if !defined(GHCLIB_API_811)
+import Data.Function -- For `compareOn`.
 -- Oprhan instance until
 -- https://gitlab.haskell.org/ghc/ghc/merge_requests/2707 lands.
 instance Ord Extension where

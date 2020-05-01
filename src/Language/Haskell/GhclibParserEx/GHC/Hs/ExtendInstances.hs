@@ -23,10 +23,8 @@ import GHC.Utils.Outputable
 #else
 import Outputable
 #endif
-
 import Data.Data
 import Data.Function
-
 import Language.Haskell.GhclibParserEx.Dump
 
 newtype HsExtendInstances a =

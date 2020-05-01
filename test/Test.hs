@@ -34,27 +34,15 @@ import HsSyn
 #endif
 #if defined (GHCLIB_API_811)
 import GHC.Types.SrcLoc
-#else
-import SrcLoc
-#endif
-#if defined (GHCLIB_API_811)
 import GHC.Driver.Session
-#else
-import DynFlags
-#endif
-#if defined (GHCLIB_API_811)
 import GHC.Parser.Lexer
-#else
-import Lexer
-#endif
-#if defined (GHCLIB_API_811)
 import GHC.Utils.Outputable
-#else
-import Outputable
-#endif
-#if defined(GHCLIB_API_811)
 import GHC.Utils.Error
 #else
+import SrcLoc
+import DynFlags
+import Lexer
+import Outputable
 import ErrUtils
 #endif
 import GHC.LanguageExtensions.Type

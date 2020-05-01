@@ -2,6 +2,8 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE CPP #-}
+#include "ghclib_api.h"
 
 module Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances (
     HsExtendInstances(..), extendInstances, astEq, astListEq)
@@ -16,7 +18,12 @@ where
 -- representations rather than the terms themselves, leads to
 -- identical results.
 
+#if defined (GHCLIB_API_811)
+import GHC.Utils.Outputable
+#else
 import Outputable
+#endif
+
 import Data.Data
 import Data.Function
 
@@ -34,7 +41,7 @@ extendInstances = HsExtendInstances
 -- string representations.
 toStr :: Data a => HsExtendInstances a -> String
 toStr (HsExtendInstances e) =
-  Outputable.showSDocUnsafe $ showAstData BlankSrcSpan e
+  showSDocUnsafe $ showAstData BlankSrcSpan e
 
 instance Data a => Eq (HsExtendInstances a) where (==) a b = toStr a == toStr b
 instance Data a => Ord (HsExtendInstances a) where compare = compare `on` toStr
@@ -47,4 +54,4 @@ astListEq as bs = length as == length bs && all (uncurry astEq) (zip as bs)
 
 -- Use 'ppr' for 'Show'.
 instance Outputable a => Show (HsExtendInstances a) where
-  show (HsExtendInstances e) =  Outputable.showSDocUnsafe $ Outputable.ppr e
+  show (HsExtendInstances e) =  showSDocUnsafe $ ppr e

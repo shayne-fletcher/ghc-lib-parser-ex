@@ -64,7 +64,10 @@ expFix _ e = e
 -- LPat and Pat have gone through a lot of churn. See
 -- https://gitlab.haskell.org/ghc/ghc/merge_requests/1925 for details.
 patFix :: [(String, Fixity)] -> LPat GhcPs -> LPat GhcPs
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_811)
+patFix fixities (L loc (ConPat _ op (InfixCon pat1 pat2))) =
+  L loc (mkConOpPat (getFixities fixities) op (findFixity' (getFixities fixities) op) pat1 pat2)
+#elif defined (GHCLIB_API_810)
 patFix fixities (L loc (ConPatIn op (InfixCon pat1 pat2))) =
   L loc (mkConOpPat (getFixities fixities) op (findFixity' (getFixities fixities) op) pat1 pat2)
 #else
@@ -78,22 +81,38 @@ mkConOpPat ::
   -> Located RdrName -> Fixity
   -> LPat GhcPs -> LPat GhcPs
   -> Pat GhcPs
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_811)
+mkConOpPat fs op2 fix2 p1@(L loc (ConPat _ op1 (InfixCon p11 p12))) p2
+#elif defined (GHCLIB_API_810)
 mkConOpPat fs op2 fix2 p1@(L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #else
 mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #endif
+#if defined (GHCLIB_API_811)
+  | nofix_error = ConPat noExtField op2 (InfixCon p1 p2)
+#else
   | nofix_error = ConPatIn op2 (InfixCon p1 p2)
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#endif
+#if defined (GHCLIB_API_811)
+  | associate_right = ConPat noExtField op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
+#elif defined (GHCLIB_API_810)
   | associate_right = ConPatIn op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
 #else
   | associate_right = ConPatIn op1 (InfixCon p11 (cL loc (mkConOpPat fs op2 fix2 p12 p2)))
 #endif
+#if defined (GHCLIB_API_811)
+  | otherwise = ConPat noExtField op2 (InfixCon p1 p2)
+#else
   | otherwise = ConPatIn op2 (InfixCon p1 p2)
+#endif
   where
     fix1 = findFixity' fs op1
     (nofix_error, associate_right) = compareFixity fix1 fix2
+#if defined (GHCLIB_API_811)
+mkConOpPat _ op _ p1 p2 = ConPat noExtField op (InfixCon p1 p2)
+#else
 mkConOpPat _ op _ p1 p2 = ConPatIn op (InfixCon p1 p2)
+#endif
 
 mkOpApp ::
   [(String, Fixity)]

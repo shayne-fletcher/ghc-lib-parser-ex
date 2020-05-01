@@ -43,7 +43,12 @@ import GHC.Types.Basic
 #else
 import BasicTypes
 #endif
+#if defined (GHCLIB_API_811)
+import GHC.Builtin.Types
+#else
 import TysWiredIn
+#endif
+
 import Data.Ratio
 
 -- 'True' if the provided expression is a variable with name 'tag'.

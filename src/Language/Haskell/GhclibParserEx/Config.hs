@@ -14,12 +14,16 @@ module Language.Haskell.GhclibParserEx.Config(
 import Config
 #if defined (GHCLIB_API_811)
 import GHC.Driver.Session
+import GHC.Utils.Fingerprint
 #else
 import DynFlags
-#endif
 import Fingerprint
+#endif
 
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_811)
+import GHC.Platform
+import GHC.Settings
+#elif defined (GHCLIB_API_810)
 import GHC.Platform
 import ToolSettings
 #else

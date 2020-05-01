@@ -1,5 +1,10 @@
 # Changelog for ghc-lib-parser-ex
 
+## Unreleased changes
+
+- New modules
+  - `Language.Haskell.GhclibParserEx.GHC.Parser`, `Language.Haskell.GhcLibParserEx.GHC.Utils.Outputable` to replace `Language.Haskell.GhclibParserEx.Parse` and `Language.Haskell.GhclibParserEx.Outputable` (which remain for now but deprecated and will be removed in a future release)
+
 ## 0.20200501 released 2020-05-01
 
 ## 8.10.0.4 released 2020-04-04

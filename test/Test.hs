@@ -18,9 +18,9 @@ import Data.List.Extra
 import Data.Maybe
 
 import Language.Haskell.GhclibParserEx.Config
-import Language.Haskell.GhclibParserEx.Parse
 import Language.Haskell.GhclibParserEx.Dump
 import Language.Haskell.GhclibParserEx.Fixity
+import Language.Haskell.GhclibParserEx.GHC.Parser
 import Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
 import Language.Haskell.GhclibParserEx.GHC.Hs.Expr
 import Language.Haskell.GhclibParserEx.GHC.Hs.Pat

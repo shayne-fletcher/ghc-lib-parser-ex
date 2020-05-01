@@ -44,6 +44,9 @@ library
       Language.Haskell.GhclibParserEx.GHC.Hs.Types
       Language.Haskell.GhclibParserEx.GHC.Hs.Decls
       Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
+      Language.Haskell.GhclibParserEx.GHC.Parser
+      Language.Haskell.GhclibParserEx.GHC.Utils.Outputable
+      -- Deprecated and will be removed in a future release.
       Language.Haskell.GhclibParserEx.Parse
       Language.Haskell.GhclibParserEx.Outputable
   other-modules:

@@ -44,12 +44,14 @@ import DynFlags
 import StringBuffer
 import Lexer
 import qualified Parser
-import RdrHsSyn
 import FastString
 import SrcLoc
 import BkpSyn
 import PackageConfig
 import RdrName
+#endif
+#if defined (GHCLIB_API_810)
+import RdrHsSyn
 #endif
 
 parse :: P a -> String -> DynFlags -> ParseResult a

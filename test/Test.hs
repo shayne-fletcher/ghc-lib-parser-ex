@@ -291,4 +291,21 @@ dynFlagsTests = testGroup "DynFlags tests"
       assertBool "two extensions enabled" $ DeriveFunctor `elem` es && DeriveFoldable `elem` es
   , testCase "check instance Bounded Language" $ assertBool "enumerate is null" (not (null (enumerate @Language)))
   , testCase "check instace Ord Extension" $ assertBool "minBound >= maxBound" (minBound @Extension < maxBound @Extension)
+  , testCase "disable via pragma" $ withTempDir $ \tmpDir -> do
+      foo <- makeFile (tmpDir </> "Foo.hs") $ unlines
+        [ "{-# LANGUAGE NoStarIsType #-}"
+        , "{-# LANGUAGE ExplicitNamespaces #-}"
+        , "import GHC.TypeLits(KnownNat, type (+), type (*))"
+        ]
+      s <- readFile' foo
+      -- If 'StarIsType' ends up enabled after
+      -- 'parsePragmasIntoDynflags' has done its work, we'll get a
+      -- parse error (see
+      -- https://github.com/ndmitchell/hlint/issues/971).
+      parsePragmasIntoDynFlags flags ([StarIsType], []) foo s >>= \case
+        Left msg -> assertFailure msg
+        Right flags -> chkParseResult report flags $ parseFile foo flags s
   ]
+  where
+    flags = unsafeGlobalDynFlags
+    report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]

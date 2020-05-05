@@ -290,7 +290,7 @@ dynFlagsTests = testGroup "DynFlags tests"
       assertBool "no extensions disabled" (null ds)
       assertBool "two extensions enabled" $ DeriveFunctor `elem` es && DeriveFoldable `elem` es
   , testCase "check instance Bounded Language" $ assertBool "enumerate is null" (not (null (enumerate @Language)))
-  , testCase "check instace Ord Extension" $ assertBool "minBound >= maxBound" (minBound @Extension < maxBound @Extension)
+  , testCase "check instance Ord Extension" $ assertBool "minBound >= maxBound" (minBound @Extension < maxBound @Extension)
   , testCase "disable via pragma" $ withTempDir $ \tmpDir -> do
       foo <- makeFile (tmpDir </> "Foo.hs") $ unlines
         [ "{-# LANGUAGE NoStarIsType #-}"

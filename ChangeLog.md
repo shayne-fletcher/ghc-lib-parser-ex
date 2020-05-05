@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.6 released 2020-05-05
+- Bugfix in `parsePragmasIntoDynFlags` that meant that default enabled/disabled extensions subsequently disabled/enabled via pragma weren't getting disabled/enabled
+
 ## 8.10.0.5 released 2020-05-02
 - New modules
   - `Language.Haskell.GhclibParserEx.GHC.Parser`, `Language.Haskell.GhcLibParserEx.GHC.Utils.Outputable` to replace `Language.Haskell.GhclibParserEx.Parse` and `Language.Haskell.GhclibParserEx.Outputable` (which remain for now but deprecated and will be removed in a future release)

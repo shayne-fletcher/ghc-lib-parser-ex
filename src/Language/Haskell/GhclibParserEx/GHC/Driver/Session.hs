@@ -154,10 +154,12 @@ parsePragmasIntoDynFlags :: DynFlags
 parsePragmasIntoDynFlags flags (enable, disable) file str =
   catchErrors $ do
     let opts = getOptions flags (stringToStringBuffer str) file
-    (flags, _, _) <- parseDynamicFilePragma flags opts
+    -- Important : apply enables, disables *before* parsing dynamic
+    -- file pragmas.
     let flags' =  foldl' xopt_set flags enable
     let flags'' = foldl' xopt_unset flags' disable
-    return $ Right (flags'' `gopt_set` Opt_KeepRawTokenStream)
+    (flags, _, _) <- parseDynamicFilePragma flags'' opts
+    return $ Right (flags `gopt_set` Opt_KeepRawTokenStream)
   where
     catchErrors :: IO (Either String DynFlags) -> IO (Either String DynFlags)
     catchErrors act = handleGhcException reportErr

@@ -171,6 +171,12 @@ fixityTests = testGroup "Fixity tests"
           showSDocUnsafe (showAstData BlankSrcSpan d) /=
           showSDocUnsafe (showAstData BlankSrcSpan (applyFixities [] d))
         PFailed{} -> assertFailure "parse error"
+  , testCase "fixitiesFromModule" $ do
+      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+      case parseModule "infixl 4 <*!" flags of
+        POk _ m ->
+          assertBool "one fixity expected" $ not (null (fixitiesFromModule m))
+        PFailed{} -> assertFailure "parse error"
   ]
 
 extendInstancesTests :: TestTree

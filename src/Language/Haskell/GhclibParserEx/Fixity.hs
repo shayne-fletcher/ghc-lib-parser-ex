@@ -11,6 +11,7 @@
 
 module Language.Haskell.GhclibParserEx.Fixity(
     applyFixities
+  , fixitiesFromModule
   , preludeFixities, baseFixities
   , infixr_, infixl_, infix_, fixity
   ) where
@@ -206,3 +207,15 @@ infix_  = fixity InfixN
 
 fixity :: FixityDirection -> Int -> [String] -> [(String, Fixity)]
 fixity a p = map (,Fixity (SourceText "") p a)
+
+#if defined (GHCLIB_API_811)
+fixitiesFromModule :: Located HsModule -> [(String, Fixity)]
+#else
+fixitiesFromModule :: Located (HsModule GhcPs) -> [(String, Fixity)]
+#endif
+fixitiesFromModule (L _ (HsModule _ _ _ decls _ _)) = concatMap f decls
+  where
+    f :: LHsDecl GhcPs -> [(String, Fixity)]
+    f (L _ (SigD _ (FixSig _ (FixitySig _ ops (Fixity _ p dir))))) =
+          fixity dir p (map (occNameString. rdrNameOcc . unLoc) ops)
+    f _ = []

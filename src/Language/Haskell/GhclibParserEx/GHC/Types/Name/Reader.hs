@@ -36,6 +36,7 @@ unqual :: Located RdrName -> Located RdrName
 unqual (L loc (Qual _ n)) = L loc $ mkRdrUnqual n
 unqual x = x
 
+-- Extract the occ name from a qualified/unqualified reader name.
 fromQual :: Located RdrName -> Maybe OccName
 fromQual (L _ (Qual _ x)) = Just x
 fromQual (L _ (Unqual x)) = Just x

@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.8 released 2020-05-14
+- New module `Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader`
+
 ## 8.10.0.7 released 2020-05-13
 - New function `fixitiesFromModule`
 

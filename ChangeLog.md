@@ -1,5 +1,10 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.9 released 2020-05-16
+- New modules
+  - `Language.Haskell.GhclibParserEx.GHC.Hs.Binds`
+  - `Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp`
+
 ## 8.10.0.8 released 2020-05-14
 - New module `Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader`
 

@@ -1,6 +1,6 @@
 # Changelog for ghc-lib-parser-ex
 
-## 8.10.0.1- released 2020-05-18
+## 8.10.0.10 released 2020-05-18
 - New modules
   - Upgrade to `ghc-lib-parser-8.10.1.20200518`
 

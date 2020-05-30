@@ -25,7 +25,7 @@ source-repository head
 flag auto
   default: True
   manual: True
-  description: Used default configuration
+  description: Use default configuration
 
 flag no-ghc-lib
   default: False

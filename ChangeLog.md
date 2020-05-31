@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.13 released 2020-05-31
+- Sync `extra` with HLint
+
 ## 8.10.0.12 released 2020-05-31
 - New module `GHC.Hs`
 

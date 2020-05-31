@@ -39,6 +39,7 @@ library
       Language.Haskell.GhclibParserEx.Fixity
       Language.Haskell.GhclibParserEx.GHC.Driver.Flags
       Language.Haskell.GhclibParserEx.GHC.Driver.Session
+      Language.Haskell.GhclibParserEx.GHC.Hs
       Language.Haskell.GhclibParserEx.GHC.Hs.Expr
       Language.Haskell.GhclibParserEx.GHC.Hs.Pat
       Language.Haskell.GhclibParserEx.GHC.Hs.Types

@@ -21,6 +21,7 @@ import Language.Haskell.GhclibParserEx.Config
 import Language.Haskell.GhclibParserEx.Dump
 import Language.Haskell.GhclibParserEx.Fixity
 import Language.Haskell.GhclibParserEx.GHC.Parser
+import Language.Haskell.GhclibParserEx.GHC.Hs
 import Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
 import Language.Haskell.GhclibParserEx.GHC.Hs.Expr
 import Language.Haskell.GhclibParserEx.GHC.Hs.Pat
@@ -64,6 +65,7 @@ tests = testGroup " All tests"
   , expressionPredicateTests
   , patternPredicateTests
   , dynFlagsTests
+  , nameTests
   ]
 
 makeFile :: FilePath -> String -> IO FilePath
@@ -141,6 +143,16 @@ parseTests = testGroup "Parse tests"
     flags = unsafeGlobalDynFlags
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 
+#if defined(GHCLIB_API_811)
+moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
+#else
+moduleTest :: String -> DynFlags -> (Located (HsModule GhcPs) -> IO ()) -> IO ()
+#endif
+moduleTest s flags test =
+      case parseModule s flags of
+        POk _ e -> test e
+        _ -> assertFailure "parse error"
+
 exprTest :: String -> DynFlags -> (LHsExpr GhcPs -> IO ()) -> IO ()
 exprTest s flags test =
       case parseExpression s flags of
@@ -155,34 +167,32 @@ patTest s flags test =
 
 fixityTests :: TestTree
 fixityTests = testGroup "Fixity tests"
-  [ testCase "Expression" $ do
-      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+  [ testCase "Expression" $
       exprTest "1 + 2 * 3" flags
         (\e ->
             assertBool "parse tree not affected" $
               showSDocUnsafe (showAstData BlankSrcSpan e) /=
               showSDocUnsafe (showAstData BlankSrcSpan (applyFixities [] e))
         )
-  , testCase "Pattern" $ do
-      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+  , testCase "Pattern" $
       case parseDeclaration "f (1 : 2 :[]) = 1" flags of
         POk _ d ->
           assertBool "parse tree not affected" $
           showSDocUnsafe (showAstData BlankSrcSpan d) /=
           showSDocUnsafe (showAstData BlankSrcSpan (applyFixities [] d))
         PFailed{} -> assertFailure "parse error"
-  , testCase "fixitiesFromModule" $ do
-      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+  , testCase "fixitiesFromModule" $
       case parseModule "infixl 4 <*!" flags of
         POk _ m ->
           assertBool "one fixity expected" $ not (null (fixitiesFromModule m))
         PFailed{} -> assertFailure "parse error"
   ]
+  where
+    flags = defaultDynFlags fakeSettings fakeLlvmConfig
 
 extendInstancesTests :: TestTree
 extendInstancesTests = testGroup "Extend instances tests"
-  [ testCase "Eq, Ord" $ do
-      let flags = defaultDynFlags fakeSettings fakeLlvmConfig
+  [ testCase "Eq, Ord" $
       exprTest "1 + 2 * 3" flags
         (\e -> do
              e' <- return $ applyFixities [] e
@@ -196,6 +206,8 @@ extendInstancesTests = testGroup "Extend instances tests"
              assertBool ">=" $ e  >= e'
           )
   ]
+  where
+    flags = defaultDynFlags fakeSettings fakeLlvmConfig
 
 expressionPredicateTests :: TestTree
 expressionPredicateTests = testGroup "Expression predicate tests"
@@ -315,3 +327,15 @@ dynFlagsTests = testGroup "DynFlags tests"
   where
     flags = unsafeGlobalDynFlags
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
+
+nameTests :: TestTree
+nameTests = testGroup "Name tests"
+  [ testCase "Module (1)" $
+      moduleTest "module Foo.Bar.Baz where" flags
+        (\n -> assertBool "Unexpected name string" $ modName n == "Foo.Bar.Baz")
+  , testCase "Module (2)" $
+      moduleTest "f x = x * 2" flags
+        (\n -> assertBool "Unexpected name string" $ modName n == "Main")
+  ]
+  where
+    flags = defaultDynFlags fakeSettings fakeLlvmConfig

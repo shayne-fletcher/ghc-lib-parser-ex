@@ -17,7 +17,7 @@ extra-deps:
   - call-stack-0.2.0
   - clock-0.8
   - colour-2.3.5
-  - extra-1.7.1
+  - extra-1.7.3
   - mintty-0.1.2 # Windows specific (but it does no harm).
   - optparse-applicative-0.15.1.0
   - semigroups-0.19.1

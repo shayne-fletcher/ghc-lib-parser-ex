@@ -86,7 +86,7 @@ strategy:
     windows-master-8.8.2:
       image: "vs2017-win2016"
       stack: "stack.yaml"
-    mac-master--8.8.2:
+    mac-master-8.8.2:
       image: "macOS-10.14"
       stack: "stack.yaml"
 

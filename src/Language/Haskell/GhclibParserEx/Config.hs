@@ -10,18 +10,20 @@ module Language.Haskell.GhclibParserEx.Config(
   )
 where
 
-import Config
 #if defined (GHCLIB_API_811)
+import GHC.Settings.Config
 import GHC.Driver.Session
 import GHC.Utils.Fingerprint
 import GHC.Platform
 import GHC.Settings
 #elif defined (GHCLIB_API_810)
+import Config
 import DynFlags
 import Fingerprint
 import GHC.Platform
 import ToolSettings
 #else
+import Config
 import DynFlags
 import Fingerprint
 import Platform
@@ -59,6 +61,18 @@ fakeSettings = Settings
 #endif
     platform =
       Platform{
+#if defined(GHCLIB_API_811)
+    -- It doesn't matter what values we write here as these fields are
+    -- not referenced for our purposes. However the fields are strict
+    -- so we must say something.
+        platformByteOrder=LittleEndian
+      , platformHasGnuNonexecStack=True
+      , platformHasIdentDirective=False
+      , platformHasSubsectionsViaSymbols=False
+      , platformIsCrossCompiling=False
+      , platformLeadingUnderscore=False
+      ,
+#endif
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
         platformWordSize = PW8
       , platformMini = PlatformMini {platformMini_arch=ArchUnknown, platformMini_os=OSUnknown}

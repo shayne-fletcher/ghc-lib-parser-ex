@@ -1,5 +1,7 @@
 # Changelog for ghc-lib-parser-ex
 
+## 0.20200601 released 2020-06-01
+
 ## 8.10.0.13 released 2020-05-31
 - Sync `extra` with HLint
 

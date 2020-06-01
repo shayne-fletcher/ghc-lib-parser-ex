@@ -1,6 +1,6 @@
 resolver: nightly-2020-01-25 # ghc-8.8.2
 extra-deps:
-  - ghc-lib-parser-0.20200501
+  - ghc-lib-parser-0.20200601
   - extra-1.7.3
 ghc-options:
     "$locals": -ddump-to-file -ddump-hi -Wall -Wno-name-shadowing

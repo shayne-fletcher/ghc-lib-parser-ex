@@ -34,9 +34,9 @@ flag no-ghc-lib
 
 library
   exposed-modules:
-      Language.Haskell.GhclibParserEx.Config
       Language.Haskell.GhclibParserEx.Dump
       Language.Haskell.GhclibParserEx.Fixity
+      Language.Haskell.GhclibParserEx.GHC.Settings.Config
       Language.Haskell.GhclibParserEx.GHC.Driver.Flags
       Language.Haskell.GhclibParserEx.GHC.Driver.Session
       Language.Haskell.GhclibParserEx.GHC.Hs
@@ -51,6 +51,7 @@ library
       Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
       Language.Haskell.GhclibParserEx.GHC.Utils.Outputable
       -- Deprecated and will be removed in a future release.
+      Language.Haskell.GhclibParserEx.Config
       Language.Haskell.GhclibParserEx.Parse
       Language.Haskell.GhclibParserEx.Outputable
   other-modules:

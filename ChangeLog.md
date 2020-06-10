@@ -2,6 +2,8 @@
 
 ## 8.10.0.14 released 2020-06-10
 - New function `isSymbolRdrName`
+- New module
+  - `Language.Haskell.GhclibParserEx.GHC.Settings.Config` to replace `Language.Haskell.GhclibParserEx.Config` (which remains for now but deprecated and will be removed in a future release)
 
 ## 0.20200601 released 2020-06-01
 
@@ -16,10 +18,6 @@
 
 ## 8.10.0.10 released 2020-05-18
 - Upgrade to `ghc-lib-parser-8.10.1.20200518`
-
-## Unreleased
-- New module
-  - `Language.Haskell.GhclibParserEx.GHC.Settings.Config` to replace `Language.Haskell.GhclibParserEx.Config` (which remains for now but deprecated and will be removed in a future release)
 
 ## 8.10.0.9 released 2020-05-16
 - New modules

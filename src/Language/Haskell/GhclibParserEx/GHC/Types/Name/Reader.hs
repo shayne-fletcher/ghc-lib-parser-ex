@@ -5,7 +5,7 @@
 #include "ghclib_api.h"
 
 module Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader(
-   occNameStr, rdrNameStr, isSpecial, unqual, fromQual
+   occNameStr, rdrNameStr, isSpecial, unqual, fromQual, isSymbolRdrName
  )
 where
 
@@ -41,3 +41,8 @@ fromQual :: Located RdrName -> Maybe OccName
 fromQual (L _ (Qual _ x)) = Just x
 fromQual (L _ (Unqual x)) = Just x
 fromQual _ = Nothing
+
+-- Test if the reader name is that of an operator (be it a data
+-- constructor, variable or whatever).
+isSymbolRdrName :: RdrName -> Bool
+isSymbolRdrName = isSymOcc . rdrNameOcc

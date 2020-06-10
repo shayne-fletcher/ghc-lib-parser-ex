@@ -27,6 +27,7 @@ import Language.Haskell.GhclibParserEx.GHC.Hs.Expr
 import Language.Haskell.GhclibParserEx.GHC.Hs.Pat
 import Language.Haskell.GhclibParserEx.GHC.Driver.Flags()
 import Language.Haskell.GhclibParserEx.GHC.Driver.Session
+import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
 
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
 import GHC.Hs
@@ -39,12 +40,16 @@ import GHC.Driver.Session
 import GHC.Parser.Lexer
 import GHC.Utils.Outputable
 import GHC.Utils.Error
+import GHC.Types.Name.Reader
+import GHC.Types.Name.Occurrence
 #else
 import SrcLoc
 import DynFlags
 import Lexer
 import Outputable
 import ErrUtils
+import RdrName
+import OccName
 #endif
 import GHC.LanguageExtensions.Type
 #if defined (GHCLIB_API_808)
@@ -330,12 +335,16 @@ dynFlagsTests = testGroup "DynFlags tests"
 
 nameTests :: TestTree
 nameTests = testGroup "Name tests"
-  [ testCase "Module (1)" $
+  [ testCase "modName (1)" $
       moduleTest "module Foo.Bar.Baz where" flags
         (\n -> assertBool "Unexpected name string" $ modName n == "Foo.Bar.Baz")
-  , testCase "Module (2)" $
+  , testCase "modName (2)" $
       moduleTest "f x = x * 2" flags
         (\n -> assertBool "Unexpected name string" $ modName n == "Main")
+  , testCase "isSymbolRdrName (1)" $ assertBool "Expected 'True'" $ isSymbolRdrName (mkRdrUnqual (mkVarOcc "+"))
+  , testCase "isSymbolRdrName (2)" $ assertBool "Expected 'False'" $ not (isSymbolRdrName (mkRdrUnqual (mkVarOcc "_foo")))
+  , testCase "isSymbolRdrName (3)" $ assertBool "Expected 'False'" $ not (isSymbolRdrName (mkRdrUnqual (mkVarOcc "foo'")))
+  , testCase "isSymbolRdrName (4)" $ assertBool "Expected 'True'" $ isSymbolRdrName (mkRdrUnqual (mkVarOcc ":+:"))
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig

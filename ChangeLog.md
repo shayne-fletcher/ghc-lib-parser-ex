@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.14 released 2020-06-10
+- New function `isSymbolRdrName`
+
 ## 0.20200601 released 2020-06-01
 
 ## 8.10.0.13 released 2020-05-31

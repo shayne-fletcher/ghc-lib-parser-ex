@@ -3,7 +3,14 @@
 {-# LANGUAGE CPP #-}
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp(
-  isPatSynIE
+    isPatSynIE
+#if defined (MIN_VERSION_ghc_lib_parser)
+#  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
+ , isImportQualifiedPost
+#  endif
+#elif  __GLASGOW_HASKELL__ >= 810
+ , isImportQualifiedPost
+#endif
   )
 where
 
@@ -21,3 +28,15 @@ import RdrName
 isPatSynIE :: IEWrappedName RdrName -> Bool
 isPatSynIE IEPattern{} = True
 isPatSynIE _ = False
+
+#if defined(MIN_VERSION_ghc_lib_parser)
+#  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
+isImportQualifiedPost :: ImportDeclQualifiedStyle -> Bool
+isImportQualifiedPost QualifiedPost = True
+isImportQualifiedPost _  = False
+#  endif
+#elif __GLASGOW_HASKELL__ >= 810
+isImportQualifiedPost :: ImportDeclQualifiedStyle -> Bool
+isImportQualifiedPost QualifiedPost = True
+isImportQualifiedPost _  = False
+#endif

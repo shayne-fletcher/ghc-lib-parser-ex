@@ -7,7 +7,7 @@ ghc-options:
 flags:
   ghc-lib-parser-ex:
     auto: false
-    no-ghc-lib: true
+    no-ghc-lib: false
 
 # Packages MUST go at the end, since we append to it during execution
 # of CI.hs.

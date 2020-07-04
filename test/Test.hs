@@ -25,6 +25,15 @@ import Language.Haskell.GhclibParserEx.GHC.Hs
 import Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
 import Language.Haskell.GhclibParserEx.GHC.Hs.Expr
 import Language.Haskell.GhclibParserEx.GHC.Hs.Pat
+-- We only test 'isImportQualifiedPost' at this time which requires >=
+-- 8.10; avoid unused import warning.
+#if defined (MIN_VERSION_ghc_lib_parser)
+#  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
+import Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp
+#  endif
+#elif __GLASGOW_HASKELL__ >= 810
+import Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp
+#endif
 import Language.Haskell.GhclibParserEx.GHC.Driver.Flags()
 import Language.Haskell.GhclibParserEx.GHC.Driver.Session
 import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
@@ -328,6 +337,19 @@ dynFlagsTests = testGroup "DynFlags tests"
       parsePragmasIntoDynFlags flags ([StarIsType], []) foo s >>= \case
         Left msg -> assertFailure msg
         Right flags -> chkParseResult report flags $ parseFile foo flags s
+#if defined (MIN_VERSION_ghc_lib_parser)
+#  if  !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
+  , testCase "ImportQualifiedPost" $ do
+      case parseImport "import Foo qualified" (flags `xopt_set` ImportQualifiedPost) of
+        POk _ (L _ decl) -> assertBool "expected postpositive" (isImportQualifiedPost . ideclQualified $ decl)
+        PFailed _ -> assertFailure "parse error"
+#  endif
+#elif __GLASGOW_HASKELL__ >= 810
+  , testCase "ImportQualifiedPost" $ do
+      case parseImport "import Foo qualified" (flags `xopt_set` ImportQualifiedPost) of
+        POk _ (L _ decl) -> assertBool "expected postpositive" (isImportQualifiedPost . ideclQualified $ decl)
+        PFailed _ -> assertFailure "parse error"
+#endif
   ]
   where
     flags = unsafeGlobalDynFlags

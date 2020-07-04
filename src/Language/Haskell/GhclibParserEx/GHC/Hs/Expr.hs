@@ -99,7 +99,11 @@ isParComp :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isParComp = \case ParStmt{} -> True; _ -> False
 
 isMDo :: HsStmtContext Name -> Bool
+#if defined(GHCLIB_API_811)
+isMDo = \case MDoExpr _ -> True; _ -> False
+#else
 isMDo = \case MDoExpr -> True; _ -> False
+#endif
 
 isTupleSection :: HsTupArg GhcPs -> Bool
 isTupleSection = \case Missing{} -> True; _ -> False

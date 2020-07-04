@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## Unreleased changes
+- New function `isImportQualifiedPost`
+
 ## 8.10.0.14 released 2020-06-10
 - New function `isSymbolRdrName`
 - New module

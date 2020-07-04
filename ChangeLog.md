@@ -1,6 +1,6 @@
 # Changelog for ghc-lib-parser-ex
 
-## Unreleased changes
+## 8.10.0.15 released 2020-07-04
 - New function `isImportQualifiedPost`
 
 ## 8.10.0.14 released 2020-06-10

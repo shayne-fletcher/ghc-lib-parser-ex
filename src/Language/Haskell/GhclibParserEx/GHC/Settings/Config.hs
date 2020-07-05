@@ -72,6 +72,7 @@ fakeSettings = Settings
       , platformHasSubsectionsViaSymbols=False
       , platformIsCrossCompiling=False
       , platformLeadingUnderscore=False
+      , platformTablesNextToCode=False
       ,
 #endif
 #if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)

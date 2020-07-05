@@ -7,10 +7,10 @@
 module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
       readExtension
     , extensionImplications
-    -- Copied from DynFlags (see
-    -- https://gitlab.haskell.org/ghc/ghc/merge_requests/2654).
+-- Landed in https://gitlab.haskell.org/ghc/ghc/merge_requests/2654.
+#if defined (GHCLIB_API_808) || defined (GHCLIB_API_810)
     , TurnOnFlag, turnOn, turnOff, impliedGFlags, impliedOffGFlags, impliedXFlags
-    --
+#endif
     , parsePragmasIntoDynFlags
   ) where
 
@@ -32,14 +32,11 @@ import GHC.LanguageExtensions.Type
 import Data.List
 import Data.Maybe
 import qualified Data.Map as Map
-#if !defined(GHCLIB_API_811)
+-- Landed in https://gitlab.haskell.org/ghc/ghc/merge_requests/2707.
+#if defined (GHCLIB_API_808) || defined (GHCLIB_API_810)
 import Data.Function -- For `compareOn`.
--- Oprhan instance until
--- https://gitlab.haskell.org/ghc/ghc/merge_requests/2707 lands.
 instance Ord Extension where
   compare = compare `on` fromEnum
-#else
--- Update : It's landed.
 #endif
 
 -- | Parse a GHC extension.
@@ -56,7 +53,10 @@ extensionImplications = map f $ Map.toList implicationsMap
       [(show a, ([c | b], [c | not b]))
         | (a, flag, c) <- impliedXFlags, let b = flag == turnOn]
 
--- Copied from 'ghc/compiler/main/DynFlags.hs'.
+-- Landed in
+-- https://gitlab.haskell.org/ghc/ghc/merge_requests/2654. Copied from
+-- 'ghc/compiler/main/DynFlags.hs'.
+#if defined(GHCLIB_API_808) || defined(GHCLIB_API_810)
 
 type TurnOnFlag = Bool   -- True  <=> we are turning the flag on
                          -- False <=> we are turning the flag off
@@ -109,7 +109,7 @@ impliedXFlags
     , (LangExt.TypeInType,       turnOn, LangExt.PolyKinds)
     , (LangExt.TypeInType,       turnOn, LangExt.KindSignatures)
 
-#if defined(GHCLIB_API_811) || defined(GHCLIB_API_810)
+#if defined(GHCLIB_API_810)
     -- Standalone kind signatures are a replacement for CUSKs.
     , (LangExt.StandaloneKindSignatures, turnOff, LangExt.CUSKs)
 #endif
@@ -143,8 +143,7 @@ impliedXFlags
     , (LangExt.TemplateHaskell, turnOn, LangExt.TemplateHaskellQuotes)
     , (LangExt.Strict, turnOn, LangExt.StrictData)
   ]
-
---
+#endif
 
 parsePragmasIntoDynFlags :: DynFlags
                          -> ([Extension], [Extension])

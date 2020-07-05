@@ -14,7 +14,9 @@ module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
     , parsePragmasIntoDynFlags
   ) where
 
+#if defined(GHCLIB_API_808) || defined(GHCLIB_API_810)
 import qualified GHC.LanguageExtensions as LangExt
+#endif
 #if defined (GHCLIB_API_811)
 import GHC.Utils.Panic
 import GHC.Parser.Header

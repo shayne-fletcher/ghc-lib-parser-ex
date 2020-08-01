@@ -73,11 +73,15 @@ fakeSettings = Settings
       , platformIsCrossCompiling=False
       , platformLeadingUnderscore=False
       , platformTablesNextToCode=False
+      , platformConstants=platformConstants
       ,
 #endif
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
-        platformWordSize = PW8
-      , platformMini = PlatformMini {platformMini_arch=ArchUnknown, platformMini_os=OSUnknown}
+#if defined (GHCLIB_API_811)
+        platformWordSize=PW8
+      , platformArchOS=ArchOS {archOS_arch=ArchUnknown, archOS_OS=OSUnknown}
+#elif defined (GHCLIB_API_810)
+        platformWordSize=PW8
+      , platformMini=PlatformMini {platformMini_arch=ArchUnknown, platformMini_os=OSUnknown}
 #else
         platformWordSize=8
       , platformOS=OSUnknown

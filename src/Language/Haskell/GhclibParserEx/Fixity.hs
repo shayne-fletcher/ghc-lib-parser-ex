@@ -213,7 +213,11 @@ fixitiesFromModule :: Located HsModule -> [(String, Fixity)]
 #else
 fixitiesFromModule :: Located (HsModule GhcPs) -> [(String, Fixity)]
 #endif
+#if defined(GHCLIB_API_811)
+fixitiesFromModule (L _ (HsModule _ _ _ _ decls _ _)) = concatMap f decls
+#else
 fixitiesFromModule (L _ (HsModule _ _ _ decls _ _)) = concatMap f decls
+#endif
   where
     f :: LHsDecl GhcPs -> [(String, Fixity)]
     f (L _ (SigD _ (FixSig _ (FixitySig _ ops (Fixity _ p dir))))) =

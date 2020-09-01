@@ -89,7 +89,12 @@ parseDeclaration :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
 parseDeclaration = parse Parser.parseDeclaration
 
 parseExpression :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_811)
+parseExpression s flags =
+  case parse Parser.parseExpression s flags of
+    POk s e -> unP (runPV . unECP $ e) s
+    PFailed ps -> PFailed ps
+#elif defined (GHCLIB_API_810)
 parseExpression s flags =
   case parse Parser.parseExpression s flags of
     POk s e -> unP (runECP_P e) s

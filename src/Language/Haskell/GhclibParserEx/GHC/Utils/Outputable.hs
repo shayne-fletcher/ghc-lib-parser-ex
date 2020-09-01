@@ -10,9 +10,15 @@ where
 
 #if defined (GHCLIB_API_811)
 import GHC.Utils.Outputable
+import GHC.Driver.Ppr
 #else
 import Outputable
 #endif
 
 unsafePrettyPrint :: Outputable a => a -> String
-unsafePrettyPrint = showSDocUnsafe . ppr
+unsafePrettyPrint =
+#if defined(GHCLIB_API_811)
+  showPprUnsafe . ppr
+#else
+  showSDocUnsafe . ppr
+#endif

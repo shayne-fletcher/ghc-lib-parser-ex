@@ -48,6 +48,7 @@ import GHC.Types.SrcLoc
 import GHC.Driver.Session
 import GHC.Parser.Lexer
 import GHC.Utils.Outputable
+import GHC.Driver.Ppr
 import GHC.Utils.Error
 import GHC.Types.Name.Reader
 import GHC.Types.Name.Occurrence
@@ -63,6 +64,11 @@ import OccName
 import GHC.LanguageExtensions.Type
 #if defined (GHCLIB_API_808)
 import Bag
+#endif
+
+#if defined(GHCLIB_API_811)
+showSDocUnsafe :: SDoc -> String
+showSDocUnsafe = showPprUnsafe
 #endif
 
 main :: IO ()

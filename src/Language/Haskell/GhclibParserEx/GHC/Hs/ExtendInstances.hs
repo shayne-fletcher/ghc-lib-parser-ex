@@ -20,6 +20,7 @@ where
 
 #if defined (GHCLIB_API_811)
 import GHC.Utils.Outputable
+import GHC.Driver.Ppr
 #else
 import Outputable
 #endif
@@ -39,7 +40,11 @@ extendInstances = HsExtendInstances
 -- string representations.
 toStr :: Data a => HsExtendInstances a -> String
 toStr (HsExtendInstances e) =
+#if defined(GHCLIB_API_811)
+  showPprUnsafe $ showAstData BlankSrcSpan e
+#else
   showSDocUnsafe $ showAstData BlankSrcSpan e
+#endif
 
 instance Data a => Eq (HsExtendInstances a) where (==) a b = toStr a == toStr b
 instance Data a => Ord (HsExtendInstances a) where compare = compare `on` toStr
@@ -52,4 +57,9 @@ astListEq as bs = length as == length bs && all (uncurry astEq) (zip as bs)
 
 -- Use 'ppr' for 'Show'.
 instance Outputable a => Show (HsExtendInstances a) where
-  show (HsExtendInstances e) =  showSDocUnsafe $ ppr e
+  show (HsExtendInstances e) =
+#if defined(GHCLIB_API_811)
+    showPprUnsafe $ ppr e
+#else
+    showSDocUnsafe $ ppr e
+#endif

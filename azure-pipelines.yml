@@ -120,8 +120,10 @@ steps:
 
   - script: |
       curl -sSL https://get.haskellstack.org/ | sh
-      stack --stack-yaml=$(stack) setup > /dev/null
+      set -e
+      stack setup --stack-yaml=$(stack) > /dev/null
       curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s . '--cpp-include cbits' '--cpp-define GHCLIB_API_808'
       curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s . '--cpp-include cbits' '--cpp-define GHCLIB_API_810'
       curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s . '--cpp-include cbits' '--cpp-define GHCLIB_API_811'
+      stack exec --stack-yaml=$(stack) --package extra --package optparse-applicative ghc -- -package extra -package optparse-applicative -Wall -Wno-name-shadowing -Werror -c CI.hs
       stack runhaskell --stack-yaml=$(stack) --package extra --package optparse-applicative CI.hs -- --stack-yaml=$(stack)

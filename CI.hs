@@ -21,12 +21,9 @@ import System.Console.ANSI
 import Data.List.Extra
 import Data.Time.Clock
 import Data.Time.Calendar
-import Data.Semigroup ((<>))
 import Data.Foldable
 import Data.Maybe
 import qualified Options.Applicative as Opts
-import qualified System.Environment as Env
-import qualified System.Exit as Exit
 import GHC.Stack
 import System.IO.Unsafe
 
@@ -91,6 +88,7 @@ buildDist opts = do
       stack' opts "exec -- pacman -S autoconf automake-wrapper make patch python tar --noconfirm"
     isolatedBuild opts
 
+isolatedBuild :: StackOptions -> IO ()
 isolatedBuild opts@StackOptions {..} = do
   version <- tag
   stackYaml <- pure $ fromMaybe "stack.yaml" stackYaml

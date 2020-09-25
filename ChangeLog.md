@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## Unreleased
+- Replace `GHCLIB_API_811` with `GHCLIB_API_901`
+
 ## 0.20200901 released 2020-09-01
 - Update to `ghc-lib-0.20200901`
 

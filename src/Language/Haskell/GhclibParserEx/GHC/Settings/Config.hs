@@ -11,7 +11,7 @@ module Language.Haskell.GhclibParserEx.GHC.Settings.Config(
   )
 where
 
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
 import GHC.Settings.Config
 import GHC.Driver.Session
 import GHC.Utils.Fingerprint
@@ -32,7 +32,7 @@ import Platform
 
 fakeSettings :: Settings
 fakeSettings = Settings
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
   { sGhcNameVersion=ghcNameVersion
   , sFileSettings=fileSettings
   , sTargetPlatform=platform
@@ -49,7 +49,7 @@ fakeSettings = Settings
   }
 #endif
   where
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
     toolSettings = ToolSettings {
       toolSettings_opt_P_fingerprint=fingerprint0
       }
@@ -62,7 +62,7 @@ fakeSettings = Settings
 #endif
     platform =
       Platform{
-#if defined(GHCLIB_API_811)
+#if defined(GHCLIB_API_901)
     -- It doesn't matter what values we write here as these fields are
     -- not referenced for our purposes. However the fields are strict
     -- so we must say something.
@@ -76,7 +76,7 @@ fakeSettings = Settings
       , platformConstants=platformConstants
       ,
 #endif
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
         platformWordSize=PW8
       , platformArchOS=ArchOS {archOS_arch=ArchUnknown, archOS_OS=OSUnknown}
 #elif defined (GHCLIB_API_810)
@@ -91,7 +91,7 @@ fakeSettings = Settings
     platformConstants =
       PlatformConstants{pc_DYNAMIC_BY_DEFAULT=False,pc_WORD_SIZE=8}
 
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
 fakeLlvmConfig :: LlvmConfig
 fakeLlvmConfig = LlvmConfig [] []
 #else

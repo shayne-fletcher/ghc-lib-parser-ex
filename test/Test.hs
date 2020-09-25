@@ -38,12 +38,12 @@ import Language.Haskell.GhclibParserEx.GHC.Driver.Flags()
 import Language.Haskell.GhclibParserEx.GHC.Driver.Session
 import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
 
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
 import GHC.Types.SrcLoc
 import GHC.Driver.Session
 import GHC.Parser.Lexer
@@ -66,7 +66,7 @@ import GHC.LanguageExtensions.Type
 import Bag
 #endif
 
-#if defined(GHCLIB_API_811)
+#if defined(GHCLIB_API_901)
 showSDocUnsafe :: SDoc -> String
 showSDocUnsafe = showPprUnsafe
 #endif
@@ -100,7 +100,7 @@ chkParseResult report flags = \case
       let (wrns, errs) = getMessages s flags
       when (not (null errs) || not (null wrns)) $
         assertFailure (report flags wrns ++ report flags errs)
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
     PFailed s -> assertFailure (report flags $ snd (getMessages s flags))
 #else
     PFailed _ loc err -> assertFailure (report flags $ unitBag $ mkPlainErrMsg flags loc err)
@@ -163,7 +163,7 @@ parseTests = testGroup "Parse tests"
     flags = unsafeGlobalDynFlags
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 
-#if defined(GHCLIB_API_811)
+#if defined(GHCLIB_API_901)
 moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
 #else
 moduleTest :: String -> DynFlags -> (Located (HsModule GhcPs) -> IO ()) -> IO ()

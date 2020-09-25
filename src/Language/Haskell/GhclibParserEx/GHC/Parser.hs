@@ -22,12 +22,12 @@ module Language.Haskell.GhclibParserEx.GHC.Parser(
   )
   where
 
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
 import GHC.Parser.PostProcess
 import GHC.Driver.Session
 import GHC.Data.StringBuffer
@@ -62,14 +62,14 @@ parse p str flags =
     buffer = stringToStringBuffer str
     parseState = mkPState flags buffer location
 
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
 parseModule :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
 parseModule :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
 #endif
 parseModule = parse Parser.parseModule
 
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
 parseSignature :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
 parseSignature :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
@@ -89,7 +89,7 @@ parseDeclaration :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
 parseDeclaration = parse Parser.parseDeclaration
 
 parseExpression :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
 parseExpression s flags =
   case parse Parser.parseExpression s flags of
     POk s e -> unP (runPV . unECP $ e) s
@@ -118,14 +118,14 @@ parseIdentifier = parse Parser.parseIdentifier
 parseType :: String -> DynFlags -> ParseResult (LHsType GhcPs)
 parseType = parse Parser.parseType
 
-#if defined(GHCLIB_API_811)
+#if defined(GHCLIB_API_901)
 parseHeader :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
 parseHeader :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
 #endif
 parseHeader = parse Parser.parseHeader
 
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
 parseFile :: String
           -> DynFlags
           -> String

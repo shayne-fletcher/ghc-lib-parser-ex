@@ -8,12 +8,12 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Types(
   , isTyQuasiQuote, isUnboxedTuple
   ) where
 
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
 import GHC.Types.SrcLoc
 #else
 import SrcLoc

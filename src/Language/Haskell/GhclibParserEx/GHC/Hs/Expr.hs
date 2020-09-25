@@ -16,12 +16,12 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   fromChar
   ) where
 
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined(GHCLIB_API_811)
+#if defined(GHCLIB_API_901)
 import GHC.Types.SrcLoc
 import GHC.Types.Name.Reader
 import GHC.Types.Name
@@ -99,7 +99,7 @@ isParComp :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isParComp = \case ParStmt{} -> True; _ -> False
 
 isMDo :: HsStmtContext Name -> Bool
-#if defined(GHCLIB_API_811)
+#if defined(GHCLIB_API_901)
 isMDo = \case MDoExpr _ -> True; _ -> False
 #else
 isMDo = \case MDoExpr -> True; _ -> False
@@ -138,7 +138,7 @@ isTransStmt = \case TransStmt{} -> True; _ -> False
 -- Field has a '_' as in '{foo=_} or is punned e.g. '{foo}'.
 isFieldWildcard :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 isFieldWildcard = \case
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
 #elif defined (GHCLIB_API_810)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ _))}) -> True
@@ -165,7 +165,7 @@ varToStr (L _ (HsVar _ (L _ n)))
 varToStr _ = ""
 
 strToVar :: String -> LHsExpr GhcPs
-#if defined (GHCLIB_API_811) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
 strToVar x = noLoc $ HsVar noExtField (noLoc $ mkRdrUnqual (mkVarOcc x))
 #else
 strToVar x = noLoc $ HsVar noExt (noLoc $ mkRdrUnqual (mkVarOcc x))

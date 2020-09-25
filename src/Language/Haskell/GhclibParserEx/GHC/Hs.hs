@@ -9,7 +9,7 @@ module Language.Haskell.GhclibParserEx.GHC.Hs(
  )
 where
 
-#if defined(GHCLIB_API_811)
+#if defined(GHCLIB_API_901)
 import GHC.Hs
 import GHC.Unit.Module
 import GHC.Types.SrcLoc
@@ -23,7 +23,7 @@ import Module
 import SrcLoc
 #endif
 
-#if defined(GHCLIB_API_811)
+#if defined(GHCLIB_API_901)
 modName :: Located HsModule -> String
 #else
 modName :: Located (HsModule GhcPs) -> String

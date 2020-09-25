@@ -14,7 +14,7 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp(
   )
 where
 
-#if defined (GHCLIB_API_811)
+#if defined (GHCLIB_API_901)
 import GHC.Hs.ImpExp
 import GHC.Types.Name.Reader
 #elif defined (GHCLIB_API_810)

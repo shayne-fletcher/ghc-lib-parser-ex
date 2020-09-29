@@ -16,7 +16,7 @@ module Language.Haskell.GhclibParserEx.Fixity(
   , infixr_, infixl_, infix_, fixity
   ) where
 
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 import GHC.Hs
 import GHC.Types.Basic
 import GHC.Types.Name.Reader
@@ -39,7 +39,7 @@ import Data.Maybe
 import Data.Data hiding (Fixity)
 import Data.Generics.Uniplate.Data
 
-#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 noExt :: NoExtField
 noExt = noExtField
 #endif
@@ -59,7 +59,7 @@ expFix _ e = e
 -- LPat and Pat have gone through a lot of churn. See
 -- https://gitlab.haskell.org/ghc/ghc/merge_requests/1925 for details.
 patFix :: [(String, Fixity)] -> LPat GhcPs -> LPat GhcPs
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 patFix fixities (L loc (ConPat _ op (InfixCon pat1 pat2))) =
   L loc (mkConOpPat (getFixities fixities) op (findFixity' (getFixities fixities) op) pat1 pat2)
 #elif defined (GHCLIB_API_810)
@@ -76,26 +76,26 @@ mkConOpPat ::
   -> Located RdrName -> Fixity
   -> LPat GhcPs -> LPat GhcPs
   -> Pat GhcPs
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 mkConOpPat fs op2 fix2 p1@(L loc (ConPat _ op1 (InfixCon p11 p12))) p2
 #elif defined (GHCLIB_API_810)
 mkConOpPat fs op2 fix2 p1@(L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #else
 mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #endif
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
   | nofix_error = ConPat noExtField op2 (InfixCon p1 p2)
 #else
   | nofix_error = ConPatIn op2 (InfixCon p1 p2)
 #endif
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
   | associate_right = ConPat noExtField op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
 #elif defined (GHCLIB_API_810)
   | associate_right = ConPatIn op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
 #else
   | associate_right = ConPatIn op1 (InfixCon p11 (cL loc (mkConOpPat fs op2 fix2 p12 p2)))
 #endif
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
   | otherwise = ConPat noExtField op2 (InfixCon p1 p2)
 #else
   | otherwise = ConPatIn op2 (InfixCon p1 p2)
@@ -103,7 +103,7 @@ mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
   where
     fix1 = findFixity' fs op1
     (nofix_error, associate_right) = compareFixity fix1 fix2
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 mkConOpPat _ op _ p1 p2 = ConPat noExtField op (InfixCon p1 p2)
 #else
 mkConOpPat _ op _ p1 p2 = ConPatIn op (InfixCon p1 p2)
@@ -208,12 +208,12 @@ infix_  = fixity InfixN
 fixity :: FixityDirection -> Int -> [String] -> [(String, Fixity)]
 fixity a p = map (,Fixity (SourceText "") p a)
 
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 fixitiesFromModule :: Located HsModule -> [(String, Fixity)]
 #else
 fixitiesFromModule :: Located (HsModule GhcPs) -> [(String, Fixity)]
 #endif
-#if defined(GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 fixitiesFromModule (L _ (HsModule _ _ _ _ decls _ _)) = concatMap f decls
 #else
 fixitiesFromModule (L _ (HsModule _ _ _ decls _ _)) = concatMap f decls

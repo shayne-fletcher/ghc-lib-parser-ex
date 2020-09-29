@@ -1,0 +1,15 @@
+resolver: nightly-2020-01-25 # ghc-8.8.2
+extra-deps:
+ - archive: /Users/shaynefletcher/project/sf-ghc-lib.git/ghc-lib-parser-9.0.1.20200929.tar.gz
+   sha256: "55d62c55e542b356915dd0ed26575ec959b478f33c9446e17a825834477706f2"
+ - extra-1.7.3
+ghc-options: {"$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans}
+flags:
+  ghc-lib-parser-ex:
+    auto: false
+    no-ghc-lib: false
+
+# Packages MUST go at the end, since we append to it during execution
+# of CI.hs.
+packages:
+- .

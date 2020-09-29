@@ -28,7 +28,7 @@ import Language.Haskell.GhclibParserEx.GHC.Hs.Pat
 -- We only test 'isImportQualifiedPost' at this time which requires >=
 -- 8.10; avoid unused import warning.
 #if defined (MIN_VERSION_ghc_lib_parser)
-#  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
+#  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(9, 0, 0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
 import Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp
 #  endif
 #elif __GLASGOW_HASKELL__ >= 810
@@ -38,17 +38,19 @@ import Language.Haskell.GhclibParserEx.GHC.Driver.Flags()
 import Language.Haskell.GhclibParserEx.GHC.Driver.Session
 import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
 
-#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 import GHC.Types.SrcLoc
 import GHC.Driver.Session
 import GHC.Parser.Lexer
 import GHC.Utils.Outputable
+#  if !defined (GHCLIB_API_900)
 import GHC.Driver.Ppr
+#  endif
 import GHC.Utils.Error
 import GHC.Types.Name.Reader
 import GHC.Types.Name.Occurrence
@@ -66,7 +68,7 @@ import GHC.LanguageExtensions.Type
 import Bag
 #endif
 
-#if defined(GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD)
 showSDocUnsafe :: SDoc -> String
 showSDocUnsafe = showPprUnsafe
 #endif
@@ -100,7 +102,7 @@ chkParseResult report flags = \case
       let (wrns, errs) = getMessages s flags
       when (not (null errs) || not (null wrns)) $
         assertFailure (report flags wrns ++ report flags errs)
-#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
     PFailed s -> assertFailure (report flags $ snd (getMessages s flags))
 #else
     PFailed _ loc err -> assertFailure (report flags $ unitBag $ mkPlainErrMsg flags loc err)
@@ -163,7 +165,7 @@ parseTests = testGroup "Parse tests"
     flags = unsafeGlobalDynFlags
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 
-#if defined(GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
 #else
 moduleTest :: String -> DynFlags -> (Located (HsModule GhcPs) -> IO ()) -> IO ()
@@ -344,7 +346,7 @@ dynFlagsTests = testGroup "DynFlags tests"
         Left msg -> assertFailure msg
         Right flags -> chkParseResult report flags $ parseFile foo flags s
 #if defined (MIN_VERSION_ghc_lib_parser)
-#  if  !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
+#  if  !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(9, 0, 0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
   , testCase "ImportQualifiedPost" $ do
       case parseImport "import Foo qualified" (flags `xopt_set` ImportQualifiedPost) of
         POk _ (L _ decl) -> assertBool "expected postpositive" (isImportQualifiedPost . ideclQualified $ decl)

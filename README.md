@@ -27,7 +27,7 @@ stack runhaskell --package extra --package optparse-applicative CI.hs
 ```
 Run `stack runhaskell --package extra --package optparse-applicative CI.hs -- --help` for more options.
 
-To run [`hlint`](https://github.com/ndmitchell/hlint) on this repository, `hlint --cpp-include cbits --cpp-define GHCLIB_API_XXX .` (where `XXX` at this time is one of `808`, `810` or `811`).
+To run [`hlint`](https://github.com/ndmitchell/hlint) on this repository, `hlint --cpp-include cbits --cpp-define GHCLIB_API_XXX .` (where `XXX` at this time is one of `808`, `810` or `901`).
 
 ## Releasing `ghc-lib-parser-ex` (notes for maintainers)
 

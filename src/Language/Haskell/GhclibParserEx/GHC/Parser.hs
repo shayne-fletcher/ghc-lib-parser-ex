@@ -22,12 +22,12 @@ module Language.Haskell.GhclibParserEx.GHC.Parser(
   )
   where
 
-#if defined (GHCLIB_API_901) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 import GHC.Parser.PostProcess
 import GHC.Driver.Session
 import GHC.Data.StringBuffer
@@ -62,14 +62,14 @@ parse p str flags =
     buffer = stringToStringBuffer str
     parseState = mkPState flags buffer location
 
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 parseModule :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
 parseModule :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
 #endif
 parseModule = parse Parser.parseModule
 
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 parseSignature :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
 parseSignature :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
@@ -89,12 +89,12 @@ parseDeclaration :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
 parseDeclaration = parse Parser.parseDeclaration
 
 parseExpression :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD)
 parseExpression s flags =
   case parse Parser.parseExpression s flags of
     POk s e -> unP (runPV . unECP $ e) s
     PFailed ps -> PFailed ps
-#elif defined (GHCLIB_API_810)
+#elif defined (GHCLIB_API_810) || defined (GHCLIB_API_900)
 parseExpression s flags =
   case parse Parser.parseExpression s flags of
     POk s e -> unP (runECP_P e) s
@@ -118,14 +118,14 @@ parseIdentifier = parse Parser.parseIdentifier
 parseType :: String -> DynFlags -> ParseResult (LHsType GhcPs)
 parseType = parse Parser.parseType
 
-#if defined(GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 parseHeader :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
 parseHeader :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
 #endif
 parseHeader = parse Parser.parseHeader
 
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 parseFile :: String
           -> DynFlags
           -> String

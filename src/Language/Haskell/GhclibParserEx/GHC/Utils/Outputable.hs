@@ -8,16 +8,18 @@ module Language.Haskell.GhclibParserEx.GHC.Utils.Outputable (
 )
 where
 
-#if defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 import GHC.Utils.Outputable
+#if !defined (GHCLIB_API_900)
 import GHC.Driver.Ppr
+#endif
 #else
 import Outputable
 #endif
 
 unsafePrettyPrint :: Outputable a => a -> String
 unsafePrettyPrint =
-#if defined(GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD)
   showPprUnsafe . ppr
 #else
   showSDocUnsafe . ppr

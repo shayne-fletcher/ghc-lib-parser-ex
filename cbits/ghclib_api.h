@@ -10,7 +10,7 @@ reserved. SPDX-License-Identifier: BSD-3-Clause.
 #    if defined(MIN_VERSION_ghc_lib_parser)
 #       if !MIN_VERSION_ghc_lib_parser( 1,  0,  0)
 #         define GHCLIB_API_HEAD
-#       elif MIN_VERSION_ghc_lib_parser(9, 0,  0)
+#       elif MIN_VERSION_ghc_lib_parser(9,  0,  0)
 #         define GHCLIB_API_900
 #       elif MIN_VERSION_ghc_lib_parser(8, 10,  0)
 #         define GHCLIB_API_810
@@ -22,7 +22,7 @@ reserved. SPDX-License-Identifier: BSD-3-Clause.
 #    else
 #      if __GLASGOW_HASKELL__   == 811
 #        define GHCLIB_API_HEAD
-#      elif __GLASGOW_HASKELL__ == 901
+#      elif __GLASGOW_HASKELL__ == 900
 #        define GHCLIB_API_900
 #      elif __GLASGOW_HASKELL__ == 810
 #        define GHCLIB_API_810

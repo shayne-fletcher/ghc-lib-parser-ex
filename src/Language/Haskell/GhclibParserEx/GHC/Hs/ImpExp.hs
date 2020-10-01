@@ -5,7 +5,7 @@
 module Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp(
     isPatSynIE
 #if defined (MIN_VERSION_ghc_lib_parser)
-#  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(9, 0, 0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
+#  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
  , isImportQualifiedPost
 #  endif
 #elif  __GLASGOW_HASKELL__ >= 810
@@ -29,8 +29,8 @@ isPatSynIE :: IEWrappedName RdrName -> Bool
 isPatSynIE IEPattern{} = True
 isPatSynIE _ = False
 
-#if defined(MIN_VERSION_ghc_lib_parser)
-#  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(9, 0, 0) | MIN_VERSION_ghc_lib_parser(8, 10, 0)
+#if defined (MIN_VERSION_ghc_lib_parser)
+#  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
 isImportQualifiedPost :: ImportDeclQualifiedStyle -> Bool
 isImportQualifiedPost QualifiedPost = True
 isImportQualifiedPost _  = False

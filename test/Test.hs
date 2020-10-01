@@ -162,7 +162,7 @@ parseTests = testGroup "Parse tests"
         Right flags -> chkParseResult report flags $ parseFile foo flags s
   ]
   where
-    flags = unsafeGlobalDynFlags
+    flags = defaultDynFlags fakeSettings fakeLlvmConfig
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
@@ -360,7 +360,7 @@ dynFlagsTests = testGroup "DynFlags tests"
 #endif
   ]
   where
-    flags = unsafeGlobalDynFlags
+    flags = defaultDynFlags fakeSettings fakeLlvmConfig
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 
 nameTests :: TestTree

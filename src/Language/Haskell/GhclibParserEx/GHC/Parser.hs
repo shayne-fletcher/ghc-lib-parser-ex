@@ -27,6 +27,9 @@ import GHC.Hs
 #else
 import HsSyn
 #endif
+#if defined (GHCLIB_API_HEAD)
+import GHC.Driver.Config
+#endif
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 import GHC.Parser.PostProcess
 import GHC.Driver.Session
@@ -60,8 +63,12 @@ parse p str flags =
   where
     location = mkRealSrcLoc (mkFastString "<string>") 1 1
     buffer = stringToStringBuffer str
-    parseState = mkPState flags buffer location
-
+    parseState =
+#if defined (GHCLIB_API_HEAD)
+      initParserState (initParserOpts flags) buffer location
+#else
+      mkPState flags buffer location
+#endif
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 parseModule :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
@@ -141,4 +148,9 @@ parseFile filename flags str =
   where
     location = mkRealSrcLoc (mkFastString filename) 1 1
     buffer = stringToStringBuffer str
-    parseState = mkPState flags buffer location
+    parseState =
+#if defined (GHCLIB_API_HEAD)
+      initParserState (initParserOpts flags) buffer location
+#else
+      mkPState flags buffer location
+#endif

@@ -75,9 +75,12 @@ isWHNF = \case
   _ -> False
 isLCase = \case (L _ HsLamCase{}) -> True; _ -> False
 
+#if defined(GHCLIB_API_HEAD) || defined (GHCLIB_API_901)
+isStrictMatch :: HsMatchContext GhcPs -> Bool
+#else
 isStrictMatch :: HsMatchContext RdrName -> Bool
-isStrictMatch FunRhs{mc_strictness=SrcStrict} = True
-isStrictMatch _ = False
+#endif
+isStrictMatch = \case FunRhs{mc_strictness=SrcStrict} -> True; _ -> False
 
 -- Field is punned e.g. '{foo}'.
 isFieldPun :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
@@ -98,10 +101,11 @@ isRecStmt = \case RecStmt{} -> True; _ -> False
 isParComp :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isParComp = \case ParStmt{} -> True; _ -> False
 
-isMDo :: HsStmtContext Name -> Bool
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+isMDo :: HsStmtContext GhcRn -> Bool
 isMDo = \case MDoExpr _ -> True; _ -> False
 #else
+isMDo :: HsStmtContext RdrName -> Bool
 isMDo = \case MDoExpr -> True; _ -> False
 #endif
 

@@ -16,6 +16,7 @@ import System.IO.Extra
 import Control.Monad
 import Data.List.Extra
 import Data.Maybe
+import Data.Generics.Uniplate.Data
 
 import Language.Haskell.GhclibParserEx.Dump
 import Language.Haskell.GhclibParserEx.Fixity
@@ -246,7 +247,7 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isVar" $ test "foo" $ assert' . isVar
   , testCase "isVar" $ test "3" $ assert' . not. isVar
   , testCase "isPar" $ test "(foo)" $ assert' . isPar
-  , testCase "isPar" $ test "foo" $ assert' . not. isPar
+  , testCase "isPar" $ test "foo" $ assert' . not . isPar
   , testCase "isApp" $ test "f x" $ assert' . isApp
   , testCase "isApp" $ test "x" $ assert' . not . isApp
   , testCase "isOpApp" $ test "l `op` r" $ assert' . isOpApp
@@ -293,6 +294,7 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isQuasiQuote" $ test "[expr(1 + 2)]" $ assert' . not . isQuasiQuote
   , testCase "isWholeFrac" $ test "3.2e1" $ assert' . isWholeFrac . unLoc
   , testCase "isWholeFrac" $ test "3.22e1" $ assert' . not . isWholeFrac . unLoc
+  , testCase "isMDo" $ test "mdo { pure () }" $ assert' . any isMDo . universeBi
   , testCase "strToVar" $ assert' . isVar . strToVar $ "foo"
   , testCase "varToStr" $ test "[]" $ assert' . (== "[]") . varToStr
   , testCase "varToStr" $ test "foo" $ assert' . (== "foo") . varToStr
@@ -302,7 +304,13 @@ expressionPredicateTests = testGroup "Expression predicate tests"
     assert' = assertBool ""
     test s = exprTest s flags
     flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
-              [ TemplateHaskell, TemplateHaskellQuotes, QuasiQuotes, TypeApplications, LambdaCase ]
+              [ TemplateHaskell
+              , TemplateHaskellQuotes
+              , QuasiQuotes
+              , TypeApplications
+              , LambdaCase
+              , RecursiveDo
+              ]
 
 patternPredicateTests :: TestTree
 patternPredicateTests = testGroup "Pattern predicate tests"

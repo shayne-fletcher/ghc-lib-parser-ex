@@ -75,7 +75,7 @@ isWHNF = \case
   _ -> False
 isLCase = \case (L _ HsLamCase{}) -> True; _ -> False
 
-#if defined(GHCLIB_API_HEAD) || defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_901)
 isStrictMatch :: HsMatchContext GhcPs -> Bool
 #else
 isStrictMatch :: HsMatchContext RdrName -> Bool
@@ -105,7 +105,7 @@ isParComp = \case ParStmt{} -> True; _ -> False
 isMDo :: HsStmtContext GhcRn -> Bool
 isMDo = \case MDoExpr _ -> True; _ -> False
 #else
-isMDo :: HsStmtContext RdrName -> Bool
+isMDo :: HsStmtContext Name -> Bool
 isMDo = \case MDoExpr -> True; _ -> False
 #endif
 

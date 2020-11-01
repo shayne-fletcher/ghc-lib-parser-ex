@@ -18,7 +18,12 @@ module Language.Haskell.GhclibParserEx.Fixity(
 
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 import GHC.Hs
+#if defined (GHCLIB_API_HEAD)
+import GHC.Types.Fixity
+import GHC.Types.SourceText
+#else
 import GHC.Types.Basic
+#endif
 import GHC.Types.Name.Reader
 import GHC.Types.Name
 import GHC.Types.SrcLoc

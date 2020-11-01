@@ -22,6 +22,9 @@ import GHC.Hs
 import HsSyn
 #endif
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+import GHC.Types.SourceText
+#endif
 import GHC.Types.SrcLoc
 import GHC.Types.Name.Reader
 import GHC.Types.Name

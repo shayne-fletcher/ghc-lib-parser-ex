@@ -22,7 +22,11 @@ import GHC.Utils.Panic
 import GHC.Parser.Header
 import GHC.Data.StringBuffer
 import GHC.Driver.Session
+#if defined (GHCLIB_API_HEAD)
+import GHC.Types.SourceError
+#else
 import GHC.Driver.Types
+#endif
 #else
 import Panic
 import HeaderInfo

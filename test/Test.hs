@@ -51,6 +51,7 @@ import GHC.Parser.Lexer
 import GHC.Utils.Outputable
 #  if !defined (GHCLIB_API_900)
 import GHC.Driver.Ppr
+import GHC.Parser.Errors.Ppr
 #  endif
 import GHC.Utils.Error
 import GHC.Types.Name.Reader
@@ -100,11 +101,23 @@ makeFile relPath contents = do
 chkParseResult :: (DynFlags -> WarningMessages -> String) -> DynFlags -> ParseResult a -> IO ()
 chkParseResult report flags = \case
     POk s _ -> do
+#if defined (GHCLIB_API_HEAD)
+      let (wrns, errs) = getMessages s
+#else
       let (wrns, errs) = getMessages s flags
+#endif
       when (not (null errs) || not (null wrns)) $
+#if defined (GHCLIB_API_HEAD)
+        assertFailure (report flags (fmap pprWarning wrns) ++ report flags (fmap pprError errs))
+#else
         assertFailure (report flags wrns ++ report flags errs)
+#endif
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD)
+    PFailed s -> assertFailure (report flags $ fmap pprError (snd (getMessages s)))
+#else
     PFailed s -> assertFailure (report flags $ snd (getMessages s flags))
+#endif
 #else
     PFailed _ loc err -> assertFailure (report flags $ unitBag $ mkPlainErrMsg flags loc err)
 #endif

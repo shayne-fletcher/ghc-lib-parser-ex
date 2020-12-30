@@ -24,18 +24,18 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-8.10.1      | ghc-8.10.1 |
-    # | windows | ghc-8.10.1      | ghc-8.10.1 |
-    # | macOS   | ghc-8.10.1      | ghc-8.10.1 |
+    # | linux   | ghc-8.10.3      | ghc-8.10.1 |
+    # | windows | ghc-8.10.3      | ghc-8.10.1 |
+    # | macOS   | ghc-8.10.3      | ghc-8.10.1 |
     # +---------+-----------------+------------+
-    linux-8.10.1-8.10.1:
-      image: "Ubuntu 16.04"
+    linux-8.10.3-8.10.3:
+      image: "ubuntu-latest"
       stack: "stack-exact.yaml"
-    windows-8.10.1-8.10.1:
-      image: "vs2017-win2016"
+    windows-8.10.3-8.10.3:
+      image: "windows-latest"
       stack: "stack-exact.yaml"
-    mac-8.10.1-8.10.1:
-      image: "macOS-10.14"
+    mac-8.10.3-8.10.3:
+      image: "macOS-latest"
       stack: "stack-exact.yaml"
 
     # +---------+-----------------+------------+
@@ -45,14 +45,14 @@ strategy:
     # | windows | ghc-8.10.1      | ghc-8.8.2  |
     # | macOS   | ghc-8.10.1      | ghc-8.8.2  |
     # +---------+-----------------+------------+
-    linux-8.10.1-8.8.2:
-      image: "Ubuntu 16.04"
+    linux-8.10.3-8.8.2:
+      image: "ubuntu-latest"
       stack: "stack-810-808-ghc-lib.yaml"
-    windows-8.10.1-8.8.2:
-      image: "vs2017-win2016"
+    windows-8.10.3-8.8.2:
+      image: "windows-latest"
       stack: "stack-810-808-ghc-lib.yaml"
-    mac-8.10.1-8.8.2:
-      image: "macOS-10.14"
+    mac-8.10.3-8.8.2:
+      image: "macOS-latest"
       stack: "stack-810-808-ghc-lib.yaml"
 
     # +---------+-----------------+------------+
@@ -64,13 +64,13 @@ strategy:
     # +---------+-----------------+------------+
     # Note : These builds use native ghc libs, not ghc-lib-parser!
     linux-8.8.2-8.8.2-no-ghc-lib:
-      image: "Ubuntu 16.04"
+      image: "ubuntu-latest"
       stack: "stack-808-808-no-ghc-lib.yaml"
     windows-8.8.2-8.8.2-no-ghc-lib:
-      image: "vs2017-win2016"
+      image: "windows-latest"
       stack: "stack-808-808-no-ghc-lib.yaml"
     mac-8.8.2-8.8.2-no-ghc-lib:
-      image: "macOS-10.14"
+      image: "macOS-latest"
       stack: "stack-808-808-no-ghc-lib.yaml"
 
     # +---------+-----------------+------------+
@@ -81,13 +81,13 @@ strategy:
     # | macOS   | ghc-master      | ghc-8.8.2  |
     # +---------+-----------------+------------+
     linux-master-8.8.2:
-      image: "Ubuntu 16.04"
+      image: "ubuntu-latest"
       stack: "stack.yaml"
     windows-master-8.8.2:
-      image: "vs2017-win2016"
+      image: "windows-latest"
       stack: "stack.yaml"
     mac-master-8.8.2:
-      image: "macOS-10.14"
+      image: "macOS-latest"
       stack: "stack.yaml"
 
     # These stopped working sometime around 2020-12-20.
@@ -115,13 +115,13 @@ strategy:
     # # | macOS   | da-ghc-8.8.1    | ghc-8.8.1  |
     # # +---------+-----------------+------------+
     # linux-da-8.8.1-8.8.1:
-    #   image: "Ubuntu 16.04"
+    #   image: "ubuntu-latest"
     #   stack: "stack-da-8.8.1.20200122.yaml"
     # windows-da-8.8.1-8.8.1:
-    #   image: "vs2017-win2016"
+    #   image: "windows-latest"
     #   stack: "stack-da-8.8.1.20200122.yaml"
     # mac-da-8.8.1-8.8.1:
-    #   image: "macOS-10.14"
+    #   image: "macOS-latest"
     #   stack: "stack-da-8.8.1.20200122.yaml"
 
 pool: {vmImage: '$(image)'}

@@ -31,7 +31,12 @@ import FastString
 #endif
 
 patToStr :: LPat GhcPs -> String
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+patToStr (L _ (ConPat _ (L _ x) (PrefixCon [] []))) | occNameString (rdrNameOcc x) == "True" = "True"
+patToStr (L _ (ConPat _ (L _ x) (PrefixCon [] []))) | occNameString (rdrNameOcc x) == "False" = "False"
+patToStr (L _ (ConPat _ (L _ x) (PrefixCon [] []))) | occNameString (rdrNameOcc x) == "[]" = "[]"
+patToStr _ = ""
+#elif defined (GHCLIB_API_900)
 patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "True" = "True"
 patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "False" = "False"
 patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "[]" = "[]"
@@ -54,7 +59,9 @@ strToPat z
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
   noLoc $
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+    ConPat noExtField (noLoc true_RDR) (PrefixCon [] [])
+#elif defined (GHCLIB_API_900)
     ConPat noExtField (noLoc true_RDR) (PrefixCon [])
 #else
     ConPatIn (noLoc true_RDR) (PrefixCon [])
@@ -63,7 +70,9 @@ strToPat z
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
   noLoc $
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+    ConPat noExtField (noLoc false_RDR) (PrefixCon [] [])
+#elif defined (GHCLIB_API_900)
     ConPat noExtField (noLoc false_RDR) (PrefixCon [])
 #else
     ConPatIn (noLoc false_RDR) (PrefixCon [])
@@ -72,7 +81,9 @@ strToPat z
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
   noLoc $
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+    ConPat noExtField (noLoc $ nameRdrName nilDataConName) (PrefixCon [] [])
+#elif defined (GHCLIB_API_900)
     ConPat noExtField (noLoc $ nameRdrName nilDataConName) (PrefixCon [])
 #else
     ConPatIn (noLoc $ nameRdrName nilDataConName) (PrefixCon [])

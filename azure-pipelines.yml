@@ -24,34 +24,34 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-8.10.3      | ghc-8.10.1 |
-    # | windows | ghc-8.10.3      | ghc-8.10.1 |
-    # | macOS   | ghc-8.10.3      | ghc-8.10.1 |
+    # | linux   | ghc-9.0.1       | ghc-8.10.1 |
+    # | windows | ghc-9.0.1       | ghc-8.10.1 |
+    # | macOS   | ghc-9.0.1       | ghc-8.10.1 |
     # +---------+-----------------+------------+
-    linux-8.10.3-8.10.3:
+    linux-9.0.1-8.10.3:
       image: "ubuntu-latest"
       stack: "stack-exact.yaml"
-    windows-8.10.3-8.10.3:
+    windows-9.0.1-8.10.3:
       image: "windows-latest"
       stack: "stack-exact.yaml"
-    mac-8.10.3-8.10.3:
+    mac-9.0.1-8.10.3:
       image: "macOS-latest"
       stack: "stack-exact.yaml"
 
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-8.10.1      | ghc-8.8.2  |
-    # | windows | ghc-8.10.1      | ghc-8.8.2  |
-    # | macOS   | ghc-8.10.1      | ghc-8.8.2  |
+    # | linux   | ghc-8.10.4      | ghc-8.8.2  |
+    # | windows | ghc-8.10.4      | ghc-8.8.2  |
+    # | macOS   | ghc-8.10.4      | ghc-8.8.2  |
     # +---------+-----------------+------------+
-    linux-8.10.3-8.8.2:
+    linux-8.10.4-8.8.2:
       image: "ubuntu-latest"
       stack: "stack-810-808-ghc-lib.yaml"
-    windows-8.10.3-8.8.2:
+    windows-8.10.4-8.8.2:
       image: "windows-latest"
       stack: "stack-810-808-ghc-lib.yaml"
-    mac-8.10.3-8.8.2:
+    mac-8.10.4-8.8.2:
       image: "macOS-latest"
       stack: "stack-810-808-ghc-lib.yaml"
 

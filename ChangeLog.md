@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.18 released 2021-02-06
+- Update to ghc-8.10.4.
+
 ## 9.0.0.1 released 2021-02-05
 - Upgrade Cabal defaults flag to 9.0.1
 

@@ -1,5 +1,11 @@
 # Changelog for ghc-lib-parser-ex
 
+## 9.0.0.2 released 2021-02-08
+- Cabal bugfix
+
+## 8.10.0.19 released 2021-02-08
+- Cabal bugfix
+
 ## 8.10.0.18 released 2021-02-06
 - Update to ghc-8.10.4.
 

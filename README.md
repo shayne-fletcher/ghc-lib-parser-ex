@@ -1,5 +1,5 @@
 # ghc-lib-parser-ex [![License BSD3](https://img.shields.io/badge/license-BSD3-brightgreen.svg)](http://opensource.org/licenses/BSD-3-Clause) [![Hackage version](https://img.shields.io/hackage/v/ghc-lib-parser-ex.svg?label=Hackage)](https://hackage.haskell.org/package/ghc-lib-parser-ex) [![Stackage version](https://www.stackage.org/package/ghc-lib-parser-ex/badge/nightly?label=Stackage)](https://www.stackage.org/package/ghc-lib-parser-ex)  [![Build Status](https://shayne-fletcher.visualstudio.com/ghc-lib-parser-ex/_apis/build/status/shayne-fletcher.ghc-lib-parser-ex?branchName=master)](https://shayne-fletcher.visualstudio.com/ghc-lib-parser-ex/_build/latest?definitionId=1&branchName=master)
-Copyright © 2020, Shayne Fletcher. All rights reserved.
+Copyright © 2020-2021 Shayne Fletcher. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 
 The `ghc-lib-parser-ex` package contains GHC API parse tree utilities. It works with or without [`ghc-lib-parser`](https://github.com/digital-asset/ghc-lib).

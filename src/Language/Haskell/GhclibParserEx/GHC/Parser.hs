@@ -98,8 +98,14 @@ parseDeclaration = parse Parser.parseDeclaration
 parseExpression :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
 #if defined (GHCLIB_API_HEAD)
 parseExpression s flags =
+  -- The need for annotations here came about first manifested with
+  -- ghc-9.0.1
   case parse Parser.parseExpression s flags of
-    POk s e -> unP (runPV . unECP $ e) s
+    POk state e ->
+      let e' = e :: ECP
+          parser_validator = unECP e' :: PV (LHsExpr GhcPs)
+          parser = runPV parser_validator :: P (LHsExpr GhcPs)
+      in unP parser state :: ParseResult (LHsExpr GhcPs)
     PFailed ps -> PFailed ps
 #elif defined (GHCLIB_API_810) || defined (GHCLIB_API_900)
 parseExpression s flags =

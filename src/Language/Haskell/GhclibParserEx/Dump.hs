@@ -17,7 +17,7 @@ module Language.Haskell.GhclibParserEx.Dump(
 
 #if !defined(MIN_VERSION_ghc_lib_parser)
 -- Using native ghc.
-#  if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_810)
+#  if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs.Dump
 #  else
 import HsDumpAst

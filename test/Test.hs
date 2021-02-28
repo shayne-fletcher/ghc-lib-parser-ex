@@ -177,7 +177,11 @@ parseTests = testGroup "Parse tests"
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig
+#if defined (GHCLIB_API_HEAD)
+    report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
+#else
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
+#endif
 
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
 moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
@@ -382,8 +386,11 @@ dynFlagsTests = testGroup "DynFlags tests"
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig
+#if defined(GHCLIB_API_HEAD)
+    report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
+#else
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
-
+#endif
 nameTests :: TestTree
 nameTests = testGroup "Name tests"
   [ testCase "modName (1)" $

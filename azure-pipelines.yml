@@ -24,17 +24,17 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-9.0.1       | ghc-8.10.1 |
-    # | windows | ghc-9.0.1       | ghc-8.10.1 |
-    # | macOS   | ghc-9.0.1       | ghc-8.10.1 |
+    # | linux   | ghc-9.0.1       | ghc-8.10.4 |
+    # | windows | ghc-9.0.1       | ghc-8.10.4 |
+    # | macOS   | ghc-9.0.1       | ghc-8.10.4 |
     # +---------+-----------------+------------+
-    linux-9.0.1-8.10.3:
+    linux-9.0.1-8.10.4:
       image: "ubuntu-latest"
       stack: "stack-exact.yaml"
-    windows-9.0.1-8.10.3:
+    windows-9.0.1-8.10.4:
       image: "windows-latest"
       stack: "stack-exact.yaml"
-    mac-9.0.1-8.10.3:
+    mac-9.0.1-8.10.4:
       image: "macOS-latest"
       stack: "stack-exact.yaml"
 
@@ -89,40 +89,6 @@ strategy:
     mac-master-8.8.2:
       image: "macOS-latest"
       stack: "stack.yaml"
-
-    # These stopped working sometime around 2020-12-20.
-    #
-    # 2020-12-20T19:14:24.1846679Z HttpExceptionRequest Request {
-    # 2020-12-20T19:14:24.1849204Z   host                 = "digitalassetsdk.bintray.com"
-    # 2020-12-20T19:14:24.1863946Z   port                 = 443
-    # 2020-12-20T19:14:24.1864712Z   secure               = True
-    # 2020-12-20T19:14:24.1866437Z   requestHeaders       = [("User-Agent","Haskell pantry package")]
-    # 2020-12-20T19:14:24.1867702Z   path                 = "/ghc-lib/ghc-lib-parser-8.8.1.20200122.tar.gz"
-    # 2020-12-20T19:14:24.1868554Z   queryString          = ""
-    # 2020-12-20T19:14:24.1869269Z   method               = "GET"
-    # 2020-12-20T19:14:24.1870009Z   proxy                = Nothing
-    # 2020-12-20T19:14:24.1870710Z   rawBody              = False
-    # 2020-12-20T19:14:24.1871422Z   redirectCount        = 10
-    # 2020-12-20T19:14:24.1872162Z   responseTimeout      = ResponseTimeoutDefault
-    # 2020-12-20T19:14:24.1873297Z   requestVersion       = HTTP/1.1
-    # 2020-12-20T19:14:24.1874127Z }
-
-    # # +---------+-----------------+------------+
-    # # | OS      | ghc-lib flavour | GHC        |
-    # # +=========+=================+============+
-    # # | linux   | da-ghc-8.8.1    | ghc-8.8.1  |
-    # # | windows | da-ghc-8.8.1    | ghc-8.8.1  |
-    # # | macOS   | da-ghc-8.8.1    | ghc-8.8.1  |
-    # # +---------+-----------------+------------+
-    # linux-da-8.8.1-8.8.1:
-    #   image: "ubuntu-latest"
-    #   stack: "stack-da-8.8.1.20200122.yaml"
-    # windows-da-8.8.1-8.8.1:
-    #   image: "windows-latest"
-    #   stack: "stack-da-8.8.1.20200122.yaml"
-    # mac-da-8.8.1-8.8.1:
-    #   image: "macOS-latest"
-    #   stack: "stack-da-8.8.1.20200122.yaml"
 
 pool: {vmImage: '$(image)'}
 

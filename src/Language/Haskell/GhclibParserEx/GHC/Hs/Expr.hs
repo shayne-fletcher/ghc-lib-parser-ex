@@ -159,8 +159,13 @@ isUnboxed :: Boxity -> Bool
 isUnboxed = \case Unboxed -> True; _ -> False
 
 isWholeFrac :: HsExpr GhcPs -> Bool
+#if defined (GHCLIB_API_HEAD)
+isWholeFrac (HsLit _ (HsRat _ fl@FL{} _)) = denominator (rationalFromFractionalLit fl) == 1
+isWholeFrac (HsOverLit _ (OverLit _ (HsFractional fl@FL {}) _)) = denominator (rationalFromFractionalLit fl) == 1
+#else
 isWholeFrac (HsLit _ (HsRat _ (FL _ _ v) _)) = denominator v == 1
 isWholeFrac (HsOverLit _ (OverLit _ (HsFractional (FL _ _ v)) _)) = denominator v == 1
+#endif
 isWholeFrac _ = False
 
 varToStr :: LHsExpr GhcPs -> String

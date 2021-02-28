@@ -20,7 +20,7 @@ reserved. SPDX-License-Identifier: BSD-3-Clause.
 #         error Unsupported GHC API version
 #      endif
 #    else
-#      if __GLASGOW_HASKELL__   == 811
+#      if __GLASGOW_HASKELL__   == 901
 #        define GHCLIB_API_HEAD
 #      elif __GLASGOW_HASKELL__ == 900
 #        define GHCLIB_API_900

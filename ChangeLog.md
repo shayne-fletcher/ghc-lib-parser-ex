@@ -1,5 +1,11 @@
 # Changelog for ghc-lib-parser-ex
 
+## Unreleased
+- Upgrade to `ghc-lib-parser-9.0.1.20210324`
+
+## 9.0.0.4 released 2021-03-11
+- Bugfix for `GHC.Hs.Dump`
+
 ## 0.20210228 released 2021-02-28
 - Update to `ghc-lib-0.20210228`
 

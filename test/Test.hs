@@ -48,7 +48,9 @@ import HsSyn
 import GHC.Types.SrcLoc
 import GHC.Driver.Session
 import GHC.Parser.Lexer
+# if !defined (GHCLIB_API_HEAD)
 import GHC.Utils.Outputable
+#endif
 #  if !defined (GHCLIB_API_900)
 import GHC.Driver.Ppr
 import GHC.Parser.Errors.Ppr
@@ -68,11 +70,6 @@ import OccName
 import GHC.LanguageExtensions.Type
 #if defined (GHCLIB_API_808)
 import Bag
-#endif
-
-#if defined (GHCLIB_API_HEAD)
-showSDocUnsafe :: SDoc -> String
-showSDocUnsafe = showPprUnsafe
 #endif
 
 main :: IO ()
@@ -211,15 +208,25 @@ fixityTests = testGroup "Fixity tests"
       exprTest "1 + 2 * 3" flags
         (\e ->
             assertBool "parse tree not affected" $
+#if defined(GHCLIB_API_HEAD)
+              showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations e) /=
+              showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] e))
+#else
               showSDocUnsafe (showAstData BlankSrcSpan e) /=
               showSDocUnsafe (showAstData BlankSrcSpan (applyFixities [] e))
+#endif
         )
   , testCase "Pattern" $
       case parseDeclaration "f (1 : 2 :[]) = 1" flags of
         POk _ d ->
           assertBool "parse tree not affected" $
+#if defined(GHCLIB_API_HEAD)
+          showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations d) /=
+          showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] d))
+#else
           showSDocUnsafe (showAstData BlankSrcSpan d) /=
           showSDocUnsafe (showAstData BlankSrcSpan (applyFixities [] d))
+#endif
         PFailed{} -> assertFailure "parse error"
   , testCase "fixitiesFromModule" $
       case parseModule "infixl 4 <*!" flags of

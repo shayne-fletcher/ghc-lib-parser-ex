@@ -125,7 +125,11 @@ parseTypeSignature = parse Parser.parseTypeSignature
 parseStmt :: String -> DynFlags -> ParseResult (Maybe (LStmt GhcPs (LHsExpr GhcPs)))
 parseStmt = parse Parser.parseStmt
 
+#if defined(GHCLIB_API_HEAD)
+parseIdentifier :: String -> DynFlags -> ParseResult (LocatedN RdrName)
+#else
 parseIdentifier :: String -> DynFlags -> ParseResult (Located RdrName)
+#endif
 parseIdentifier = parse Parser.parseIdentifier
 
 parseType :: String -> DynFlags -> ParseResult (LHsType GhcPs)

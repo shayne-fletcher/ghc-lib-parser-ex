@@ -12,7 +12,10 @@
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.Dump(
     showAstData
-  , BlankSrcSpan(..),
+  , BlankSrcSpan(..)
+#if defined(GHCLIB_API_HEAD)
+  , BlankEpAnnotations(..)
+#endif
 ) where
 
 #if !defined(MIN_VERSION_ghc_lib_parser)

@@ -56,40 +56,48 @@ patToStr _ = ""
 strToPat :: String -> LPat GhcPs
 strToPat z
   | z == "True"  =
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD)
+  noLocA $
+#elif defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
   noLoc $
 #endif
 #if defined (GHCLIB_API_HEAD)
-    ConPat noExtField (noLoc true_RDR) (PrefixCon [] [])
+    ConPat noAnn (noLocA true_RDR) (PrefixCon [] [])
 #elif defined (GHCLIB_API_900)
     ConPat noExtField (noLoc true_RDR) (PrefixCon [])
 #else
     ConPatIn (noLoc true_RDR) (PrefixCon [])
 #endif
   | z == "False" =
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD)
+  noLocA $
+#elif defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
   noLoc $
 #endif
 #if defined (GHCLIB_API_HEAD)
-    ConPat noExtField (noLoc false_RDR) (PrefixCon [] [])
+    ConPat noAnn (noLocA false_RDR) (PrefixCon [] [])
 #elif defined (GHCLIB_API_900)
     ConPat noExtField (noLoc false_RDR) (PrefixCon [])
 #else
     ConPatIn (noLoc false_RDR) (PrefixCon [])
 #endif
   | z == "[]"    =
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD)
+  noLocA $
+#elif defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
   noLoc $
 #endif
 #if defined (GHCLIB_API_HEAD)
-    ConPat noExtField (noLoc $ nameRdrName nilDataConName) (PrefixCon [] [])
+    ConPat noAnn (noLocA $ nameRdrName nilDataConName) (PrefixCon [] [])
 #elif defined (GHCLIB_API_900)
     ConPat noExtField (noLoc $ nameRdrName nilDataConName) (PrefixCon [])
 #else
     ConPatIn (noLoc $ nameRdrName nilDataConName) (PrefixCon [])
 #endif
   | otherwise =
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD)
+      noLocA $ VarPat noExtField (noLocA $ mkVarUnqual (fsLit z))
+#elif defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
       noLoc $ VarPat noExtField (noLoc $ mkVarUnqual (fsLit z))
 #else
       VarPat noExt (noLoc $ mkVarUnqual (fsLit z))

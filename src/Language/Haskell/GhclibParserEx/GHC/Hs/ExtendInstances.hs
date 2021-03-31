@@ -43,7 +43,7 @@ extendInstances = HsExtendInstances
 toStr :: Data a => HsExtendInstances a -> String
 toStr (HsExtendInstances e) =
 #if defined(GHCLIB_API_HEAD)
-  showPprUnsafe $ showAstData BlankSrcSpan e
+  showPprUnsafe $ showAstData BlankSrcSpan BlankEpAnnotations e
 #else
   showSDocUnsafe $ showAstData BlankSrcSpan e
 #endif

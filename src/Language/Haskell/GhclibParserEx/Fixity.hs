@@ -44,7 +44,7 @@ import Data.Maybe
 import Data.Data hiding (Fixity)
 import Data.Generics.Uniplate.Data
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 noExt :: NoExtField
 noExt = noExtField
 #endif
@@ -78,7 +78,12 @@ patFix _ p = p
 
 mkConOpPat ::
   [(String, Fixity)]
-  -> Located RdrName -> Fixity
+#if defined (GHCLIB_API_HEAD)
+  -> LocatedN RdrName
+#else
+  -> Located RdrName
+#endif
+  -> Fixity
   -> LPat GhcPs -> LPat GhcPs
   -> Pat GhcPs
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
@@ -88,19 +93,25 @@ mkConOpPat fs op2 fix2 p1@(L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #else
 mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+  | nofix_error = ConPat noAnn op2 (InfixCon p1 p2)
+#elif defined (GHCLIB_API_900)
   | nofix_error = ConPat noExtField op2 (InfixCon p1 p2)
 #else
   | nofix_error = ConPatIn op2 (InfixCon p1 p2)
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+  | associate_right = ConPat noAnn op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
+#elif defined (GHCLIB_API_900)
   | associate_right = ConPat noExtField op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
 #elif defined (GHCLIB_API_810)
   | associate_right = ConPatIn op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
 #else
   | associate_right = ConPatIn op1 (InfixCon p11 (cL loc (mkConOpPat fs op2 fix2 p12 p2)))
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+  | otherwise = ConPat noAnn op2 (InfixCon p1 p2)
+#elif defined (GHCLIB_API_900)
   | otherwise = ConPat noExtField op2 (InfixCon p1 p2)
 #else
   | otherwise = ConPatIn op2 (InfixCon p1 p2)
@@ -108,41 +119,75 @@ mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
   where
     fix1 = findFixity' fs op1
     (nofix_error, associate_right) = compareFixity fix1 fix2
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+mkConOpPat _ op _ p1 p2 = ConPat noAnn op (InfixCon p1 p2)
+#elif defined (GHCLIB_API_900)
 mkConOpPat _ op _ p1 p2 = ConPat noExtField op (InfixCon p1 p2)
 #else
 mkConOpPat _ op _ p1 p2 = ConPatIn op (InfixCon p1 p2)
 #endif
 
 mkOpApp ::
-  [(String, Fixity)]
-  -> SrcSpan
-  -> LHsExpr GhcPs -- Left operand; already rearrange.
-  -> LHsExpr GhcPs -> Fixity -- Operator and fixity.
-  -> LHsExpr GhcPs -- Right operand (not an OpApp, but might be a NegApp).
-  -> LHsExpr GhcPs
+   [(String, Fixity)]
+#if defined(GHCLIB_API_HEAD)
+   -> SrcSpanAnnA
+#else
+   -> SrcSpan
+#endif
+   -> LHsExpr GhcPs -- Left operand; already rearrange.
+   -> LHsExpr GhcPs -> Fixity -- Operator and fixity.
+   -> LHsExpr GhcPs -- Right operand (not an OpApp, but might be a NegApp).
+   -> LHsExpr GhcPs
 --      (e11 `op1` e12) `op2` e2
 mkOpApp fs loc e1@(L _ (OpApp x1 e11 op1 e12)) op2 fix2 e2
+#if defined (GHCLIB_API_HEAD)
+  | nofix_error = L loc (OpApp noAnn e1 op2 e2)
+#else
   | nofix_error = L loc (OpApp noExt e1 op2 e2)
+#endif
   | associate_right = L loc (OpApp x1 e11 op1 (mkOpApp fs loc' e12 op2 fix2 e2 ))
   where
+#if defined (GHCLIB_API_HEAD)
+    loc'= combineLocsA e12 e2
+#else
     loc'= combineLocs e12 e2
+#endif
     fix1 = findFixity fs op1
     (nofix_error, associate_right) = compareFixity fix1 fix2
 --      (- neg_arg) `op` e2
 mkOpApp fs loc e1@(L _ (NegApp _ neg_arg neg_name)) op2 fix2 e2
+#if defined(GHCLIB_API_HEAD)
+  | nofix_error = L loc (OpApp noAnn e1 op2 e2)
+#else
   | nofix_error = L loc (OpApp noExt e1 op2 e2)
+#endif
+#if defined(GHCLIB_API_HEAD)
+  | associate_right = L loc (NegApp noAnn (mkOpApp fs loc' neg_arg op2 fix2 e2) neg_name)
+#else
   | associate_right = L loc (NegApp noExt (mkOpApp fs loc' neg_arg op2 fix2 e2) neg_name)
+#endif
   where
+#if defined (GHCLIB_API_HEAD)
+    loc' = combineLocsA neg_arg e2
+#else
     loc' = combineLocs neg_arg e2
+#endif
     (nofix_error, associate_right) = compareFixity negateFixity fix2
 --      e1 `op` - neg_arg
 mkOpApp _ loc e1 op1 fix1 e2@(L _ NegApp {}) -- NegApp can occur on the right.
+#if defined(GHCLIB_API_HEAD)
+  | not associate_right  = L loc (OpApp noAnn e1 op1 e2)-- We *want* right association.
+#else
   | not associate_right  = L loc (OpApp noExt e1 op1 e2)-- We *want* right association.
+#endif
   where
     (_, associate_right) = compareFixity fix1 negateFixity
  --     Default case, no rearrangment.
+#if defined(GHCLIB_API_HEAD)
+mkOpApp _ loc e1 op _fix e2 = L loc (OpApp noAnn e1 op e2)
+#else
 mkOpApp _ loc e1 op _fix e2 = L loc (OpApp noExt e1 op e2)
+#endif
 
 getIdent :: LHsExpr GhcPs -> String
 getIdent (unLoc -> HsVar _ (L _ n)) = occNameString . rdrNameOcc $ n
@@ -155,7 +200,11 @@ getFixities fixities = if null fixities then baseFixities else fixities
 findFixity :: [(String, Fixity)] -> LHsExpr GhcPs -> Fixity
 findFixity fs r = askFix fs (getIdent r) -- Expressions.
 
+#if defined(GHCLIB_API_HEAD)
+findFixity' :: [(String, Fixity)] -> LocatedN RdrName -> Fixity
+#else
 findFixity' :: [(String, Fixity)] -> Located RdrName -> Fixity
+#endif
 findFixity' fs r = askFix fs (occNameString . rdrNameOcc . unLoc $ r) -- Patterns.
 
 askFix :: [(String, Fixity)] -> String -> Fixity
@@ -218,7 +267,9 @@ fixitiesFromModule :: Located HsModule -> [(String, Fixity)]
 #else
 fixitiesFromModule :: Located (HsModule GhcPs) -> [(String, Fixity)]
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+fixitiesFromModule (L _ (HsModule _ _ _ _ _ decls _ _)) = concatMap f decls
+#elif defined (GHCLIB_API_900)
 fixitiesFromModule (L _ (HsModule _ _ _ _ decls _ _)) = concatMap f decls
 #else
 fixitiesFromModule (L _ (HsModule _ _ _ decls _ _)) = concatMap f decls

@@ -76,9 +76,9 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-master      | ghc-8.8.2  |
-    # | windows | ghc-master      | ghc-8.8.2  |
-    # | macOS   | ghc-master      | ghc-8.8.2  |
+    # | linux   | ghc-master      | ghc-8.10.4 |
+    # | windows | ghc-master      | ghc-8.10.4 |
+    # | macOS   | ghc-master      | ghc-8.10.4 |
     # +---------+-----------------+------------+
     linux-master-8.8.2:
       image: "ubuntu-latest"
@@ -94,10 +94,16 @@ pool: {vmImage: '$(image)'}
 
 steps:
   # macOS
+  # 2021-03-31:
+  # brew has started installing autoconf 2.71 and it doesn't work. To
+  # workaround I'm installing 2.69 over the top of it.
   - bash: |
       /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-      brew install autoconf automake
+      brew install autoconf automake pkgconfig m4 libtool gettext
       brew upgrade gmp
+      curl -O -L http://ftpmirror.gnu.org/autoconf/autoconf-2.69.tar.gz
+      tar -xzf autoconf-2.69.tar.gz
+      (cd autoconf-* && ./configure && make && make install && autoconf --version)
     condition: eq( variables['Agent.OS'], 'Darwin' )
     displayName: Install brew
 

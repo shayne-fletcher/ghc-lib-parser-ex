@@ -177,7 +177,9 @@ varToStr (L _ (HsVar _ (L _ n)))
 varToStr _ = ""
 
 strToVar :: String -> LHsExpr GhcPs
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD)
+strToVar x = noLocA $ HsVar noExtField (noLocA $ mkRdrUnqual (mkVarOcc x))
+#elif defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 strToVar x = noLoc $ HsVar noExtField (noLoc $ mkRdrUnqual (mkVarOcc x))
 #else
 strToVar x = noLoc $ HsVar noExt (noLoc $ mkRdrUnqual (mkVarOcc x))

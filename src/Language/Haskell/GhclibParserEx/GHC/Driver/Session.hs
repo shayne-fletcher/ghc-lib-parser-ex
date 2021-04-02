@@ -17,12 +17,12 @@ module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
 #if defined (GHCLIB_API_808) || defined (GHCLIB_API_810)
 import qualified GHC.LanguageExtensions as LangExt
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_920) || defined(GHCLIB_API_920) || defined (GHCLIB_API_900)
 import GHC.Utils.Panic
 import GHC.Parser.Header
 import GHC.Data.StringBuffer
 import GHC.Driver.Session
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_920) || defined(GHCLIB_API_920)
 import GHC.Types.SourceError
 #else
 import GHC.Driver.Types

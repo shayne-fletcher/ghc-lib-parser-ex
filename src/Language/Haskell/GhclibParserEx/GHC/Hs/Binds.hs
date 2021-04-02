@@ -7,7 +7,7 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Binds(
   )
 where
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_920) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs.Binds
 import GHC.Hs.Extension
 #else

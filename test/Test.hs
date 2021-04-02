@@ -39,16 +39,16 @@ import Language.Haskell.GhclibParserEx.GHC.Driver.Flags()
 import Language.Haskell.GhclibParserEx.GHC.Driver.Session
 import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920) || defined (GHCLIB_API_900)
 import GHC.Types.SrcLoc
 import GHC.Driver.Session
 import GHC.Parser.Lexer
-# if !defined (GHCLIB_API_HEAD)
+# if !(defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920))
 import GHC.Utils.Outputable
 #endif
 #  if !defined (GHCLIB_API_900)
@@ -98,19 +98,19 @@ makeFile relPath contents = do
 chkParseResult :: (DynFlags -> WarningMessages -> String) -> DynFlags -> ParseResult a -> IO ()
 chkParseResult report flags = \case
     POk s _ -> do
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
       let (wrns, errs) = getMessages s
 #else
       let (wrns, errs) = getMessages s flags
 #endif
       when (not (null errs) || not (null wrns)) $
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
         assertFailure (report flags (fmap pprWarning wrns) ++ report flags (fmap pprError errs))
 #else
         assertFailure (report flags wrns ++ report flags errs)
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
     PFailed s -> assertFailure (report flags $ fmap pprError (snd (getMessages s)))
 #else
     PFailed s -> assertFailure (report flags $ snd (getMessages s flags))
@@ -174,13 +174,13 @@ parseTests = testGroup "Parse tests"
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
     report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
 #else
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920) || defined (GHCLIB_API_900)
 moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
 #else
 moduleTest :: String -> DynFlags -> (Located (HsModule GhcPs) -> IO ()) -> IO ()
@@ -208,7 +208,7 @@ fixityTests = testGroup "Fixity tests"
       exprTest "1 + 2 * 3" flags
         (\e ->
             assertBool "parse tree not affected" $
-#if defined(GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
               showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations e) /=
               showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] e))
 #else
@@ -220,7 +220,7 @@ fixityTests = testGroup "Fixity tests"
       case parseDeclaration "f (1 : 2 :[]) = 1" flags of
         POk _ d ->
           assertBool "parse tree not affected" $
-#if defined(GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
           showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations d) /=
           showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] d))
 #else
@@ -393,7 +393,7 @@ dynFlagsTests = testGroup "DynFlags tests"
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig
-#if defined(GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
     report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
 #else
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]

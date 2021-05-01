@@ -8,9 +8,9 @@ module Language.Haskell.GhclibParserEx.GHC.Utils.Outputable (
 )
 where
 
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_920) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Utils.Outputable
-#if !defined (GHCLIB_API_900)
+#if !defined(GHCLIB_API_HEAD) && !defined (GHCLIB_API_900)
 import GHC.Driver.Ppr
 #endif
 #else

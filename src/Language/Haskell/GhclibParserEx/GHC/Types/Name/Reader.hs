@@ -9,7 +9,7 @@ module Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader(
  )
 where
 
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_920) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Types.SrcLoc
 import GHC.Types.Name
 import GHC.Types.Name.Reader

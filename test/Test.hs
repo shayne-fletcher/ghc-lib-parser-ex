@@ -17,6 +17,10 @@ import Control.Monad
 import Data.List.Extra
 import Data.Maybe
 import Data.Generics.Uniplate.Data
+#if defined (GHCLIB_API_HEAD)
+import GHC.Data.Bag
+import GHC.Parser.Errors.Types
+#endif
 
 import Language.Haskell.GhclibParserEx.Dump
 import Language.Haskell.GhclibParserEx.Fixity
@@ -39,16 +43,16 @@ import Language.Haskell.GhclibParserEx.GHC.Driver.Flags()
 import Language.Haskell.GhclibParserEx.GHC.Driver.Session
 import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Types.SrcLoc
 import GHC.Driver.Session
 import GHC.Parser.Lexer
-# if !(defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920))
+# if !(defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902))
 import GHC.Utils.Outputable
 #endif
 #  if !defined (GHCLIB_API_900)
@@ -95,22 +99,30 @@ makeFile relPath contents = do
     writeFile relPath contents
     return relPath
 
+#if defined (GHCLIB_API_HEAD)
+chkParseResult :: (DynFlags -> Bag (MsgEnvelope PsMessage)  -> String) -> DynFlags -> ParseResult a -> IO ()
+#else
 chkParseResult :: (DynFlags -> WarningMessages -> String) -> DynFlags -> ParseResult a -> IO ()
+#endif
 chkParseResult report flags = \case
     POk s _ -> do
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902)
       let (wrns, errs) = getMessages s
 #else
       let (wrns, errs) = getMessages s flags
 #endif
       when (not (null errs) || not (null wrns)) $
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
+#if defined (GHCLIB_API_HEAD)
+        assertFailure (report flags (fmap (mkParserWarn flags) wrns) ++ report flags (fmap mkParserErr errs))
+#elif defined (GHCLIB_API_902)
         assertFailure (report flags (fmap pprWarning wrns) ++ report flags (fmap pprError errs))
 #else
         assertFailure (report flags wrns ++ report flags errs)
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD)
+    PFailed s -> assertFailure (report flags $ fmap mkParserErr (snd (getMessages s)))
+#elif defined (GHCLIB_API_902)
     PFailed s -> assertFailure (report flags $ fmap pprError (snd (getMessages s)))
 #else
     PFailed s -> assertFailure (report flags $ snd (getMessages s flags))
@@ -121,44 +133,53 @@ chkParseResult report flags = \case
 
 parseTests :: TestTree
 parseTests = testGroup "Parse tests"
-  [ testCase "Module" $
-      chkParseResult report flags $
+  [
+    testCase "Module" $
+      chkParseResult report flags (
         parseModule (unlines
           [ "module Foo (readMany) where"
           , "import Data.List"
           , "import Data.Maybe"
           , "readMany = unfoldr $ listToMaybe . concatMap reads . tails"
-          ]) flags
+          ]) flags)
+  , testCase "Module" $
+      chkParseResult report flags (
+        parseModule (unlines
+          [ "module Foo (readMany) where"
+          , "import Data.List"
+          , "import Data.Maybe"
+          , "readMany = unfoldr $ listToMaybe . concatMap reads . tails"
+          ]) flags)
   , testCase "Signature" $
-      chkParseResult report flags $
+      chkParseResult report flags (
         parseSignature (unlines
           [ "signature Str where"
           , "data Str"
           , "empty :: Str"
           , "append :: Str -> Str -> Str"
-          ]) flags
+          ]) flags)
   , testCase "Import" $
-      chkParseResult report flags $
-        parseImport "import qualified \"foo-lib\" Foo as Bar hiding ((<.>))" flags
+      chkParseResult report flags (
+        parseImport "import qualified \"foo-lib\" Foo as Bar hiding ((<.>))" flags)
   , testCase "Statement" $
-      chkParseResult report flags $
-        parseStatement "Foo foo <- bar" flags
+      chkParseResult report flags (
+        parseStatement "Foo foo <- bar" flags)
   , testCase "Backpack" $
-      chkParseResult report flags $
+      chkParseResult report flags (
         parseBackpack (unlines
           [ "unit main where"
           , "  module Main where"
           , "    main = putStrLn \"Hello world!\""
-          ]) flags
+          ]) flags)
   , testCase "Expression" $
-      chkParseResult report flags $
-        parseExpression "unfoldr $ listToMaybe . concatMap reads . tails" flags
+      chkParseResult report flags (
+        parseExpression "unfoldr $ listToMaybe . concatMap reads . tails" flags)
   , testCase "Declaration (1)" $
-      chkParseResult report flags $
-        parseDeclaration "fact n = if n <= 1 then 1 else n * fact (n - 1)" flags
+      chkParseResult report flags (
+        parseDeclaration "fact n = if n <= 1 then 1 else n * fact (n - 1)" flags)
   , testCase "Declaration (2)" $ -- Example from https://github.com/ndmitchell/hlint/issues/842.
-      chkParseResult report flags $
-        parseDeclaration "infixr 4 <%@~" flags
+      chkParseResult report flags (
+        parseDeclaration "infixr 4 <%@~" flags)
   , testCase "File" $ withTempDir $ \tmpDir -> do
       foo <- makeFile (tmpDir </> "Foo.hs") $ unlines
         ["{-# LANGUAGE ScopedTypeVariables #-}"
@@ -170,17 +191,17 @@ parseTests = testGroup "Parse tests"
       s <- readFile' foo
       parsePragmasIntoDynFlags flags ([], []) foo s >>= \case
         Left msg -> assertFailure msg
-        Right flags -> chkParseResult report flags $ parseFile foo flags s
+        Right flags -> chkParseResult report flags (parseFile foo flags s)
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902)
     report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
 #else
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
 moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
 #else
 moduleTest :: String -> DynFlags -> (Located (HsModule GhcPs) -> IO ()) -> IO ()
@@ -208,7 +229,7 @@ fixityTests = testGroup "Fixity tests"
       exprTest "1 + 2 * 3" flags
         (\e ->
             assertBool "parse tree not affected" $
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902)
               showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations e) /=
               showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] e))
 #else
@@ -220,7 +241,7 @@ fixityTests = testGroup "Fixity tests"
       case parseDeclaration "f (1 : 2 :[]) = 1" flags of
         POk _ d ->
           assertBool "parse tree not affected" $
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902)
           showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations d) /=
           showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] d))
 #else
@@ -376,7 +397,7 @@ dynFlagsTests = testGroup "DynFlags tests"
       -- https://github.com/ndmitchell/hlint/issues/971).
       parsePragmasIntoDynFlags flags ([StarIsType], []) foo s >>= \case
         Left msg -> assertFailure msg
-        Right flags -> chkParseResult report flags $ parseFile foo flags s
+        Right flags -> chkParseResult report flags (parseFile foo flags s)
 #if defined (MIN_VERSION_ghc_lib_parser)
 #  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
   , testCase "ImportQualifiedPost" $ do
@@ -393,7 +414,7 @@ dynFlagsTests = testGroup "DynFlags tests"
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_920)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902)
     report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
 #else
     report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]

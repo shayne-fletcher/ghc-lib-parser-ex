@@ -18,9 +18,9 @@ where
 -- representations rather than the terms themselves, leads to
 -- identical results.
 
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_920) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Utils.Outputable
-#  if !defined(GHCLIB_API_900)
+#  if !defined(GHCLIB_API_HEAD) && !defined(GHCLIB_API_900)
 import GHC.Driver.Ppr
 #  endif
 #else
@@ -42,7 +42,7 @@ extendInstances = HsExtendInstances
 -- string representations.
 toStr :: Data a => HsExtendInstances a -> String
 toStr (HsExtendInstances e) =
-#if defined(GHCLIB_API_HEAD) || defined(GHCLIB_API_920)
+#if defined(GHCLIB_API_HEAD) || defined(GHCLIB_API_902)
   showPprUnsafe $ showAstData BlankSrcSpan BlankEpAnnotations e
 #else
   showSDocUnsafe $ showAstData BlankSrcSpan e
@@ -60,7 +60,7 @@ astListEq as bs = length as == length bs && all (uncurry astEq) (zip as bs)
 -- Use 'ppr' for 'Show'.
 instance Outputable a => Show (HsExtendInstances a) where
   show (HsExtendInstances e) =
-#if defined(GHCLIB_API_HEAD) || defined(GHCLIB_API_920)
+#if defined(GHCLIB_API_HEAD) || defined(GHCLIB_API_902)
     showPprUnsafe $ ppr e
 #else
     showSDocUnsafe $ ppr e

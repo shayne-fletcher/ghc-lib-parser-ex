@@ -3,7 +3,7 @@
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Driver.Flags () where
 
-#if !(defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_920) || defined (GHCLIB_API_900))
+#if !(defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900))
 import DynFlags
 #endif
 

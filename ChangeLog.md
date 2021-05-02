@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 0.20210501 released 2021-05-01
+- Update to `ghc-lib-0.20210501`
+
 ## 0.20210331 released 2021-02-31
 - Update to `ghc-lib-0.20210331`
 

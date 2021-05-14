@@ -8,8 +8,6 @@
 
 ## 0.20210331 released 2021-02-31
 - Update to `ghc-lib-0.20210331`
-
-## Unreleased
 - Upgrade to `ghc-lib-parser-9.0.1.20210324`
 
 ## 9.0.0.4 released 2021-03-11

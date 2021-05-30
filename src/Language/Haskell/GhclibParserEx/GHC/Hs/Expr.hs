@@ -69,7 +69,11 @@ isWHNF = \case
   (L _ HsLam{}) -> True
   (L _ ExplicitTuple{}) -> True
   (L _ ExplicitList{}) -> True
+#if defined (GHCLIB_API_HEAD)
+  (L _ (HsPar _ _ x _)) -> isWHNF x
+#else
   (L _ (HsPar _ x)) -> isWHNF x
+#endif
   (L _ (ExprWithTySig _ x _)) -> isWHNF x
   -- Other (unknown) constructors may have bang patterns in them, so
   -- approximate.
@@ -86,13 +90,22 @@ isStrictMatch :: HsMatchContext RdrName -> Bool
 isStrictMatch = \case FunRhs{mc_strictness=SrcStrict} -> True; _ -> False
 
 -- Field is punned e.g. '{foo}'.
+#if defined (GHCLIB_API_HEAD)
+isFieldPun :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
+isFieldPun = \case (L _ HsFieldBind {hfbPun=True}) -> True; _ -> False
+#else
 isFieldPun :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 isFieldPun = \case (L _ HsRecField {hsRecPun=True}) -> True; _ -> False
-
+#endif
 -- Field puns in updates have a different type to field puns in
 -- constructions.
+#if defined (GHCLIB_API_HEAD)
+isFieldPunUpdate :: HsFieldBind (FieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
+isFieldPunUpdate = \case HsFieldBind {hfbPun=True} -> True; _ -> False
+#else
 isFieldPunUpdate :: HsRecField' (AmbiguousFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 isFieldPunUpdate = \case HsRecField {hsRecPun=True} -> True; _ -> False
+#endif
 
 -- Contains a '..' as in 'Foo{..}'
 hasFieldsDotDot :: HsRecFields GhcPs (LHsExpr GhcPs) -> Bool
@@ -143,17 +156,28 @@ isTransStmt :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isTransStmt = \case TransStmt{} -> True; _ -> False
 
 -- Field has a '_' as in '{foo=_} or is punned e.g. '{foo}'.
+#if defined (GHCLIB_API_HEAD)
+isFieldWildcard :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
+#else
 isFieldWildcard :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
+#endif
 isFieldWildcard = \case
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+  (L _ HsFieldBind {hfbRHS=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
+#elif defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
 #elif defined (GHCLIB_API_810)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ _))}) -> True
 #else
   (L _ HsRecField {hsRecFieldArg=(L _ (EWildPat _))}) -> True
 #endif
+#if defined (GHCLIB_API_HEAD)
+  (L _ HsFieldBind {hfbPun=True}) -> True
+  (L _ HsFieldBind {}) -> False
+#else
   (L _ HsRecField {hsRecPun=True}) -> True
   (L _ HsRecField {}) -> False
+#endif
 
 isUnboxed :: Boxity -> Bool
 isUnboxed = \case Unboxed -> True; _ -> False

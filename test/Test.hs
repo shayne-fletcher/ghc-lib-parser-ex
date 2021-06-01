@@ -59,7 +59,9 @@ import GHC.Utils.Outputable
 #endif
 #  if !defined (GHCLIB_API_900)
 import GHC.Driver.Ppr
+#    if !defined (GHCLIB_API_HEAD)
 import GHC.Parser.Errors.Ppr
+#    endif
 #  endif
 import GHC.Utils.Error
 import GHC.Types.Name.Reader

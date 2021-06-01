@@ -117,8 +117,16 @@ hasPFieldsDotDot HsRecFields {rec_dotdot=Just _} = True
 hasPFieldsDotDot _ = False
 
 -- Field has a '_' as in '{foo=_} or is punned e.g. '{foo}'.
+#if defined (GHCLIB_API_HEAD)
+isPFieldWildcard :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LPat GhcPs) -> Bool
+#else
 isPFieldWildcard :: LHsRecField GhcPs (LPat GhcPs) -> Bool
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#endif
+#if defined (GHCLIB_API_HEAD)
+isPFieldWildcard (L _ HsFieldBind {hfbRHS=L _ WildPat {}}) = True
+isPFieldWildcard (L _ HsFieldBind {hfbPun=True}) = True
+isPFieldWildcard (L _ HsFieldBind {}) = False
+#elif defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 isPFieldWildcard (L _ HsRecField {hsRecFieldArg=L _ WildPat {}}) = True
 isPFieldWildcard (L _ HsRecField {hsRecPun=True}) = True
 isPFieldWildcard (L _ HsRecField {}) = False
@@ -136,8 +144,14 @@ isPWildcard (dL -> L _ (WildPat _)) = True
 #endif
 isPWildcard _ = False
 
+#if defined (GHCLIB_API_HEAD)
+isPFieldPun :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LPat GhcPs) -> Bool
+#else
 isPFieldPun :: LHsRecField GhcPs (LPat GhcPs) -> Bool
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#endif
+#if defined (GHCLIB_API_HEAD)
+isPFieldPun (L _ HsFieldBind {hfbPun=True}) = True
+#elif defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 isPFieldPun (L _ HsRecField {hsRecPun=True}) = True
 #else
 isPFieldPun (dL -> L _ HsRecField {hsRecPun=True}) = True

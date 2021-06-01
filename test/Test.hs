@@ -19,7 +19,9 @@ import Data.Maybe
 import Data.Generics.Uniplate.Data
 #if defined (GHCLIB_API_HEAD)
 import GHC.Data.Bag
-import GHC.Parser.Errors.Types
+import GHC.Driver.Errors.Types
+import GHC.Types.Error hiding (getMessages)
+import qualified GHC.Types.Error (getMessages)
 #endif
 
 import Language.Haskell.GhclibParserEx.Dump
@@ -100,7 +102,7 @@ makeFile relPath contents = do
     return relPath
 
 #if defined (GHCLIB_API_HEAD)
-chkParseResult :: (DynFlags -> Bag (MsgEnvelope PsMessage)  -> String) -> DynFlags -> ParseResult a -> IO ()
+chkParseResult :: (DynFlags -> Bag (MsgEnvelope GhcMessage)  -> String) -> DynFlags -> ParseResult a -> IO ()
 #else
 chkParseResult :: (DynFlags -> WarningMessages -> String) -> DynFlags -> ParseResult a -> IO ()
 #endif
@@ -113,20 +115,22 @@ chkParseResult report flags = \case
 #endif
       when (not (null errs) || not (null wrns)) $
 #if defined (GHCLIB_API_HEAD)
-        assertFailure (report flags (fmap (mkParserWarn flags) wrns) ++ report flags (fmap mkParserErr errs))
+        assertFailure (
+          report flags (GHC.Types.Error.getMessages (GhcPsMessage <$> wrns)) ++
+          report flags (GHC.Types.Error.getMessages (GhcPsMessage <$> errs))
+        )
+
 #elif defined (GHCLIB_API_902)
         assertFailure (report flags (fmap pprWarning wrns) ++ report flags (fmap pprError errs))
 #else
         assertFailure (report flags wrns ++ report flags errs)
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 #if defined (GHCLIB_API_HEAD)
-    PFailed s -> assertFailure (report flags $ fmap mkParserErr (snd (getMessages s)))
+    PFailed s -> assertFailure (report flags $ GHC.Types.Error.getMessages (GhcPsMessage <$> snd (getMessages s)))
 #elif defined (GHCLIB_API_902)
     PFailed s -> assertFailure (report flags $ fmap pprError (snd (getMessages s)))
-#else
+#elif defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
     PFailed s -> assertFailure (report flags $ snd (getMessages s flags))
-#endif
 #else
     PFailed _ loc err -> assertFailure (report flags $ unitBag $ mkPlainErrMsg flags loc err)
 #endif
@@ -285,8 +289,16 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isDot" $ test "f . g" $ \case L _ (OpApp _ _ op _) -> assert' $ isDot op; _ -> assertFailure "unexpected"
   , testCase "isReturn" $ test "return x" $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
   , testCase "isReturn" $ test "pure x" $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
+#if defined (GHCLIB_API_HEAD)
+  , testCase "isSection" $ test "(1 +)" $ \case L _ (HsPar _ _ x _) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+#else
   , testCase "isSection" $ test "(1 +)" $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+#endif
+#if defined (GHCLIB_API_HEAD)
+  , testCase "isSection" $ test "(+ 1)" $ \case L _ (HsPar _ _ x _) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+#else
   , testCase "isSection" $ test "(+ 1)" $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
+#endif
   , testCase "isRecConstr" $ test "Foo {bar=1}" $ assert' . isRecConstr
   , testCase "isRecUpdate" $ test "foo {bar=1}" $ assert' . isRecUpdate
   , testCase "isVar" $ test "foo" $ assert' . isVar

@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.20 released 2021-06-06
+- Update to `ghc-lib-8.10.5.20210606`
+
 ## 0.20210601 released 2021-06-01
 - Update to `ghc-lib-parser-0.20210601`
 - Update types in `GHC.Types.Name.Reader` for ghc-9.2.1, `Located` becomes `LocatedN`

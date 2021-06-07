@@ -6,13 +6,12 @@ homepage:       https://github.com/shayne-fletcher/ghc-lib-parser-ex#readme
 bug-reports:    https://github.com/shayne-fletcher/ghc-lib-parser-ex/issues
 author:         Shayne Fletcher
 maintainer:     shayne@shaynefletcher.org
-copyright:      Copyright © 2020, Shayne Fletcher. All rights reserved.
+copyright:      Copyright © 2020-2021 Shayne Fletcher. All rights reserved.
 license:        BSD3
 license-file:   LICENSE
 category:       Development
 synopsis:       Algorithms on GHC parse trees
 build-type:     Simple
-tested-with:    GHC==8.8.2, GHC==8.6.5
 extra-source-files:
     README.md
     ChangeLog.md

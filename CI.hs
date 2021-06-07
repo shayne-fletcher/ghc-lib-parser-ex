@@ -1,4 +1,4 @@
--- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020, 2021 Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# LANGUAGE TupleSections #-}
@@ -11,6 +11,7 @@
 module CI (main) where
 
 import Control.Monad.Extra
+import Control.Applicative
 import System.Directory
 import System.FilePath
 import System.IO.Extra
@@ -52,8 +53,7 @@ data StackOptions = StackOptions
     } deriving (Show)
 
 parseOptions :: Opts.Parser Options
-parseOptions = Options
-    <$> parseStackOptions
+parseOptions = Options <$> parseStackOptions
 
 parseStackOptions :: Opts.Parser StackOptions
 parseStackOptions = StackOptions
@@ -88,6 +88,43 @@ buildDist opts = do
       stack' opts "exec -- pacman -S autoconf automake-wrapper make patch python tar --noconfirm"
     isolatedBuild opts
 
+patchCabal :: String -> IO ()
+patchCabal version = do
+  setSGR [SetColor Foreground Dull Red]
+  putStrLn "Patching cabal:"
+  putStrLn $ "- version " ++ version
+  writeFile "ghc-lib-parser-ex.cabal" .
+      replace "version:        0.1.0" ("version:        " ++ version)
+      =<< readFile' "ghc-lib-parser-ex.cabal"
+  -- If the version is of form major.minor.* parse out the major and
+  -- minor numbers and patch the ghc bounds with them.
+  let series =
+        case stripInfix "." version of
+          Just (major, r) ->
+            case stripInfix "." r of
+              Just (minor, _) ->
+                liftA2 (,) (maybeRead major) (maybeRead minor)
+              _ -> Nothing
+          _ -> Nothing
+  case series of
+    Just (major, minor) -> do
+      let family = show major ++ "." ++ show minor ++ ".*"
+      let lower  = show major ++ "." ++ show minor ++ ".0"
+      let upper  = show major ++ "." ++ show (minor + 1) ++ ".0"
+      putStrLn $ "- ghc >= " ++ lower ++ " && ghc < " ++ upper
+      writeFile "ghc-lib-parser-ex.cabal" .
+        replace "9.0.0" lower .
+        replace "9.1.0" upper .
+        replace "9.0.*" family
+        =<< readFile' "ghc-lib-parser-ex.cabal"
+    Nothing -> return ()
+  setSGR [Reset]
+  where
+    maybeRead :: String -> Maybe Int
+    maybeRead s
+      | [(x, "")] <- reads s = Just x
+      | otherwise = Nothing
+
 isolatedBuild :: StackOptions -> IO ()
 isolatedBuild opts@StackOptions {..} = do
   version <- tag
@@ -101,9 +138,7 @@ isolatedBuild opts@StackOptions {..} = do
     copyDirectoryRecursive (rootDir </> "src") (tmpDir </> "src")
     copyDirectoryRecursive (rootDir </> "test") (tmpDir </> "test")
     withCurrentDirectory tmpDir $ do
-      writeFile "ghc-lib-parser-ex.cabal" .
-          replace "version:        0.1.0" ("version:        " ++ version)
-          =<< readFile' "ghc-lib-parser-ex.cabal"
+      patchCabal version
       stack "sdist . --tar-dir=."
       copyFile (pkg_ghclib_parser_ex <> ".tar.gz") (rootDir </> (pkg_ghclib_parser_ex <> ".tar.gz"))
       cmd $ "tar -xvf " <> (pkg_ghclib_parser_ex  <> ".tar.gz")

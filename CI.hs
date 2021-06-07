@@ -100,7 +100,7 @@ patchCabal version = do
   -- If the version is of form major.minor.* parse out the major and
   -- minor numbers and patch the ghc bounds with them.
   let series =
-        case bimap id (stripInfix ".") <$> stripInfix "." version of
+        case second (stripInfix ".") <$> stripInfix "." version of
           Just (major, Just (minor, _)) ->
             liftA2 (,) (maybeRead major) (maybeRead minor)
           _ -> Nothing

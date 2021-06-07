@@ -24,6 +24,7 @@ import Data.Time.Clock
 import Data.Time.Calendar
 import Data.Foldable
 import Data.Maybe
+import Data.Bifunctor
 import qualified Options.Applicative as Opts
 import GHC.Stack
 import System.IO.Unsafe
@@ -99,12 +100,9 @@ patchCabal version = do
   -- If the version is of form major.minor.* parse out the major and
   -- minor numbers and patch the ghc bounds with them.
   let series =
-        case stripInfix "." version of
-          Just (major, r) ->
-            case stripInfix "." r of
-              Just (minor, _) ->
-                liftA2 (,) (maybeRead major) (maybeRead minor)
-              _ -> Nothing
+        case bimap id (stripInfix ".") <$> stripInfix "." version of
+          Just (major, Just (minor, _)) ->
+            liftA2 (,) (maybeRead major) (maybeRead minor)
           _ -> Nothing
   case series of
     Just (major, minor) -> do

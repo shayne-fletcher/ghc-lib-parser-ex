@@ -1,4 +1,4 @@
-cabal-version: >= 1.18
+cabal-version:  1.18
 name:           ghc-lib-parser-ex
 version:        0.1.0
 description:    Please see the README on GitHub at <https://github.com/shayne-fletcher/ghc-lib-parser-ex#readme>

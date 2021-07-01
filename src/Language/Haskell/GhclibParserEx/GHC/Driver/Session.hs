@@ -44,6 +44,9 @@ import Data.Function -- For `compareOn`.
 instance Ord Extension where
   compare = compare `on` fromEnum
 #endif
+#if defined (GHCLIB_API_HEAD)
+import GHC.Driver.Config.Parser
+#endif
 
 -- | Parse a GHC extension.
 readExtension :: String -> Maybe Extension
@@ -158,7 +161,12 @@ parsePragmasIntoDynFlags :: DynFlags
                          -> IO (Either String DynFlags)
 parsePragmasIntoDynFlags flags (enable, disable) file str =
   catchErrors $ do
-    let opts = getOptions flags (stringToStringBuffer str) file
+    let opts =
+#if defined (GHCLIB_API_HEAD)
+          getOptions (initParserOpts flags) (stringToStringBuffer str) file
+#else
+          getOptions flags (stringToStringBuffer str) file
+#endif
     -- Important : apply enables, disables *before* parsing dynamic
     -- file pragmas.
     let flags' =  foldl' xopt_set flags enable

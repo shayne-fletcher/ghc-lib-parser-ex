@@ -28,7 +28,12 @@ import GHC.Hs
 import HsSyn
 #endif
 #if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902)
+#  if defined (GHCLIB_API_902)
 import GHC.Driver.Config
+#  endif
+#  if defined (GHCLIB_API_HEAD)
+import GHC.Driver.Config.Parser
+#  endif
 #endif
 #if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Parser.PostProcess

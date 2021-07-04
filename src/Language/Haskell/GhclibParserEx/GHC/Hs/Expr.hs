@@ -9,7 +9,7 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   isTag, isDol, isDot, isReturn, isSection, isRecConstr, isRecUpdate,
   isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isLambda, isQuasiQuote,
   isDotApp, isTypeApp, isWHNF, isLCase,
-  isFieldPun, isFieldPunUpdate, isRecStmt, isParComp, isMDo, isTupleSection, isString, isPrimLiteral,
+  isFieldPun, isFieldPunUpdate, isRecStmt, isParComp, isMDo, isListComp, isMonadComp, isTupleSection, isString, isPrimLiteral,
   isSpliceDecl, isFieldWildcard, isUnboxed, isWholeFrac, isStrictMatch, isMultiIf, isProc, isTransStmt,
   hasFieldsDotDot,
   varToStr, strToVar,
@@ -117,12 +117,21 @@ isRecStmt = \case RecStmt{} -> True; _ -> False
 isParComp :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isParComp = \case ParStmt{} -> True; _ -> False
 
+-- TODO: Seems `HsStmtContext (HsDoRn p)` on master right now.
 #if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 isMDo :: HsStmtContext GhcRn -> Bool
 isMDo = \case MDoExpr _ -> True; _ -> False
+isMonadComp :: HsStmtContext GhcRn -> Bool
+isMonadComp = \case MonadComp -> True; _ -> False
+isListComp :: HsStmtContext GhcRn -> Bool
+isListComp = \case ListComp -> True; _ -> False
 #else
 isMDo :: HsStmtContext Name -> Bool
 isMDo = \case MDoExpr -> True; _ -> False
+isMonadComp :: HsStmtContext Name -> Bool
+isMonadComp = \case MonadComp -> True; _ -> False
+isListComp :: HsStmtContext Name -> Bool
+isListComp = \case ListComp -> True; _ -> False
 #endif
 
 isTupleSection :: HsTupArg GhcPs -> Bool

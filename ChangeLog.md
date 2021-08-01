@@ -1,9 +1,10 @@
 # Changelog for ghc-lib-parser-ex
 
-## Unreleased
+## 0.20210801 released 2021-08-01
 - Added to `GhclibParserEx.GHC.Hs.Expr`:
   - `isMonadComp`
   - `isListComp`
+- Update to `ghc-lib-0.20210801`
 
 ## 0.20210701 released 2021-07-01
 - Update to `ghc-lib-0.20210701`

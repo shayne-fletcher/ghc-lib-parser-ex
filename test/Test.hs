@@ -353,7 +353,13 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isQuasiQuote" $ test "[expr(1 + 2)]" $ assert' . not . isQuasiQuote
   , testCase "isWholeFrac" $ test "3.2e1" $ assert' . isWholeFrac . unLoc
   , testCase "isWholeFrac" $ test "3.22e1" $ assert' . not . isWholeFrac . unLoc
-  , testCase "isMDo" $ test "mdo { pure () }" $ assert' . any isMDo . universeBi
+  , testCase "isMDo" $ test_with_exts [ RecursiveDo ] "mdo { pure () }" $ assert' . any isMDo . universeBi
+  , testCase "isListComp (1)" $ test "[ x + y | x <- xs, y <- ys ]" $ assert' . any isListComp . universeBi
+  , testCase "isListComp (2)" $ test_with_exts [ MonadComprehensions ] "[ x + y | x <- xs, y <- ys ]" $ assert' . any isMonadComp . universeBi
+  , testCase "isMonadComp (0)" $ test_with_exts [ MonadComprehensions ] "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . not . any isListComp . universeBi
+  , testCase "isMonadComp (1)" $ test_with_exts [ MonadComprehensions ] "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . any isMonadComp . universeBi
+  , testCase "isMonadComp (2)" $ test_with_exts [] "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . not . any isMonadComp . universeBi
+  , testCase "isMonadComp (3)" $ test_with_exts [] "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . any isListComp . universeBi
   , testCase "strToVar" $ assert' . isVar . strToVar $ "foo"
   , testCase "varToStr" $ test "[]" $ assert' . (== "[]") . varToStr
   , testCase "varToStr" $ test "foo" $ assert' . (== "foo") . varToStr
@@ -361,15 +367,17 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   ]
   where
     assert' = assertBool ""
-    test s = exprTest s flags
-    flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
-              [ TemplateHaskell
-              , TemplateHaskellQuotes
-              , QuasiQuotes
-              , TypeApplications
-              , LambdaCase
-              , RecursiveDo
-              ]
+    test s = exprTest s (flags [])
+    test_with_exts exts s = exprTest s (flags exts)
+    flags exts = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
+              (exts ++
+                 [ TemplateHaskell
+                 , TemplateHaskellQuotes
+                 , QuasiQuotes
+                 , TypeApplications
+                 , LambdaCase
+                 ]
+              )
 
 patternPredicateTests :: TestTree
 patternPredicateTests = testGroup "Pattern predicate tests"

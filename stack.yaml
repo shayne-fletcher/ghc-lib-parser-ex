@@ -1,6 +1,6 @@
 resolver: nightly-2021-03-31 # ghc-8.10.4
 extra-deps:
-- ghc-lib-parser-0.20210601
+- ghc-lib-parser-0.20210701
 ghc-options:
     "$locals": -ddump-to-file -ddump-hi -Wall -Wno-name-shadowing -Wunused-imports
 flags:

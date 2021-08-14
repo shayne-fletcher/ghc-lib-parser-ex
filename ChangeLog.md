@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.22 released 2021-08-14
+- Update to `ghc-lib-parser-0.20210814`
+
 ## 8.10.0.21 released 2021-06-07
 - Bugfix cabal files
 

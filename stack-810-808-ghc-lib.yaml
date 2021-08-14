@@ -1,6 +1,6 @@
 resolver: nightly-2020-01-25 # ghc-8.8.2
 extra-deps:
-  - ghc-lib-parser-8.10.5.20210606
+  - ghc-lib-parser-8.10.6.20210814
 ghc-options:
     "$locals": -Wall -Wno-name-shadowing
 flags:

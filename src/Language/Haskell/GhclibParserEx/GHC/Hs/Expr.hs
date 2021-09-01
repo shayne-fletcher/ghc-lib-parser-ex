@@ -118,7 +118,14 @@ isParComp :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isParComp = \case ParStmt{} -> True; _ -> False
 
 -- TODO: Seems `HsStmtContext (HsDoRn p)` on master right now.
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD)
+isMDo :: HsDoFlavour -> Bool
+isMDo = \case MDoExpr _ -> True; _ -> False
+isMonadComp :: HsDoFlavour -> Bool
+isMonadComp = \case MonadComp -> True; _ -> False
+isListComp :: HsDoFlavour -> Bool
+isListComp = \case ListComp -> True; _ -> False
+#elif defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 isMDo :: HsStmtContext GhcRn -> Bool
 isMDo = \case MDoExpr _ -> True; _ -> False
 isMonadComp :: HsStmtContext GhcRn -> Bool
@@ -192,7 +199,11 @@ isUnboxed :: Boxity -> Bool
 isUnboxed = \case Unboxed -> True; _ -> False
 
 isWholeFrac :: HsExpr GhcPs -> Bool
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902)
+
+#if defined (GHCLIB_API_HEAD)
+isWholeFrac (HsLit _ (HsRat _ fl@FL{} _)) = denominator (rationalFromFractionalLit fl) == 1
+isWholeFrac (HsOverLit _ (OverLit _ (HsFractional fl@FL {}) )) = denominator (rationalFromFractionalLit fl) == 1
+#elif defined(GHCLIB_API_902)
 isWholeFrac (HsLit _ (HsRat _ fl@FL{} _)) = denominator (rationalFromFractionalLit fl) == 1
 isWholeFrac (HsOverLit _ (OverLit _ (HsFractional fl@FL {}) _)) = denominator (rationalFromFractionalLit fl) == 1
 #else

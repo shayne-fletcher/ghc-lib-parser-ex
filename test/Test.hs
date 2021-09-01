@@ -20,8 +20,7 @@ import Data.Generics.Uniplate.Data
 #if defined (GHCLIB_API_HEAD)
 import GHC.Data.Bag
 import GHC.Driver.Errors.Types
-import GHC.Types.Error hiding (getMessages)
-import qualified GHC.Types.Error (getMessages)
+import GHC.Types.Error
 #endif
 
 import Language.Haskell.GhclibParserEx.Dump
@@ -110,7 +109,9 @@ chkParseResult :: (DynFlags -> WarningMessages -> String) -> DynFlags -> ParseRe
 #endif
 chkParseResult report flags = \case
     POk s _ -> do
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD)
+      let (wrns, errs) = getPsMessages s
+#elif defined (GHCLIB_API_902)
       let (wrns, errs) = getMessages s
 #else
       let (wrns, errs) = getMessages s flags
@@ -118,8 +119,8 @@ chkParseResult report flags = \case
       when (not (null errs) || not (null wrns)) $
 #if defined (GHCLIB_API_HEAD)
         assertFailure (
-          report flags (GHC.Types.Error.getMessages (GhcPsMessage <$> wrns)) ++
-          report flags (GHC.Types.Error.getMessages (GhcPsMessage <$> errs))
+          report flags (getMessages (GhcPsMessage <$> wrns)) ++
+          report flags (getMessages (GhcPsMessage <$> errs))
         )
 
 #elif defined (GHCLIB_API_902)
@@ -128,7 +129,7 @@ chkParseResult report flags = \case
         assertFailure (report flags wrns ++ report flags errs)
 #endif
 #if defined (GHCLIB_API_HEAD)
-    PFailed s -> assertFailure (report flags $ GHC.Types.Error.getMessages (GhcPsMessage <$> snd (getMessages s)))
+    PFailed s -> assertFailure (report flags $ getMessages (GhcPsMessage <$> snd (getPsMessages s)))
 #elif defined (GHCLIB_API_902)
     PFailed s -> assertFailure (report flags $ fmap pprError (snd (getMessages s)))
 #elif defined (GHCLIB_API_900) || defined (GHCLIB_API_810)

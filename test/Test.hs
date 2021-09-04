@@ -390,12 +390,21 @@ patternPredicateTests = testGroup "Pattern predicate tests"
   , testCase "strToPat" $ assert' . (== "[]") . patToStr . strToPat $ "[]"
   , testCase "fromPChar" $ test "'a'" $ assert' . (== Just 'a') . fromPChar
   , testCase "fromPChar" $ test "\"a\"" $ assert' . isNothing . fromPChar
+  , testCase "isSplicePat" $ test "$(varP pylonExPtrVarName)" $ assert' . isSplicePat
   ]
   where
     assert' = assertBool ""
-    test s = patTest s flags
-    flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
-              [ TemplateHaskell, QuasiQuotes, TypeApplications, LambdaCase ]
+    test = test_with_exts []
+    test_with_exts exts s = patTest s (flags exts)
+    flags exts = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
+              (exts ++
+                 [ TemplateHaskell
+                 , TemplateHaskellQuotes
+                 , QuasiQuotes
+                 , TypeApplications
+                 , LambdaCase
+                 ]
+              )
 
 dynFlagsTests :: TestTree
 dynFlagsTests = testGroup "DynFlags tests"

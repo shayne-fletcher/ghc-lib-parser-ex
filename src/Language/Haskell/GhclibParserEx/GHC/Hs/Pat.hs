@@ -9,6 +9,7 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Pat(
   , fromPChar
   , hasPFieldsDotDot
   , isPFieldWildcard, isPWildcard, isPFieldPun, isPatTypeSig, isPBangPat, isPViewPat
+  , isSplicePat
  ) where
 
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
@@ -167,4 +168,11 @@ isPViewPat (L _ ViewPat{}) = True; isPViewPat _ = False
 isPatTypeSig (dL -> L _ SigPat{}) = True; isPatTypeSig _ = False
 isPBangPat (dL -> L _ BangPat{}) = True; isPBangPat _ = False
 isPViewPat (dL -> L _ ViewPat{}) = True; isPViewPat _ = False
+#endif
+
+isSplicePat :: LPat GhcPs -> Bool
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+isSplicePat (L _ SplicePat{}) = True; isSplicePat _ = False
+#else
+isSplicePat (dL -> L _ SplicePat{}) = True; isSplicePat _ = False
 #endif

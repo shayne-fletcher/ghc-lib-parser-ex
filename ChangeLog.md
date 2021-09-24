@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Add `isSplicePat` to `Language.Haskell.GhclibParserEx.GHC.Hs.Pat`
+- Use `genericPlatform` on `GHCLIB_API_HEAD` in `GhclibParserEx.GHC.Settings.Config.hs`
 
 ## 0.20210901 released 2021-09-01
 - Update to `ghc-lib-parser-0.20210901`

@@ -53,7 +53,7 @@ import HsSyn
 import GHC.Types.SrcLoc
 import GHC.Driver.Session
 import GHC.Parser.Lexer
-# if !(defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902))
+# if !defined (GHCLIB_API_HEAD)
 import GHC.Utils.Outputable
 #endif
 #  if !defined (GHCLIB_API_900)

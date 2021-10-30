@@ -37,7 +37,7 @@ fakeSettings = Settings
   , sFileSettings=fileSettings
   , sTargetPlatform=platform
   , sPlatformMisc=platformMisc
-#  if !defined(GHCLIB_API_HEAD)
+#  if !defined(GHCLIB_API_HEAD) && !defined(GHCLIB_API_902)
   , sPlatformConstants=platformConstants
 #  endif
   , sToolSettings=toolSettings
@@ -63,11 +63,11 @@ fakeSettings = Settings
                     }
 #endif
     platform =
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902)
       genericPlatform
 #else
       Platform{
-#if defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_900)
     -- It doesn't matter what values we write here as these fields are
     -- not referenced for our purposes. However the fields are strict
     -- so we must say something.
@@ -96,7 +96,7 @@ fakeSettings = Settings
       , platformUnregisterised=True
       }
 #endif
-#if !defined(GHCLIB_API_HEAD)
+#if !defined(GHCLIB_API_HEAD) && !defined(GHCLIB_API_902)
     platformConstants =
       PlatformConstants{pc_DYNAMIC_BY_DEFAULT=False,pc_WORD_SIZE=8}
 #endif

@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 9.2.0.0 released 2021-10-30
+- Update to `ghc-lib-parser-9.2.1.20211030`
+
 ## 0.20211001 released 2021-10-01
 - Add `isSplicePat` to `Language.Haskell.GhclibParserEx.GHC.Hs.Pat`
 - Use `genericPlatform` on `GHCLIB_API_HEAD` in `GhclibParserEx.GHC.Settings.Config.hs`

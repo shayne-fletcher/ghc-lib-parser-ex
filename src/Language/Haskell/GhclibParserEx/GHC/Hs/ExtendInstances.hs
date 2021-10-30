@@ -20,9 +20,6 @@ where
 
 #if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Utils.Outputable
-#  if !defined(GHCLIB_API_HEAD) && !defined(GHCLIB_API_900)
-import GHC.Driver.Ppr
-#  endif
 #else
 import Outputable
 #endif

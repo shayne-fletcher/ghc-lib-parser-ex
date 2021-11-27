@@ -100,7 +100,7 @@ isFieldPun = \case (L _ HsRecField {hsRecPun=True}) -> True; _ -> False
 -- Field puns in updates have a different type to field puns in
 -- constructions.
 #if defined (GHCLIB_API_HEAD)
-isFieldPunUpdate :: HsFieldBind (FieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
+isFieldPunUpdate :: HsFieldBind (LAmbiguousFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 isFieldPunUpdate = \case HsFieldBind {hfbPun=True} -> True; _ -> False
 #else
 isFieldPunUpdate :: HsRecField' (AmbiguousFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool

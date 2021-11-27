@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## Unreleased
+- Bugfix to `isFieldPunUpdate`
+
 ## 9.2.0.1 released 2021-11-01
 - Update to `ghc-lib-parser-9.2.1.20211101`
 

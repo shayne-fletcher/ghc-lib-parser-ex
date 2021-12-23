@@ -41,6 +41,7 @@ library
       Language.Haskell.GhclibParserEx.GHC.Hs
       Language.Haskell.GhclibParserEx.GHC.Hs.Expr
       Language.Haskell.GhclibParserEx.GHC.Hs.Pat
+      Language.Haskell.GhclibParserEx.GHC.Hs.Type
       Language.Haskell.GhclibParserEx.GHC.Hs.Types
       Language.Haskell.GhclibParserEx.GHC.Hs.Decls
       Language.Haskell.GhclibParserEx.GHC.Hs.Binds

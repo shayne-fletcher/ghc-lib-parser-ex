@@ -31,6 +31,7 @@ import Language.Haskell.GhclibParserEx.GHC.Hs
 import Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances
 import Language.Haskell.GhclibParserEx.GHC.Hs.Expr
 import Language.Haskell.GhclibParserEx.GHC.Hs.Pat
+import Language.Haskell.GhclibParserEx.GHC.Hs.Type
 -- We only test 'isImportQualifiedPost' at this time which requires >=
 -- 8.10; avoid unused import warning.
 #if defined (MIN_VERSION_ghc_lib_parser)
@@ -91,6 +92,7 @@ tests = testGroup " All tests"
   , fixityTests
   , extendInstancesTests
   , expressionPredicateTests
+  , typePredicateTests
   , patternPredicateTests
   , dynFlagsTests
   , nameTests
@@ -224,6 +226,12 @@ exprTest s flags test =
         POk _ e -> test e
         _ -> assertFailure "parse error"
 
+typeTest :: String -> DynFlags -> (LHsType GhcPs -> IO ()) -> IO ()
+typeTest s flags test =
+      case parseType s flags of
+        POk _ e -> test e
+        _ -> assertFailure "parse error"
+
 patTest :: String -> DynFlags -> (LPat GhcPs -> IO ()) -> IO ()
 patTest s flags test =
       case parsePattern s flags of
@@ -283,6 +291,16 @@ extendInstancesTests = testGroup "Extend instances tests"
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig
+
+typePredicateTests :: TestTree
+typePredicateTests = testGroup "Type predicate tests"
+  [ testCase "isKindTyApp" $ test_with_exts [TypeApplications] "K @T" $ assert' . isKindTyApp
+  , testCase "isKindTyApp" $ test_with_exts [TypeApplications] "K T" $ assert' . not . isKindTyApp
+  ]
+  where
+    assert' = assertBool ""
+    test_with_exts exts s = typeTest s (flags exts)
+    flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
 
 expressionPredicateTests :: TestTree
 expressionPredicateTests = testGroup "Expression predicate tests"

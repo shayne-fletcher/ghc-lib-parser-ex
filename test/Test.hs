@@ -368,8 +368,8 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isSpliceDecl" $ test "$x" $ assert' . isSpliceDecl . unLoc
   , testCase "isSpliceDecl" $ test "f$x" $ assert' . not . isSpliceDecl . unLoc
   , testCase "isSpliceDecl" $ test "$(a + b)" $ assert' . isSpliceDecl . unLoc
-  , testCase "isQuasiQuote" $ test "[expr|1 + 2|]" $ assert' . isQuasiQuote
-  , testCase "isQuasiQuote" $ test "[expr(1 + 2)]" $ assert' . not . isQuasiQuote
+  , testCase "isQuasiQuote" $ test "[expr|1 + 2|]" $ assert' . isQuasiQuoteExpr
+  , testCase "isQuasiQuote" $ test "[expr(1 + 2)]" $ assert' . not . isQuasiQuoteExpr
   , testCase "isWholeFrac" $ test "3.2e1" $ assert' . isWholeFrac . unLoc
   , testCase "isWholeFrac" $ test "3.22e1" $ assert' . not . isWholeFrac . unLoc
   , testCase "isMDo" $ test_with_exts [ RecursiveDo ] "mdo { pure () }" $ assert' . any isMDo . universeBi

@@ -7,7 +7,7 @@
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   isTag, isDol, isDot, isReturn, isSection, isRecConstr, isRecUpdate,
-  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isLambda, isQuasiQuote,
+  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isLambda, isQuasiQuoteExpr, isQuasiQuoteSplice,
   isDotApp, isTypeApp, isWHNF, isLCase,
   isFieldPun, isFieldPunUpdate, isRecStmt, isParComp, isMDo, isListComp, isMonadComp, isTupleSection, isString, isPrimLiteral,
   isSpliceDecl, isFieldWildcard, isUnboxed, isWholeFrac, isStrictMatch, isMultiIf, isProc, isTransStmt,
@@ -45,7 +45,7 @@ isTag :: String -> LHsExpr GhcPs -> Bool
 isTag tag = \case (L _ (HsVar _ (L _ s))) -> occNameString (rdrNameOcc s) == tag; _ -> False
 
 isDot, isDol, isReturn, isSection, isRecConstr, isRecUpdate,
-  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isQuasiQuote,
+  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isQuasiQuoteExpr,
   isLambda, isDotApp, isTypeApp, isWHNF, isLCase :: LHsExpr GhcPs -> Bool
 isDol = isTag "$"
 isDot = isTag "."
@@ -60,7 +60,7 @@ isOpApp = \case (L _ OpApp{}) -> True; _ -> False
 isAnyApp x = isApp x || isOpApp x
 isLexeme = \case (L _ HsVar{}) -> True; (L _ HsOverLit{}) -> True; (L _ HsLit{}) -> True; _ -> False
 isLambda = \case (L _ HsLam{}) -> True; _ -> False
-isQuasiQuote = \case (L _ (HsSpliceE _ HsQuasiQuote{})) -> True; _ -> False
+isQuasiQuoteExpr = \case (L _ (HsSpliceE _ HsQuasiQuote{})) -> True; _ -> False
 isDotApp = \case (L _ (OpApp _ _ op _)) -> isDot op; _ -> False
 isTypeApp = \case (L _ HsAppType{}) -> True; _ -> False
 isWHNF = \case
@@ -81,6 +81,9 @@ isWHNF = \case
     | occNameString (rdrNameOcc x) `elem` ["Just", "Left", "Right"] -> True
   _ -> False
 isLCase = \case (L _ HsLamCase{}) -> True; _ -> False
+
+isQuasiQuoteSplice :: HsSplice GhcPs -> Bool
+isQuasiQuoteSplice = \case HsQuasiQuote{} -> True; _ -> False
 
 #if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_901)
 isStrictMatch :: HsMatchContext GhcPs -> Bool

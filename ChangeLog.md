@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 9.0.0.6 released 2021-12-26
+- Add back `isQuasiQuote` for backwards compatibility
+
 ## 9.0.0.5 released 2021-12-25
 - Bugfix to `isFieldPunUpdate`
 - New module `Language.Haskell.GHC.Hs.Type.hs` to replace `Language.Haskell.GHC.Hs.Types.hs` (which remains for now but deprecated and will be removed in a future release)

@@ -7,7 +7,7 @@
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   isTag, isDol, isDot, isReturn, isSection, isRecConstr, isRecUpdate,
-  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isLambda, isQuasiQuoteExpr, isQuasiQuoteSplice,
+  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isLambda, isQuasiQuote, isQuasiQuoteExpr, isQuasiQuoteSplice,
   isDotApp, isTypeApp, isWHNF, isLCase,
   isFieldPun, isFieldPunUpdate, isRecStmt, isParComp, isMDo, isListComp, isMonadComp, isTupleSection, isString, isPrimLiteral,
   isSpliceDecl, isFieldWildcard, isUnboxed, isWholeFrac, isStrictMatch, isMultiIf, isProc, isTransStmt,
@@ -61,6 +61,7 @@ isAnyApp x = isApp x || isOpApp x
 isLexeme = \case (L _ HsVar{}) -> True; (L _ HsOverLit{}) -> True; (L _ HsLit{}) -> True; _ -> False
 isLambda = \case (L _ HsLam{}) -> True; _ -> False
 isQuasiQuoteExpr = \case (L _ (HsSpliceE _ HsQuasiQuote{})) -> True; _ -> False
+isQuasiQuote = isQuasiQuoteExpr -- Backwards compat.
 isDotApp = \case (L _ (OpApp _ _ op _)) -> isDot op; _ -> False
 isTypeApp = \case (L _ HsAppType{}) -> True; _ -> False
 isWHNF = \case

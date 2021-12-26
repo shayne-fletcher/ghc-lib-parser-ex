@@ -41,20 +41,19 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-9.0.1       | ghc-9.0.1  |
-    # | windows | ghc-9.0.1       | ghc-9.0.1  |
-    # | macOS   | ghc-9.0.1       | ghc-9.0.1  |
+    # | linux   | ghc-9.0.2       | ghc-9.0.1  |
+    # | windows | ghc-9.0.2       | ghc-9.0.1  |
+    # | macOS   | ghc-9.0.2       | ghc-9.0.1  |
     # +---------+-----------------+------------+
-    linux-9.0.1-9.0.1:
+    linux-9.0.2-9.0.1:
       image: "ubuntu-latest"
       stack: "stack-exact.yaml"
     #Failure installing GHC.
     #C:\Users\VssAdministrator\AppData\Local\Programs\stack\x86_64-windows\ghc-9.0.1-tmp-9533a853c86e2382\ghc-9.0.1\: renameDirectory:pathIsDirectory:CreateFile "\\\\?\\C:\\Users\\VssAdministrator\\AppData\\Local\\Programs\\stack\\x86_64-windows\\ghc-9.0.1-tmp-9533a853c86e2382\\ghc-9.0.1\\": does not exist (The system cannot find the file specified.)
-    #windows-9.0.1-9.0.1:
-    #  image: "windows-latest"
-    #  stack: "stack-exact.yaml"
-
-    mac-9.0.1-9.0.1:
+    windows-9.0.2-9.0.1:
+      image: "windows-latest"
+      stack: "stack-exact.yaml"
+    mac-9.0.2-9.0.1:
       image: "macOS-latest"
       stack: "stack-exact.yaml"
 

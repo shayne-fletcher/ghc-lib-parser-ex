@@ -1,11 +1,12 @@
 # Changelog for ghc-lib-parser-ex
 
-## Unreleased
+## 9.0.0.5 released 2021-12-25
 - Bugfix to `isFieldPunUpdate`
 - New module `Language.Haskell.GHC.Hs.Type.hs` to replace `Language.Haskell.GHC.Hs.Types.hs` (which remains for now but deprecated and will be removed in a future release)
   - New function `isKindTyApp`
 - Rename `isQuasiQuote` to `isQuasiQuoteExpr`
 - Add new function `isQuasiQuoteSplice`
+- Update to `ghc-lib-parser-9.0.2.20211226`
 
 ## 9.2.0.1 released 2021-11-01
 - Update to `ghc-lib-parser-9.2.1.20211101`

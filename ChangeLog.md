@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## Unreleased
+- New function `isOverLabel`
+
 ## 9.0.0.6 released 2021-12-26
 - Add back `isQuasiQuote` for backwards compatibility
 

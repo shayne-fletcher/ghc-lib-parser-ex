@@ -7,7 +7,7 @@
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   isTag, isDol, isDot, isReturn, isSection, isRecConstr, isRecUpdate,
-  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isLambda, isQuasiQuote, isQuasiQuoteExpr, isQuasiQuoteSplice,
+  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isLambda, isQuasiQuote, isQuasiQuoteExpr, isQuasiQuoteSplice,  isOverLabel,
   isDotApp, isTypeApp, isWHNF, isLCase,
   isFieldPun, isFieldPunUpdate, isRecStmt, isParComp, isMDo, isListComp, isMonadComp, isTupleSection, isString, isPrimLiteral,
   isSpliceDecl, isFieldWildcard, isUnboxed, isWholeFrac, isStrictMatch, isMultiIf, isProc, isTransStmt,
@@ -46,7 +46,7 @@ isTag tag = \case (L _ (HsVar _ (L _ s))) -> occNameString (rdrNameOcc s) == tag
 
 isDot, isDol, isReturn, isSection, isRecConstr, isRecUpdate,
   isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isQuasiQuote, isQuasiQuoteExpr,
-  isLambda, isDotApp, isTypeApp, isWHNF, isLCase :: LHsExpr GhcPs -> Bool
+  isLambda, isDotApp, isTypeApp, isWHNF, isLCase, isOverLabel :: LHsExpr GhcPs -> Bool
 isDol = isTag "$"
 isDot = isTag "."
 isReturn x = isTag "return" x || isTag "pure" x -- Allow both 'pure' and 'return' as they have the same semantics.
@@ -82,6 +82,7 @@ isWHNF = \case
     | occNameString (rdrNameOcc x) `elem` ["Just", "Left", "Right"] -> True
   _ -> False
 isLCase = \case (L _ HsLamCase{}) -> True; _ -> False
+isOverLabel = \case (L _ HsOverLabel{}) -> True; _ -> False
 
 isQuasiQuoteSplice :: HsSplice GhcPs -> Bool
 isQuasiQuoteSplice = \case HsQuasiQuote{} -> True; _ -> False

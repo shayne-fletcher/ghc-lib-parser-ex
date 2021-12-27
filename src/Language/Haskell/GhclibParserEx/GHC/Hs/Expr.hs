@@ -45,7 +45,7 @@ isTag :: String -> LHsExpr GhcPs -> Bool
 isTag tag = \case (L _ (HsVar _ (L _ s))) -> occNameString (rdrNameOcc s) == tag; _ -> False
 
 isDot, isDol, isReturn, isSection, isRecConstr, isRecUpdate,
-  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isQuasiQuoteExpr,
+  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isQuasiQuote, isQuasiQuoteExpr,
   isLambda, isDotApp, isTypeApp, isWHNF, isLCase :: LHsExpr GhcPs -> Bool
 isDol = isTag "$"
 isDot = isTag "."

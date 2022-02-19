@@ -6,7 +6,7 @@ homepage:       https://github.com/shayne-fletcher/ghc-lib-parser-ex#readme
 bug-reports:    https://github.com/shayne-fletcher/ghc-lib-parser-ex/issues
 author:         Shayne Fletcher
 maintainer:     shayne@shaynefletcher.org
-copyright:      Copyright © 2020-2021 Shayne Fletcher. All rights reserved.
+copyright:      Copyright © 2020-2022 Shayne Fletcher. All rights reserved.
 license:        BSD3
 license-file:   LICENSE
 category:       Development

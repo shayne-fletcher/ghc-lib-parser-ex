@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 8.10.0.24 released
+- Update to `ghc-lib-parser-8.10.7.20220219`
+
 ## 0.20220201 released
 - Update to `ghc-lib-parser-0.20220201`
 

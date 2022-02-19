@@ -110,6 +110,7 @@ patchCabal version = do
       let lower  = show major ++ "." ++ show minor ++ ".0"
       let upper  = show major ++ "." ++ show (minor + 1) ++ ".0"
       putStrLn $ "- ghc >= " ++ lower ++ " && ghc < " ++ upper
+      putStrLn $ "- ghc-lib-parser " ++ family
       writeFile "ghc-lib-parser-ex.cabal" .
         replace "9.0.0" lower .
         replace "9.1.0" upper .

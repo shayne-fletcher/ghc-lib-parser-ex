@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 9.2.0.3 released
+- Fix ghc bounds in auto mode to use ghc-lib not ghc if build compiler ghc-9.2.1 (see [issue](https://github.com/ndmitchell/hlint/issues/1314))
+
 ## 9.2.0.2 released
 - Update to `ghc-lib-parser-9.2.2.20220307`
 

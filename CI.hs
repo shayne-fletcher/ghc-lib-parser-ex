@@ -109,6 +109,8 @@ patchCabal version = do
       let family = show major ++ "." ++ show minor ++ ".*"
       let lower  = show major ++ "." ++ show minor ++ ".0"
       let upper  = show major ++ "." ++ show (minor + 1) ++ ".0"
+      -- Tiny hack to skip past 9.2.1 (see https://github.com/ndmitchell/hlint/issues/1314)
+      lower <- pure $ if lower == "9.2.0" then "9.2.2" else lower
       putStrLn $ "- ghc >= " ++ lower ++ " && ghc < " ++ upper
       putStrLn $ "- ghc-lib-parser " ++ family
       writeFile "ghc-lib-parser-ex.cabal" .

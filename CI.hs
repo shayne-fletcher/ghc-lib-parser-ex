@@ -164,9 +164,17 @@ isolatedBuild opts@StackOptions {..} = do
 
       stack = stack' opts
 
+-- Mitigate macOS w/[ghc-9.0 <= 9.2.2] build failures for lack of
+-- this c-include path (including e.g. ghc-lib-parser on
+-- ghc-9.2.2). See
+-- https://gitlab.haskell.org/ghc/ghc/-/issues/20592#note_391266.
+prelude :: (String, String) -> String
+prelude ("darwin", _) = "C_INCLUDE_PATH=`xcrun --show-sdk-path`/usr/include/ffi"
+prelude _ = ""
+
 stack' :: StackOptions -> String -> IO ()
 stack' StackOptions {stackYaml, resolver, verbosity, cabalVerbose} action =
-  cmd $ "stack " ++
+  cmd $ prelude (os, arch) ++ " stack " ++
     concatMap (<> " ")
     [ stackYamlOpt stackYaml
     , stackResolverOpt resolver

@@ -24,17 +24,17 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-master      | ghc-9.2.1  |
-    # | windows | ghc-master      | ghc-9.2.1  |
-    # | macOS   | ghc-master      | ghc-9.2.1  |
+    # | linux   | ghc-master      | ghc-9.2.2  |
+    # | windows | ghc-master      | ghc-9.2.2  |
+    # | macOS   | ghc-master      | ghc-9.2.2  |
     # +---------+-----------------+------------+
-    linux-master-9.2.1:
+    linux-master-9.2.2:
       image: "ubuntu-latest"
       stack: "stack-exact.yaml"
-    # windows-master-9.2.1:
+    # windows-master-9.2.2:
     #   image: "windows-latest"
     #   stack: "stack-exact.yaml"
-    mac-master-9.2.1:
+    mac-master-9.2.2:
       image: "macOS-latest"
       stack: "stack-exact.yaml"
 

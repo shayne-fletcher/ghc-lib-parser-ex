@@ -1,6 +1,6 @@
 resolver: lts-18.20 # ghc-8.10.7
 extra-deps:
-- ghc-lib-parser-0.20220401
+- ghc-lib-parser-0.20220501
 ghc-options:
     "$locals": -ddump-to-file -ddump-hi -Wall -Wno-name-shadowing -Wunused-imports
 flags:

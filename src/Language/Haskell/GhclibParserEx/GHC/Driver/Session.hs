@@ -161,12 +161,14 @@ parsePragmasIntoDynFlags :: DynFlags
                          -> IO (Either String DynFlags)
 parsePragmasIntoDynFlags flags (enable, disable) file str =
   catchErrors $ do
-    let opts =
 #if defined (GHCLIB_API_HEAD)
+    let (_, opts) =
           getOptions (initParserOpts flags) (stringToStringBuffer str) file
 #else
+    let opts =
           getOptions flags (stringToStringBuffer str) file
 #endif
+
     -- Important : apply enables, disables *before* parsing dynamic
     -- file pragmas.
     let flags' =  foldl' xopt_set flags enable

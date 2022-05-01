@@ -166,7 +166,7 @@ parsePragmasIntoDynFlags flags (enable, disable) file str =
           getOptions (initParserOpts flags) (stringToStringBuffer str) file
 #else
     let opts =
-          getOptions (initParserOpts flags) (stringToStringBuffer str) file
+          getOptions flags (stringToStringBuffer str) file
 #endif
 
     -- Important : apply enables, disables *before* parsing dynamic

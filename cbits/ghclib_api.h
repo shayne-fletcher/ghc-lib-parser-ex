@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause.
 #  define GHCLIB_API_H
 
 #  if !(defined (GHCLIB_API_HEAD)   \
+     || defined (GHCLIB_API_904)    \
      || defined (GHCLIB_API_902)    \
      || defined (GHCLIB_API_900)    \
      || defined (GHCLIB_API_810)    \
@@ -14,6 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause.
 #    if defined(MIN_VERSION_ghc_lib_parser)
 #       if !MIN_VERSION_ghc_lib_parser( 1,  0,  0)
 #         define GHCLIB_API_HEAD
+#       elif MIN_VERSION_ghc_lib_parser(9,  4,  0)
+#         define GHCLIB_API_904
 #       elif MIN_VERSION_ghc_lib_parser(9,  2,  0)
 #         define GHCLIB_API_902
 #       elif MIN_VERSION_ghc_lib_parser(9,  0,  0)
@@ -26,8 +29,10 @@ SPDX-License-Identifier: BSD-3-Clause.
 #         error Unsupported GHC API version
 #      endif
 #    else
-#      if __GLASGOW_HASKELL__   == 903
+#      if __GLASGOW_HASKELL__   == 905
 #        define GHCLIB_API_HEAD
+#      elif __GLASGOW_HASKELL__ == 904
+#        define GHCLIB_API_904
 #      elif __GLASGOW_HASKELL__ == 902
 #        define GHCLIB_API_902
 #      elif __GLASGOW_HASKELL__ == 900

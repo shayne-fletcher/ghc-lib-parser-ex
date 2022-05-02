@@ -11,7 +11,7 @@ module Language.Haskell.GhclibParserEx.GHC.Settings.Config(
   )
 where
 
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Settings.Config
 import GHC.Driver.Session
 import GHC.Utils.Fingerprint
@@ -32,12 +32,12 @@ import Platform
 
 fakeSettings :: Settings
 fakeSettings = Settings
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
   { sGhcNameVersion=ghcNameVersion
   , sFileSettings=fileSettings
   , sTargetPlatform=platform
   , sPlatformMisc=platformMisc
-#  if !defined(GHCLIB_API_HEAD) && !defined(GHCLIB_API_902)
+#  if !defined(GHCLIB_API_HEAD) && !defined(GHCLIB_API_904) && !defined(GHCLIB_API_902)
   , sPlatformConstants=platformConstants
 #  endif
   , sToolSettings=toolSettings
@@ -51,7 +51,7 @@ fakeSettings = Settings
   }
 #endif
   where
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
     toolSettings = ToolSettings {
       toolSettings_opt_P_fingerprint=fingerprint0
       }
@@ -63,7 +63,7 @@ fakeSettings = Settings
                     }
 #endif
     platform =
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
       genericPlatform
 #else
       Platform{
@@ -96,12 +96,12 @@ fakeSettings = Settings
       , platformUnregisterised=True
       }
 #endif
-#if !defined(GHCLIB_API_HEAD) && !defined(GHCLIB_API_902)
+#if !defined(GHCLIB_API_HEAD) && !defined(GHCLIB_API_904) && !defined(GHCLIB_API_902)
     platformConstants =
       PlatformConstants{pc_DYNAMIC_BY_DEFAULT=False,pc_WORD_SIZE=8}
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
 fakeLlvmConfig :: LlvmConfig
 fakeLlvmConfig = LlvmConfig [] []
 #else

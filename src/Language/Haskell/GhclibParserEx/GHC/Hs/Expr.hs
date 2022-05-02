@@ -16,13 +16,13 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   fromChar
   ) where
 
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 import GHC.Types.SourceText
 #endif
 import GHC.Types.SrcLoc
@@ -70,7 +70,7 @@ isWHNF = \case
   (L _ HsLam{}) -> True
   (L _ ExplicitTuple{}) -> True
   (L _ ExplicitList{}) -> True
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
   (L _ (HsPar _ _ x _)) -> isWHNF x
 #else
   (L _ (HsPar _ x)) -> isWHNF x
@@ -87,7 +87,7 @@ isOverLabel = \case (L _ HsOverLabel{}) -> True; _ -> False
 isQuasiQuoteSplice :: HsSplice GhcPs -> Bool
 isQuasiQuoteSplice = \case HsQuasiQuote{} -> True; _ -> False
 
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902) || defined (GHCLIB_API_901)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_901)
 isStrictMatch :: HsMatchContext GhcPs -> Bool
 #else
 isStrictMatch :: HsMatchContext RdrName -> Bool
@@ -95,7 +95,7 @@ isStrictMatch :: HsMatchContext RdrName -> Bool
 isStrictMatch = \case FunRhs{mc_strictness=SrcStrict} -> True; _ -> False
 
 -- Field is punned e.g. '{foo}'.
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
 isFieldPun :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 isFieldPun = \case (L _ HsFieldBind {hfbPun=True}) -> True; _ -> False
 #else
@@ -104,7 +104,7 @@ isFieldPun = \case (L _ HsRecField {hsRecPun=True}) -> True; _ -> False
 #endif
 -- Field puns in updates have a different type to field puns in
 -- constructions.
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
 isFieldPunUpdate :: HsFieldBind (LAmbiguousFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 isFieldPunUpdate = \case HsFieldBind {hfbPun=True} -> True; _ -> False
 #else
@@ -123,7 +123,7 @@ isParComp :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isParComp = \case ParStmt{} -> True; _ -> False
 
 -- TODO: Seems `HsStmtContext (HsDoRn p)` on master right now.
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
 isMDo :: HsDoFlavour -> Bool
 isMDo = \case MDoExpr _ -> True; _ -> False
 isMonadComp :: HsDoFlavour -> Bool
@@ -177,13 +177,13 @@ isTransStmt :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isTransStmt = \case TransStmt{} -> True; _ -> False
 
 -- Field has a '_' as in '{foo=_} or is punned e.g. '{foo}'.
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
 isFieldWildcard :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 #else
 isFieldWildcard :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 #endif
 isFieldWildcard = \case
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
   (L _ HsFieldBind {hfbRHS=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
 #elif defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
@@ -192,7 +192,7 @@ isFieldWildcard = \case
 #else
   (L _ HsRecField {hsRecFieldArg=(L _ (EWildPat _))}) -> True
 #endif
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
   (L _ HsFieldBind {hfbPun=True}) -> True
   (L _ HsFieldBind {}) -> False
 #else
@@ -205,7 +205,7 @@ isUnboxed = \case Unboxed -> True; _ -> False
 
 isWholeFrac :: HsExpr GhcPs -> Bool
 
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
 isWholeFrac (HsLit _ (HsRat _ fl@FL{} _)) = denominator (rationalFromFractionalLit fl) == 1
 isWholeFrac (HsOverLit _ (OverLit _ (HsFractional fl@FL {}) )) = denominator (rationalFromFractionalLit fl) == 1
 #elif defined(GHCLIB_API_902)
@@ -226,7 +226,7 @@ varToStr (L _ (HsVar _ (L _ n)))
 varToStr _ = ""
 
 strToVar :: String -> LHsExpr GhcPs
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 strToVar x = noLocA $ HsVar noExtField (noLocA $ mkRdrUnqual (mkVarOcc x))
 #elif defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 strToVar x = noLoc $ HsVar noExtField (noLoc $ mkRdrUnqual (mkVarOcc x))

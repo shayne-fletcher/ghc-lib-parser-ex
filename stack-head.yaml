@@ -1,0 +1,12 @@
+resolver: lts-18.20 # ghc-8.10.7
+extra-deps:
+  - archive: /Users/shayne/project/sf-ghc-lib/ghc-lib-parser-0.20220501.tar.gz
+    sha256: "e471f98fa00e3128f2f54dcab9dce1277e899aeb069393f297be623197ad47be"
+ghc-options:
+    "$locals": -ddump-to-file -ddump-hi -Wall -Wno-name-shadowing -Wunused-imports
+flags:
+  ghc-lib-parser-ex:
+    auto: false
+    no-ghc-lib: false
+packages:
+  - .

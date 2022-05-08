@@ -123,6 +123,7 @@ steps:
   - script: |
       curl -sSL https://get.haskellstack.org/ | sh -s - -f
       set -e
+      stack --version
       stack setup --stack-yaml=$(stack) > /dev/null
       curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s . '--cpp-include cbits' '--cpp-define GHCLIB_API_808'
       curl -sSL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s . '--cpp-include cbits' '--cpp-define GHCLIB_API_810'

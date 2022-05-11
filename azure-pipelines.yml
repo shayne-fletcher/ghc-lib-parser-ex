@@ -21,28 +21,6 @@ strategy:
     #  Not every combination is tested
     #  - We do sampling to keep the number of builds reasonable.
 
-    # At some point I think somewhere in the first half of 2022, this
-    # command started failing:
-    #
-    # stack --stack-yaml stack.yaml exec -- pacman -S autoconf automake-wrapper make patch python tar --noconfirm
-    #
-    # This sort of thing has in the past been fixed by Michael Snoyman
-    # by a new stack release. I've been hoping it will get picked up
-    # and resolved by someone but it hasn't long enough now for me to
-    # disable the Windows builds completely.
-    # 
-    # These are the errors.
-    #
-    # error: autoconf: signature from "David Macek <david.macek.0@gmail.com>" is unknown trust
-    # :: File /var/cache/pacman/pkg/autoconf-2.71-1-any.pkg.tar.zst is corrupted (invalid or corrupted package (PGP signature)).
-    # error: automake1.6: signature from "David Macek <david.macek.0@gmail.com>" is unknown trust
-    # Do you want to delete it? [Y/n] 
-    # :: File /var/cache/pacman/pkg/automake1.6-1.6.3-3-any.pkg.tar.zst is corrupted (invalid or corrupted package (PGP signature)).
-    # error: automake1.7: signature from "David Macek <david.macek.0@gmail.com>" is unknown trust
-    # Do you want to delete it? [Y/n] 
-    # :: File /var/cache/pacman/pkg/automake1.7-1.7.9-3-any.pkg.tar.zst is corrupted (invalid or corrupted package (PGP signature)).
-    # error: automake1.8: signature from "David Macek <david.macek.0@gmail.com>" is unknown trust
-
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
@@ -87,9 +65,9 @@ strategy:
     linux-9.2.2-8.10.4:
       image: "ubuntu-latest"
       stack: "stack-922-8104.yaml"
-    # windows-9.2.2-8.10.4:
-    #   image: "windows-latest"
-    #   stack: "stack-922-8104.yaml"
+    windows-9.2.2-8.10.4:
+      image: "windows-latest"
+      stack: "stack-922-8104.yaml"
     mac-9.2.2-8.10.4:
       image: "macOS-latest"
       stack: "stack-922-8104.yaml"
@@ -107,9 +85,9 @@ strategy:
     mac-9.0.2-8.10.7:
       image: "macOS-latest"
       stack: "stack-902-8107.yaml"
-    # windows-9.0.2-8.10.7:
-    #   image: "windows-latest"
-    #   stack: "stack-902-8107.yaml"
+    windows-9.0.2-8.10.7:
+      image: "windows-latest"
+      stack: "stack-902-8107.yaml"
 
 pool: {vmImage: '$(image)'}
 

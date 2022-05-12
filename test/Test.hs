@@ -17,9 +17,11 @@ import Control.Monad
 import Data.List.Extra
 import Data.Maybe
 import Data.Generics.Uniplate.Data
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902)
 import GHC.Data.Bag
+#if !defined (GHCLIB_API_902)
 import GHC.Driver.Errors.Types
+#endif
 import GHC.Types.Error
 #endif
 
@@ -104,12 +106,23 @@ makeFile relPath contents = do
     writeFile relPath contents
     return relPath
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
-chkParseResult :: (DynFlags -> Bag (MsgEnvelope GhcMessage)  -> String) -> DynFlags -> ParseResult a -> IO ()
+#if defined(GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
+report :: DynFlags -> Bag (MsgEnvelope GhcMessage) -> String
+report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
+#elif defined (GHCLIB_API_902)
+report :: DynFlags -> Bag (MsgEnvelope DecoratedSDoc) -> String
+report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
 #else
-chkParseResult :: (DynFlags -> WarningMessages -> String) -> DynFlags -> ParseResult a -> IO ()
+report :: DynFlags -> WarningMessages -> String
+report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 #endif
-chkParseResult report flags = \case
+
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
+chkParseResult :: DynFlags -> ParseResult a -> IO ()
+#else
+chkParseResult :: DynFlags -> ParseResult a -> IO ()
+#endif
+chkParseResult flags = \case
     POk s _ -> do
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
       let (wrns, errs) = getPsMessages s
@@ -144,7 +157,7 @@ parseTests :: TestTree
 parseTests = testGroup "Parse tests"
   [
     testCase "Module" $
-      chkParseResult report flags (
+      chkParseResult flags (
         parseModule (unlines
           [ "module Foo (readMany) where"
           , "import Data.List"
@@ -152,7 +165,7 @@ parseTests = testGroup "Parse tests"
           , "readMany = unfoldr $ listToMaybe . concatMap reads . tails"
           ]) flags)
   , testCase "Module" $
-      chkParseResult report flags (
+      chkParseResult flags (
         parseModule (unlines
           [ "module Foo (readMany) where"
           , "import Data.List"
@@ -160,7 +173,7 @@ parseTests = testGroup "Parse tests"
           , "readMany = unfoldr $ listToMaybe . concatMap reads . tails"
           ]) flags)
   , testCase "Signature" $
-      chkParseResult report flags (
+      chkParseResult flags (
         parseSignature (unlines
           [ "signature Str where"
           , "data Str"
@@ -168,26 +181,26 @@ parseTests = testGroup "Parse tests"
           , "append :: Str -> Str -> Str"
           ]) flags)
   , testCase "Import" $
-      chkParseResult report flags (
+      chkParseResult flags (
         parseImport "import qualified \"foo-lib\" Foo as Bar hiding ((<.>))" flags)
   , testCase "Statement" $
-      chkParseResult report flags (
+      chkParseResult flags (
         parseStatement "Foo foo <- bar" flags)
   , testCase "Backpack" $
-      chkParseResult report flags (
+      chkParseResult flags (
         parseBackpack (unlines
           [ "unit main where"
           , "  module Main where"
           , "    main = putStrLn \"Hello world!\""
           ]) flags)
   , testCase "Expression" $
-      chkParseResult report flags (
+      chkParseResult flags (
         parseExpression "unfoldr $ listToMaybe . concatMap reads . tails" flags)
   , testCase "Declaration (1)" $
-      chkParseResult report flags (
+      chkParseResult flags (
         parseDeclaration "fact n = if n <= 1 then 1 else n * fact (n - 1)" flags)
   , testCase "Declaration (2)" $ -- Example from https://github.com/ndmitchell/hlint/issues/842.
-      chkParseResult report flags (
+      chkParseResult flags (
         parseDeclaration "infixr 4 <%@~" flags)
   , testCase "File" $ withTempDir $ \tmpDir -> do
       foo <- makeFile (tmpDir </> "Foo.hs") $ unlines
@@ -200,15 +213,10 @@ parseTests = testGroup "Parse tests"
       s <- readFile' foo
       parsePragmasIntoDynFlags flags ([], []) foo s >>= \case
         Left msg -> assertFailure msg
-        Right flags -> chkParseResult report flags (parseFile foo flags s)
+        Right flags -> chkParseResult flags (parseFile foo flags s)
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902)
-    report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
-#else
-    report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
-#endif
 
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
 moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
@@ -447,7 +455,7 @@ dynFlagsTests = testGroup "DynFlags tests"
       -- https://github.com/ndmitchell/hlint/issues/971).
       parsePragmasIntoDynFlags flags ([StarIsType], []) foo s >>= \case
         Left msg -> assertFailure msg
-        Right flags -> chkParseResult report flags (parseFile foo flags s)
+        Right flags -> chkParseResult flags (parseFile foo flags s)
 #if defined (MIN_VERSION_ghc_lib_parser)
 #  if !MIN_VERSION_ghc_lib_parser(1,  0,  0) || MIN_VERSION_ghc_lib_parser(8, 10, 0)
   , testCase "ImportQualifiedPost" $ do
@@ -464,11 +472,7 @@ dynFlagsTests = testGroup "DynFlags tests"
   ]
   where
     flags = defaultDynFlags fakeSettings fakeLlvmConfig
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902)
-    report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
-#else
-    report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
-#endif
+
 nameTests :: TestTree
 nameTests = testGroup "Name tests"
   [ testCase "modName (1)" $

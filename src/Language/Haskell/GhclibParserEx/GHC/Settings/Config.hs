@@ -78,15 +78,9 @@ fakeSettings = Settings
       , platformIsCrossCompiling=False
       , platformLeadingUnderscore=False
       , platformTablesNextToCode=False
-#if !defined (GHCLIB_API_900)
-      , platformConstants=platformConstants
-#endif
       ,
 #endif
-#if defined(GHCLIB_API_902)
-        platformWordSize=PW8
-      , platformArchOS=ArchOS {archOS_arch=ArchUnknown, archOS_OS=OSUnknown}
-#elif defined (GHCLIB_API_810) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_810) || defined (GHCLIB_API_900)
         platformWordSize=PW8
       , platformMini=PlatformMini {platformMini_arch=ArchUnknown, platformMini_os=OSUnknown}
 #else

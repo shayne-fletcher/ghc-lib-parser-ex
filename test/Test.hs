@@ -117,11 +117,7 @@ report :: DynFlags -> WarningMessages -> String
 report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msgs ]
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
 chkParseResult :: DynFlags -> ParseResult a -> IO ()
-#else
-chkParseResult :: DynFlags -> ParseResult a -> IO ()
-#endif
 chkParseResult flags = \case
     POk s _ -> do
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
@@ -137,7 +133,6 @@ chkParseResult flags = \case
           report flags (getMessages (GhcPsMessage <$> wrns)) ++
           report flags (getMessages (GhcPsMessage <$> errs))
         )
-
 #elif defined (GHCLIB_API_902)
         assertFailure (report flags (fmap pprWarning wrns) ++ report flags (fmap pprError errs))
 #else

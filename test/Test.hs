@@ -82,10 +82,17 @@ import GHC.LanguageExtensions.Type
 import Bag
 #endif
 
+basicDynFlags :: DynFlags
+basicDynFlags =
+  defaultDynFlags fakeSettings
+#if !defined (GHCLIB_API_HEAD)
+                                fakeLlvmConfig
+#endif
+
 main :: IO ()
 main = do
   setEnv "TASTY_NUM_THREADS" "1"
-  setUnsafeGlobalDynFlags (defaultDynFlags fakeSettings fakeLlvmConfig)
+  setUnsafeGlobalDynFlags basicDynFlags
   defaultMain tests
 
 tests :: TestTree
@@ -211,7 +218,7 @@ parseTests = testGroup "Parse tests"
         Right flags -> chkParseResult flags (parseFile foo flags s)
   ]
   where
-    flags = defaultDynFlags fakeSettings fakeLlvmConfig
+    flags = basicDynFlags
 
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
 moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
@@ -274,7 +281,7 @@ fixityTests = testGroup "Fixity tests"
         PFailed{} -> assertFailure "parse error"
   ]
   where
-    flags = defaultDynFlags fakeSettings fakeLlvmConfig
+    flags = basicDynFlags
 
 extendInstancesTests :: TestTree
 extendInstancesTests = testGroup "Extend instances tests"
@@ -293,7 +300,7 @@ extendInstancesTests = testGroup "Extend instances tests"
           )
   ]
   where
-    flags = defaultDynFlags fakeSettings fakeLlvmConfig
+    flags = basicDynFlags
 
 typePredicateTests :: TestTree
 typePredicateTests = testGroup "Type predicate tests"
@@ -303,7 +310,7 @@ typePredicateTests = testGroup "Type predicate tests"
   where
     assert' = assertBool ""
     test_with_exts exts s = typeTest s (flags exts)
-    flags = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
+    flags = foldl' xopt_set basicDynFlags
 
 expressionPredicateTests :: TestTree
 expressionPredicateTests = testGroup "Expression predicate tests"
@@ -391,7 +398,7 @@ expressionPredicateTests = testGroup "Expression predicate tests"
     assert' = assertBool ""
     test s = exprTest s (flags [])
     test_with_exts exts s = exprTest s (flags exts)
-    flags exts = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
+    flags exts = foldl' xopt_set basicDynFlags
               (exts ++
                  [ TemplateHaskell
                  , TemplateHaskellQuotes
@@ -417,7 +424,7 @@ patternPredicateTests = testGroup "Pattern predicate tests"
     assert' = assertBool ""
     test = test_with_exts []
     test_with_exts exts s = patTest s (flags exts)
-    flags exts = foldl' xopt_set (defaultDynFlags fakeSettings fakeLlvmConfig)
+    flags exts = foldl' xopt_set basicDynFlags
               (exts ++
                  [ TemplateHaskell
                  , TemplateHaskellQuotes
@@ -466,7 +473,7 @@ dynFlagsTests = testGroup "DynFlags tests"
 #endif
   ]
   where
-    flags = defaultDynFlags fakeSettings fakeLlvmConfig
+    flags = basicDynFlags
 
 nameTests :: TestTree
 nameTests = testGroup "Name tests"
@@ -482,4 +489,4 @@ nameTests = testGroup "Name tests"
   , testCase "isSymbolRdrName (4)" $ assertBool "Expected 'True'" $ isSymbolRdrName (mkRdrUnqual (mkVarOcc ":+:"))
   ]
   where
-    flags = defaultDynFlags fakeSettings fakeLlvmConfig
+    flags = basicDynFlags

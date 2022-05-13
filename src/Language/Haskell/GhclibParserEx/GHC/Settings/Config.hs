@@ -7,7 +7,9 @@
 
 module Language.Haskell.GhclibParserEx.GHC.Settings.Config(
     fakeSettings
+#if !defined (GHCLIB_API_HEAD)
   , fakeLlvmConfig
+#endif
   )
 where
 
@@ -95,7 +97,9 @@ fakeSettings = Settings
       PlatformConstants{pc_DYNAMIC_BY_DEFAULT=False,pc_WORD_SIZE=8}
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined(GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD)
+-- Intentionally empty
+#elif defined(GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
 fakeLlvmConfig :: LlvmConfig
 fakeLlvmConfig = LlvmConfig [] []
 #else

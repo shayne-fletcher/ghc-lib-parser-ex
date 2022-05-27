@@ -1,6 +1,7 @@
 # Changelog for ghc-lib-parser-ex
 
-## Unpublished
+## 9.2.0.4 released
+- Update to `ghc-lib-parser-9.2.3.20220527`
 - Add support for ghc-9.4 series: `GHCLIB_API_904`
 
 ## 0.20220501 released

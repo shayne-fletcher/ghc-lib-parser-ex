@@ -1,5 +1,9 @@
 # Changelog for ghc-lib-parser-ex
 
+## 0.20220601 released
+- Update to `ghc-lib-parser-0.20220601`
+- `fakeLlvmConfig` removed for `GHCLIB_API_HEAD`
+
 ## 9.2.0.4 released
 - Update to `ghc-lib-parser-9.2.3.20220527`
 - Add support for ghc-9.4 series: `GHCLIB_API_904`

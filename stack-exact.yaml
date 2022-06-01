@@ -8,7 +8,7 @@ extra-deps:
   - base-orphans-0.8.6
   - ghc-bignum-1.2
   - ghc-bignum-orphans-0.1.1
-  - ghc-lib-parser-0.20220501
+  - ghc-lib-parser-0.20220601
   - binary-0.8.9.0
   - bytestring-0.11.2.0
   - parsec-3.1.15.0

@@ -1,5 +1,14 @@
 # Changelog for ghc-lib-parser-ex
 
+## Unreleased
+- The Cabal flag `auto` now defaults to `False`
+  - When `auto` has the value `False`:
+    - `ghc-lib-parser-ex` depends on `ghc-lib-parser`
+  - When `auto` has the value `True`:
+    - When the build compiler is >=9.2.2 && <9.3.0
+      - `ghc-lib-parser-ex` depends on the compiler libs
+    - Otherwise, `ghc-lib-parser-ex` depends on `ghc-lib-parser`
+
 ## 0.20220601 released
 - Update to `ghc-lib-parser-0.20220601`
 - `fakeLlvmConfig` removed for `GHCLIB_API_HEAD`

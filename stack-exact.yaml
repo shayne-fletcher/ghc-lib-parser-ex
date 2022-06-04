@@ -36,13 +36,5 @@ extra-deps:
   - transformers-compat-0.7.1
   - unbounded-delays-0.1.1.1
   - wcwidth-0.0.2
-flags:
-  ghc-bignum:
-    native: true
-  transformers-compat:
-    five-three: true
-  ghc-lib-parser-ex:
-    auto: false
-    no-ghc-lib: false
 packages:
 - .

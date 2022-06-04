@@ -10,6 +10,14 @@ flags:
   mintty:
     Win32-2-13-1: false
 
+# If running via `stack build` rather than `CI.hs`, then
+# `ghc-lib-parser-ex.cabal` won't get "on-the-fly" edited in which
+# case it have a build dependency on `ghc-lib-parser == 9.0`. This
+# works around e.g. "WARNING: Ignoring ghc-lib-parser-ex's bounds on
+# ghc-lib-parser (==9.0.*); using ghc-lib-parser-0.20220601. Reason:
+# allow-newer enabled."
+allow-newer: true
+
 # Packages MUST go at the end, since we append to it during execution
 # of CI.hs.
 packages:

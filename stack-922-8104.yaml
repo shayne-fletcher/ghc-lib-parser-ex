@@ -2,10 +2,6 @@ resolver: nightly-2021-03-31 # ghc-8.10.4
 extra-deps:
   - ghc-lib-parser-9.2.2.20220307
 ghc-options: {"$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans}
-flags:
-  ghc-lib-parser-ex:
-    auto: false
-    no-ghc-lib: false
 
 # Packages MUST go at the end, since we append to it during execution
 # of CI.hs.

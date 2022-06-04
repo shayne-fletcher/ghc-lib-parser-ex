@@ -4,34 +4,34 @@ extra-deps:
   - alex-3.2.6
   - directory-1.3.7.0
   - happy-1.20.0
-  - hashable-1.4.0.1
+  - hashable-1.4.0.2
   - base-orphans-0.8.6
   - ghc-bignum-1.2
   - ghc-bignum-orphans-0.1.1
   - ghc-lib-parser-0.20220601
-  - binary-0.8.9.0
-  - bytestring-0.11.2.0
+  - binary-0.8.9.0 # latest is 0.10.0.0
+  - bytestring-0.11.3.1
   - parsec-3.1.15.0
-  - process-1.6.13.2
+  - process-1.6.14.0
   - text-2.0
   - unix-2.7.2.2
   - syb-0.7.2.1
   - uniplate-1.6.13
-  - unordered-containers-0.2.16.0
+  - unordered-containers-0.2.19.1
   # Addtional dependencies for the test:
-  - ansi-terminal-0.11.1
+  - ansi-terminal-0.11.3
   - ansi-wl-pprint-0.6.9
   - async-2.2.4
   - call-stack-0.4.0
-  - clock-0.8.2
+  - clock-0.8.3
   - colour-2.3.6
   - extra-1.7.10
   # - mintty-0.1.3 # windows specific (but it does no harm)
   # - Win32-2.13.2.0 # new mintty dependency
-  - optparse-applicative-0.16.1.0
+  - optparse-applicative-0.17.0.0
   - semigroups-0.20
   - tagged-0.8.6.1
-  - tasty-1.4.2.1
+  - tasty-1.4.2.3
   - tasty-hunit-0.10.0.3
   - transformers-compat-0.7.1
   - unbounded-delays-0.1.1.1

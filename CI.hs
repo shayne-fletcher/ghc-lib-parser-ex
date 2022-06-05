@@ -133,8 +133,11 @@ patchCabal version opts = do
       writeFile "ghc-lib-parser-ex.cabal" .
         replace section (
           unlines [
-              "  build-depends:\n" ++
-              "      ghc-lib-parser == " ++ ghcLibParserVersion
+              "  build-depends:",
+              "      ghc-lib-parser == " ++ ghcLibParserVersion,
+              "  -- pseduo use of flags to suppress cabal check warnings",
+              "  if flag(auto)",
+              "  if flag(no-ghc-lib)"
               ])
         =<< readFile' "ghc-lib-parser-ex.cabal"
 

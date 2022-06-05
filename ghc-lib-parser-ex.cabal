@@ -50,10 +50,6 @@ library
       Language.Haskell.GhclibParserEx.GHC.Parser
       Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
       Language.Haskell.GhclibParserEx.GHC.Utils.Outputable
-      -- Deprecated and will be removed in a future release.
-      Language.Haskell.GhclibParserEx.Config
-      Language.Haskell.GhclibParserEx.Parse
-      Language.Haskell.GhclibParserEx.Outputable
   other-modules:
       Paths_ghc_lib_parser_ex
   hs-source-dirs:

@@ -89,22 +89,22 @@ buildDist opts = do
       stack' opts "exec -- pacman -S autoconf automake-wrapper make patch python tar --noconfirm"
     isolatedBuild opts
 
-patchCabal :: String -> IO ()
-patchCabal version = do
+patchCabal :: String -> StackOptions -> IO ()
+patchCabal version opts = do
   setSGR [SetColor Foreground Dull Red]
   putStrLn "Patching cabal:"
   putStrLn $ "- version " ++ version
   writeFile "ghc-lib-parser-ex.cabal" .
       replace "version:        0.1.0" ("version:        " ++ version)
       =<< readFile' "ghc-lib-parser-ex.cabal"
-  -- If the version is of form major.minor.* parse out the major and
-  -- minor numbers and patch the ghc bounds with them.
   let series =
         case second (stripInfix ".") <$> stripInfix "." version of
           Just (major, Just (minor, _)) ->
             liftA2 (,) (maybeRead major) (maybeRead minor)
           _ -> Nothing
   case series of
+    -- If the version is of form major.minor.* parse out the major and
+    -- minor numbers and patch ghc/ghc-lib-parser bounds with them.
     Just (major, minor) -> do
       let family = show major ++ "." ++ show minor ++ ".*"
       let lower  = show major ++ "." ++ show minor ++ ".0"
@@ -118,13 +118,54 @@ patchCabal version = do
         replace "9.1.0" upper .
         replace "9.0.*" family
         =<< readFile' "ghc-lib-parser-ex.cabal"
-    Nothing -> return ()
+    Nothing -> do
+      -- If version is of the form 0.x, depend strictly on
+      -- ghc-lib-parser and don't constrain its bounds.
+      out <- dropSuffix "\n" <$> systemOutput_ (
+        stackWithOpts opts ++ " ls dependencies --depth 1"
+        )
+      let ls = filter ("ghc-lib-parser " `isPrefixOf`) $ map trim (lines out)
+      let ghcLibParserVersion =
+            case map (stripPrefix "ghc-lib-parser ") ls of
+              [Just version] -> version
+              _ -> fail "Couldn't determine ghc-lib-parser version"
+      putStrLn $ "- ghc-lib-parser " ++ ghcLibParserVersion
+      writeFile "ghc-lib-parser-ex.cabal" .
+        replace section (
+          unlines [
+              "  build-depends:\n" ++
+              "      ghc-lib-parser == " ++ ghcLibParserVersion
+              ])
+        =<< readFile' "ghc-lib-parser-ex.cabal"
+
   setSGR [Reset]
   where
     maybeRead :: String -> Maybe Int
     maybeRead s
       | [(x, "")] <- reads s = Just x
       | otherwise = Nothing
+
+    section :: String
+    section = unlines [
+        "  if flag(auto) && impl(ghc >= 9.0.0) && impl(ghc < 9.1.0)"
+      , "    build-depends:"
+      , "      ghc == 9.0.*,"
+      , "      ghc-boot-th,"
+      , "      ghc-boot"
+      , "  else"
+      , "    if flag(auto)"
+      , "      build-depends:"
+      , "        ghc-lib-parser == 9.0.*"
+      , "    else"
+      , "      if flag(no-ghc-lib)"
+      , "        build-depends:"
+      , "          ghc == 9.0.*,"
+      , "          ghc-boot-th,"
+      , "          ghc-boot"
+      , "      else"
+      , "        build-depends:"
+      , "          ghc-lib-parser == 9.0.*"
+      ]
 
 isolatedBuild :: StackOptions -> IO ()
 isolatedBuild opts@StackOptions {..} = do
@@ -139,7 +180,9 @@ isolatedBuild opts@StackOptions {..} = do
     copyDirectoryRecursive (rootDir </> "src") (tmpDir </> "src")
     copyDirectoryRecursive (rootDir </> "test") (tmpDir </> "test")
     withCurrentDirectory tmpDir $ do
-      patchCabal version
+      patchCabal version opts
+      contents <- readFile' "ghc-lib-parser-ex.cabal"
+      putStrLn contents
       stack "sdist . --tar-dir=."
       copyFile (pkg_ghclib_parser_ex <> ".tar.gz") (rootDir </> (pkg_ghclib_parser_ex <> ".tar.gz"))
       cmd $ "tar -xvf " <> (pkg_ghclib_parser_ex  <> ".tar.gz")
@@ -169,19 +212,20 @@ isolatedBuild opts@StackOptions {..} = do
 -- ghc-9.2.2). See
 -- https://gitlab.haskell.org/ghc/ghc/-/issues/20592#note_391266.
 prelude :: (String, String) -> String
-prelude ("darwin", _) = "C_INCLUDE_PATH=`xcrun --show-sdk-path`/usr/include/ffi"
+prelude ("darwin", _) = "C_INCLUDE_PATH=`xcrun --show-sdk-path`/usr/include/ffi "
 prelude _ = ""
 
 stack' :: StackOptions -> String -> IO ()
-stack' StackOptions {stackYaml, resolver, verbosity, cabalVerbose} action =
-  cmd $ prelude (os, arch) ++ " stack " ++
-    concatMap (<> " ")
-    [ stackYamlOpt stackYaml
-    , stackResolverOpt resolver
-    , stackVerbosityOpt verbosity
-    , cabalVerboseOpt cabalVerbose
-    ] ++
-  action
+stack' opts action = cmd $ prelude (os, arch) ++ stackWithOpts opts ++ action
+
+stackWithOpts :: StackOptions -> String
+stackWithOpts StackOptions {stackYaml, resolver, verbosity, cabalVerbose} =
+ "stack " ++ concatMap (<> " ")
+  [ stackYamlOpt stackYaml
+  , stackResolverOpt resolver
+  , stackVerbosityOpt verbosity
+  , cabalVerboseOpt cabalVerbose
+  ]
 
 cmd :: String -> IO ()
 cmd x = do

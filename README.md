@@ -18,7 +18,7 @@ The major part γ of the release number indicates an interface breaking change f
 
 ## Building `ghc-lib-parser-ex`
 
-You can build with `stack build` and test with `stack test`. Produce `ghc-lib-parser-ex` package distributions by executing the CI script:
+Produce and test `ghc-lib-parser-ex` package distributions by executing the CI script:
 ```bash
 # Setup
 git clone git@github.com:shayne-fletcher/ghc-lib-parser-ex.git

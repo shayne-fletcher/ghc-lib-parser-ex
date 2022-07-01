@@ -60,7 +60,11 @@ isOpApp = \case (L _ OpApp{}) -> True; _ -> False
 isAnyApp x = isApp x || isOpApp x
 isLexeme = \case (L _ HsVar{}) -> True; (L _ HsOverLit{}) -> True; (L _ HsLit{}) -> True; _ -> False
 isLambda = \case (L _ HsLam{}) -> True; _ -> False
+#if defined (GHCLIB_API_HEAD)
+isQuasiQuoteExpr = \case (L _ (HsUntypedSplice _ HsQuasiQuote{})) -> True; _ -> False
+#else
 isQuasiQuoteExpr = \case (L _ (HsSpliceE _ HsQuasiQuote{})) -> True; _ -> False
+#endif
 isQuasiQuote = isQuasiQuoteExpr -- Backwards compat.
 isDotApp = \case (L _ (OpApp _ _ op _)) -> isDot op; _ -> False
 isTypeApp = \case (L _ HsAppType{}) -> True; _ -> False
@@ -84,8 +88,13 @@ isWHNF = \case
 isLCase = \case (L _ HsLamCase{}) -> True; _ -> False
 isOverLabel = \case (L _ HsOverLabel{}) -> True; _ -> False
 
+#if defined (GHCLIB_API_HEAD)
+isQuasiQuoteSplice :: HsUntypedSplice GhcPs -> Bool
+#else
 isQuasiQuoteSplice :: HsSplice GhcPs -> Bool
+#endif
 isQuasiQuoteSplice = \case HsQuasiQuote{} -> True; _ -> False
+
 
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_901)
 isStrictMatch :: HsMatchContext GhcPs -> Bool
@@ -165,7 +174,14 @@ isPrimLiteral = \case
   _ -> False
 
 isSpliceDecl :: HsExpr GhcPs -> Bool
+#if defined (GHCLIB_API_HEAD)
+isSpliceDecl = \case
+  HsTypedSplice{} -> True
+  HsUntypedSplice{} -> True
+  _ -> False
+#else
 isSpliceDecl = \case HsSpliceE{} -> True; _ -> False
+#endif
 
 isMultiIf :: HsExpr GhcPs -> Bool
 isMultiIf = \case HsMultiIf{} -> True; _ -> False

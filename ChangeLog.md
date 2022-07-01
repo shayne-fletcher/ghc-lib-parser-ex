@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 0.20220701 released
+- Update to `ghc-lib-parser-0.20220701`
+
 ## 9.2.1.0 released
 - The Cabal flag `auto` now defaults to `False`:
   - When `auto` has the value `False`:

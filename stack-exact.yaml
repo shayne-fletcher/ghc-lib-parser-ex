@@ -22,5 +22,8 @@ extra-deps:
   - transformers-compat-0.7.1
   - unbounded-delays-0.1.1.1
   - wcwidth-0.0.2
+ghc-options:
+  "$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans
+  "$everything": -j
 packages:
 - .

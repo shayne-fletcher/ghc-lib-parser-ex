@@ -2,7 +2,9 @@ resolver: lts-18.19 # ghc-8.10.7
 extra-deps:
   - archive: /Users/shayne/project/sf-ghc-lib/ghc-lib-parser-9.4.1.20220502.tar.gz
     sha256: "e2ff86b3cc1b8640272bcf48f2ea701473517fded1eeb672599b10faab04d100"
-ghc-options: {"$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans}
+ghc-options:
+  "$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans
+  "$everything": -j
 
 # Packages MUST go at the end, since we append to it during execution
 # of CI.hs.

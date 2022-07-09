@@ -1,7 +1,9 @@
 resolver: lts-18.20 # ghc-8.10.7
 extra-deps:
   - ghc-lib-parser-9.0.2.20211226
-ghc-options: {"$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans}
+ghc-options:
+  "$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans
+  "$everything": -j
 flags:
   mintty:
     Win32-2-13-1: false

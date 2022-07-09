@@ -2,7 +2,8 @@ resolver: lts-19.8 # ghc-9.0.2
 extra-deps:
 - ghc-lib-parser-0.20220701
 ghc-options:
-    "$locals": -ddump-to-file -ddump-hi -Wall -Wno-name-shadowing -Wunused-imports
+  "$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans
+  "$everything": -j
 flags:
   ghc-lib-parser-ex:
     auto: false

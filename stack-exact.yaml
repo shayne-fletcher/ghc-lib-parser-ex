@@ -1,7 +1,7 @@
-resolver: ghc-9.2.2
+resolver: ghc-9.2.3
 extra-deps:
   # Depedendencies of ghc-lib-parser-ex:
-  - alex-3.2.6
+  - alex-3.2.7.1
   - happy-1.20.0
   - hashable-1.4.0.2
   - ghc-lib-parser-0.20220701
@@ -22,6 +22,9 @@ extra-deps:
   - transformers-compat-0.7.1
   - unbounded-delays-0.1.1.1
   - wcwidth-0.0.2
+flags:
+  transformers-compat:
+    five-three: true
 ghc-options:
   "$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans
   "$everything": -j

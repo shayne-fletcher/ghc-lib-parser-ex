@@ -21,21 +21,17 @@ strategy:
     #  Not every combination is tested
     #  - We do sampling to keep the number of builds reasonable.
 
-    # note(sf, 2022-0604): We should be able to bump this to ghc-9.2.3
-    # soon (see
-    # https://github.com/commercialhaskell/stackage-content/issues/103).
-
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-master      | ghc-9.2.2  |
-    # | windows | ghc-master      | ghc-9.2.2  |
-    # | macOS   | ghc-master      | ghc-9.2.2  |
+    # | linux   | ghc-master      | ghc-9.2.3  |
+    # | windows | ghc-master      | ghc-9.2.3  |
+    # | macOS   | ghc-master      | ghc-9.2.3  |
     # +---------+-----------------+------------+
-    linux-master-9.2.2:
+    linux-master-9.2.3:
       image: "ubuntu-latest"
       stack: "stack-exact.yaml"
-    mac-master-9.2.2:
+    mac-master-9.2.3:
       image: "macOS-latest"
       stack: "stack-exact.yaml"
 

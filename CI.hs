@@ -19,6 +19,7 @@ import System.Info.Extra
 import System.Process.Extra
 import System.Time.Extra
 import System.Console.ANSI
+import System.Exit
 import Data.List.Extra
 import Data.Time.Clock
 import Data.Time.Calendar
@@ -37,11 +38,12 @@ main = do
             <> Opts.progDesc "Build and test ghc-lib-parser-ex."
             <> Opts.header "CI - CI script for ghc-lib-parser-ex"
           )
-    Options { stackOptions } <- Opts.execParser opts
-    buildDist stackOptions
+    Options { stackOptions, noBuilds } <- Opts.execParser opts
+    buildDist stackOptions noBuilds
 
-newtype Options = Options
+data Options = Options
     { stackOptions :: StackOptions
+    , noBuilds :: Bool
     } deriving (Show)
 
 data StackOptions = StackOptions
@@ -54,7 +56,12 @@ data StackOptions = StackOptions
     } deriving (Show)
 
 parseOptions :: Opts.Parser Options
-parseOptions = Options <$> parseStackOptions
+parseOptions = Options
+  <$> parseStackOptions
+  <*> Opts.switch
+  (
+    Opts.long "no-builds" <> Opts.help "If enabled, stop after producing sdists"
+  )
 
 parseStackOptions :: Opts.Parser StackOptions
 parseStackOptions = StackOptions
@@ -83,11 +90,11 @@ parseStackOptions = StackOptions
        <> Opts.help "If specified, set this as the version in ghc-lib-parser-ex.cabal"
         ))
 
-buildDist :: StackOptions -> IO ()
-buildDist opts = do
+buildDist :: StackOptions -> Bool -> IO ()
+buildDist opts noBuilds = do
     when isWindows $
       stack' opts "exec -- pacman -S autoconf automake-wrapper make patch python tar --noconfirm"
-    isolatedBuild opts
+    isolatedBuild opts noBuilds
 
 patchCabal :: String -> StackOptions -> IO ()
 patchCabal version opts = do
@@ -170,8 +177,8 @@ patchCabal version opts = do
       , "          ghc-lib-parser == 9.0.*"
       ]
 
-isolatedBuild :: StackOptions -> IO ()
-isolatedBuild opts@StackOptions {..} = do
+isolatedBuild :: StackOptions -> Bool -> IO ()
+isolatedBuild opts@StackOptions {..} noBuilds = do
   version <- tag
   stackYaml <- pure $ fromMaybe "stack.yaml" stackYaml
   let pkg_ghclib_parser_ex = "ghc-lib-parser-ex-" ++ version
@@ -188,6 +195,9 @@ isolatedBuild opts@StackOptions {..} = do
       putStrLn contents
       stack "sdist . --tar-dir=."
       copyFile (pkg_ghclib_parser_ex <> ".tar.gz") (rootDir </> (pkg_ghclib_parser_ex <> ".tar.gz"))
+
+      when noBuilds exitSuccess
+
       cmd $ "tar -xvf " <> (pkg_ghclib_parser_ex  <> ".tar.gz")
       renameDirectory pkg_ghclib_parser_ex "ghc-lib-parser-ex"
       writeFile stackYaml . replace "- ." "- ghc-lib-parser-ex" =<< readFile' stackYaml

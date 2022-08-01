@@ -220,7 +220,7 @@ parseTests = testGroup "Parse tests"
   where
     flags = basicDynFlags
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
 moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
 #else
 moduleTest :: String -> DynFlags -> (Located (HsModule GhcPs) -> IO ()) -> IO ()

@@ -262,12 +262,14 @@ infix_  = fixity InfixN
 fixity :: FixityDirection -> Int -> [String] -> [(String, Fixity)]
 fixity a p = map (,Fixity (SourceText "") p a)
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 fixitiesFromModule :: Located HsModule -> [(String, Fixity)]
 #else
 fixitiesFromModule :: Located (HsModule GhcPs) -> [(String, Fixity)]
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD)
+fixitiesFromModule (L _ (HsModule _ _ _ _ decls)) = concatMap f decls
+#elif defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 fixitiesFromModule (L _ (HsModule _ _ _ _ _ decls _ _)) = concatMap f decls
 #elif defined (GHCLIB_API_900)
 fixitiesFromModule (L _ (HsModule _ _ _ _ decls _ _)) = concatMap f decls

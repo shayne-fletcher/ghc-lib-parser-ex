@@ -55,6 +55,23 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
+    # | linux   | ghc-9.4.1       | ghc-9.0.2  |
+    # | windows | ghc-9.4.1       | ghc-9.0.2  |
+    # | macOS   | ghc-9.4.1       | ghc-9.0.2  |
+    # +---------+-----------------+------------+
+    linux-9.4.1-9.0.2:
+      image: "ubuntu-latest"
+      stack: "stack-941-902.yaml"
+    windows-9.4.1-9.0.2:
+      image: "windows-latest"
+      stack: "stack-941-902.yaml"
+    mac-9.4.1-9.0.9.0.2:
+      image: "macOS-latest"
+      stack: "stack-941-902.yaml"
+
+    # +---------+-----------------+------------+
+    # | OS      | ghc-lib flavour | GHC        |
+    # +=========+=================+============+
     # | linux   | ghc-9.2.4       | ghc-8.10.4 |
     # | windows | ghc-9.2.4       | ghc-8.10.4 |
     # | macOS   | ghc-9.2.4       | ghc-8.10.4 |
@@ -68,40 +85,6 @@ strategy:
     mac-9.2.4-8.10.4:
       image: "macOS-latest"
       stack: "stack-924-8104.yaml"
-
-    # +---------+-----------------+------------+
-    # | OS      | ghc-lib flavour | GHC        |
-    # +=========+=================+============+
-    # | linux   | ghc-9.0.2       | ghc-8.10.7 |
-    # | windows | ghc-9.0.2       | ghc-8.10.7 |
-    # | macOS   | ghc-9.0.2       | ghc-8.10.7 |
-    # +---------+-----------------+------------+
-    linux-9.0.2-8.10.7:
-      image: "ubuntu-latest"
-      stack: "stack-902-8107.yaml"
-    mac-9.0.2-8.10.7:
-      image: "macOS-latest"
-      stack: "stack-902-8107.yaml"
-    windows-9.0.2-8.10.7:
-      image: "windows-latest"
-      stack: "stack-902-8107.yaml"
-
-    # +---------+-----------------+------------+
-    # | OS      | ghc-lib flavour | GHC        |
-    # +=========+=================+============+
-    # | linux   | ghc-8.10.7       | ghc-8.8.2 |
-    # | windows | ghc-8.10.7       | ghc-8.8.2 |
-    # | macOS   | ghc-8.10.7       | ghc-8.8.2 |
-    # +---------+-----------------+------------+
-    linux-8.10.7-8.8.2:
-      image: "ubuntu-latest"
-      stack: "stack-810-808.yaml"
-    mac-8.10.7-8.8.2:
-      image: "macOS-latest"
-      stack: "stack-810-808.yaml"
-    windows-8.10.7-8.8.2:
-      image: "windows-latest"
-      stack: "stack-810-808.yaml"
 
 pool: {vmImage: '$(image)'}
 

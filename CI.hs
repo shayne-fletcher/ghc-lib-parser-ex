@@ -30,6 +30,15 @@ import qualified Options.Applicative as Opts
 import GHC.Stack
 import System.IO.Unsafe
 
+enableAnsiColors::Bool
+enableAnsiColors =
+#if __GLASGOW_HASKELL__ == 904 && (__GLASGOW_HASKELL_PATCHLEVEL1__ == 1)
+-- Avoid: illegal hardware instruction  stack runhaskell --stack-yaml stack-exact.yaml --resolver ghc-9.4.1 --package extra --package optparse-applicative CI.hs
+  False
+#else
+  True
+#endif
+
 main :: IO ()
 main = do
     let opts =
@@ -98,7 +107,8 @@ buildDist opts noBuilds = do
 
 patchCabal :: String -> StackOptions -> IO ()
 patchCabal version opts = do
-  setSGR [SetColor Foreground Dull Red]
+  when enableAnsiColors $ do
+    setSGR [SetColor Foreground Dull Red]
   putStrLn "Patching cabal:"
   putStrLn $ "- version " ++ version
   writeFile "ghc-lib-parser-ex.cabal" .
@@ -148,7 +158,8 @@ patchCabal version opts = do
               ])
         =<< readFile' "ghc-lib-parser-ex.cabal"
 
-  setSGR [Reset]
+  when enableAnsiColors $ do
+    setSGR [Reset]
   where
     maybeRead :: String -> Maybe Int
     maybeRead s
@@ -245,14 +256,17 @@ stackWithOpts StackOptions {stackYaml, resolver, verbosity, cabalVerbose} =
 
 cmd :: String -> IO ()
 cmd x = do
-  setSGR [SetColor Foreground Dull Cyan]
+  when enableAnsiColors $ do
+    setSGR [SetColor Foreground Dull Cyan]
   putStrLn x
   hFlush stdout
   (t, _) <- duration $ system_ x
-  setSGR [SetColor Foreground Dull Cyan]
+  when enableAnsiColors $ do
+    setSGR [SetColor Foreground Dull Cyan]
   putStrLn $ "Completed " ++ showDuration t ++ ": " ++ x ++ "\n"
   hFlush stdout
-  setSGR [Reset]
+  when enableAnsiColors $ do
+    setSGR [Reset]
 
 -- Command line argument generators.
 

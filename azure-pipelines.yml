@@ -55,19 +55,19 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-9.4.1       | ghc-9.0.2  |
-    # | windows | ghc-9.4.1       | ghc-9.0.2  |
-    # | macOS   | ghc-9.4.1       | ghc-9.0.2  |
+    # | linux   | ghc-9.4.2       | ghc-9.0.2  |
+    # | windows | ghc-9.4.2       | ghc-9.0.2  |
+    # | macOS   | ghc-9.4.2       | ghc-9.0.2  |
     # +---------+-----------------+------------+
-    linux-9.4.1-9.0.2:
+    linux-9.4.2-9.0.2:
       image: "ubuntu-latest"
-      stack: "stack-941-902.yaml"
-    windows-9.4.1-9.0.2:
+      stack: "stack-942-902.yaml"
+    windows-9.4.2-9.0.2:
       image: "windows-latest"
-      stack: "stack-941-902.yaml"
-    mac-9.4.1-9.0.9.0.2:
+      stack: "stack-942-902.yaml"
+    mac-9.4.2-9.0.9.0.2:
       image: "macOS-latest"
-      stack: "stack-941-902.yaml"
+      stack: "stack-942-902.yaml"
 
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |

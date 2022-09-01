@@ -1,15 +1,16 @@
-resolver: ghc-9.2.3
+resolver: ghc-9.2.4
 extra-deps:
   # Depedendencies of ghc-lib-parser-ex:
   - alex-3.2.7.1
   - happy-1.20.0
   - hashable-1.4.0.2
-  - ghc-lib-parser-0.20220801
+  - ghc-lib-parser-0.20220901
   - syb-0.7.2.1
   - uniplate-1.6.13
   - unordered-containers-0.2.19.1
   # Addtional dependencies for the test:
   - ansi-terminal-0.11.3
+  - mintty-0.1.4
   - ansi-wl-pprint-0.6.9
   - call-stack-0.4.0
   - clock-0.8.3
@@ -23,6 +24,9 @@ extra-deps:
   - unbounded-delays-0.1.1.1
   - wcwidth-0.0.2
 flags:
+  # Win32 is a compiler lib, the current version is 2.12.0.0.
+  mintty:
+    win32-2-13-1: false
   transformers-compat:
     five-three: true
 ghc-options:

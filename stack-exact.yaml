@@ -4,7 +4,7 @@ extra-deps:
   - alex-3.2.7.1
   - happy-1.20.0
   - hashable-1.4.0.2
-  - ghc-lib-parser-0.20220901
+  - ghc-lib-parser-0.20221001
   - syb-0.7.2.1
   - uniplate-1.6.13
   - unordered-containers-0.2.19.1

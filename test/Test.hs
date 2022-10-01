@@ -113,7 +113,10 @@ makeFile relPath contents = do
     writeFile relPath contents
     return relPath
 
-#if defined(GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
+#if defined(GHCLIB_API_HEAD)
+report :: DynFlags -> Bag (MsgEnvelope GhcMessage) -> String
+report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLocDefault msgs ]
+#elif defined (GHCLIB_API_904)
 report :: DynFlags -> Bag (MsgEnvelope GhcMessage) -> String
 report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
 #elif defined (GHCLIB_API_902)

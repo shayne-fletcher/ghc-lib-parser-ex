@@ -72,23 +72,6 @@ strategy:
       image: "macOS-latest"
       stack: "stack-942-902.yaml"
 
-    # +---------+-----------------+------------+
-    # | OS      | ghc-lib flavour | GHC        |
-    # +=========+=================+============+
-    # | linux   | ghc-9.2.4       | ghc-8.10.4 |
-    # | windows | ghc-9.2.4       | ghc-8.10.4 |
-    # | macOS   | ghc-9.2.4       | ghc-8.10.4 |
-    # +---------+-----------------+------------+
-    linux-9.2.4-8.10.4:
-      image: "ubuntu-latest"
-      stack: "stack-924-8104.yaml"
-    windows-9.2.4-8.10.4:
-      image: "windows-latest"
-      stack: "stack-924-8104.yaml"
-    mac-9.2.4-8.10.4:
-      image: "macOS-latest"
-      stack: "stack-924-8104.yaml"
-
 pool: {vmImage: '$(image)'}
 
 steps:

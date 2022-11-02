@@ -1,6 +1,6 @@
 resolver: nightly-2022-09-01 # ghc-9.2.4
 extra-deps:
-- ghc-lib-parser-0.20221001
+- ghc-lib-parser-0.20221101
 ghc-options:
   "$locals": -ddump-to-file -ddump-hi -Werror=unused-imports -Werror=unused-top-binds -Werror=orphans
   "$everything": -j

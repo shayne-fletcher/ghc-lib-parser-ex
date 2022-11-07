@@ -72,6 +72,15 @@ strategy:
       image: "macOS-latest"
       stack: "stack-943-902.yaml"
 
+    # +---------+-----------------+------------+
+    # | OS      | ghc-lib flavour | GHC        |
+    # +=========+=================+============+
+    # | linux   | ghc-9.2.5       | ghc-9.0.2  |
+    # +---------+-----------------+------------+
+    linux-9.2.5-9.0.2:
+      image: "ubuntu-latest"
+      stack: "stack-925-902.yaml"
+
 pool: {vmImage: '$(image)'}
 
 steps:

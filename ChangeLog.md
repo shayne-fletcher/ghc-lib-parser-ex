@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 0.20221201 released
+- Update to `ghc-lib-parser-0.20221201`
+
 ## 0.20221101 released
 - Update to `ghc-lib-parser-0.20221101`
 

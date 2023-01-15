@@ -200,7 +200,7 @@ isFieldWildcard :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 #endif
 isFieldWildcard = \case
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
-  (L _ HsFieldBind {hfbRHS=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
+  (L _ HsFieldBind {hfbRHS=(L _ (HsUnboundVar _ s))}) -> occNameStr s == "_"
 #elif defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
 #elif defined (GHCLIB_API_810)

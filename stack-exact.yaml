@@ -1,4 +1,15 @@
 resolver: ghc-9.2.4
+
+# workaround:
+allow-newer: true # ghc-flavor ghc-9.6.1 errors with.
+# In the dependencies for hashable-1.4.0.2:
+#     base-4.17.0.0 from Stack configuration does not
+#                   match >=4.5 && <4.17 (latest matching version is
+#                   4.16.4.0)
+#     ghc-bignum-1.3 from Stack configuration does not
+#                    match >=1.0 && <1.3 (latest matching version is 1.2)
+# needed due to ghc-lib-parser-ex-9.6.1.20230115 -> hashable-1.4.0.2
+
 extra-deps:
   # Depedendencies of ghc-lib-parser-ex:
   - alex-3.2.7.1

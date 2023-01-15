@@ -9,9 +9,9 @@ module Language.Haskell.GhclibParserEx.GHC.Hs(
  )
 where
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Hs
-#  if !defined (GHCLIB_API_HEAD)
+#  if !defined (GHCLIB_API_HEAD) && !defined (GHCLIB_API_906)
 import GHC.Unit.Module
 #  endif
 import GHC.Types.SrcLoc

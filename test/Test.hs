@@ -85,7 +85,7 @@ import Bag
 basicDynFlags :: DynFlags
 basicDynFlags =
   defaultDynFlags fakeSettings
-#if !defined (GHCLIB_API_HEAD) && !defined (GHLIB_API_906)
+#if !defined (GHCLIB_API_HEAD) && !defined (GHCLIB_API_906)
                                 fakeLlvmConfig
 #endif
 

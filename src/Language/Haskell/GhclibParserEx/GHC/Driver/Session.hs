@@ -17,12 +17,12 @@ module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
 #if defined (GHCLIB_API_808) || defined (GHCLIB_API_810)
 import qualified GHC.LanguageExtensions as LangExt
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Utils.Panic
 import GHC.Parser.Header
 import GHC.Data.StringBuffer
 import GHC.Driver.Session
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 import GHC.Types.SourceError
 #else
 import GHC.Driver.Types
@@ -44,7 +44,7 @@ import Data.Function -- For `compareOn`.
 instance Ord Extension where
   compare = compare `on` fromEnum
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
 import GHC.Driver.Config.Parser
 #endif
 
@@ -161,7 +161,7 @@ parsePragmasIntoDynFlags :: DynFlags
                          -> IO (Either String DynFlags)
 parsePragmasIntoDynFlags flags (enable, disable) file str =
   catchErrors $ do
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_904)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
     let (_, opts) =
           getOptions (initParserOpts flags) (stringToStringBuffer str) file
 #else

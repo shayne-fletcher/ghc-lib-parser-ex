@@ -25,6 +25,9 @@ import HsSyn
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 import GHC.Types.SourceText
 #endif
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906)
+import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
+#endif
 import GHC.Types.SrcLoc
 import GHC.Types.Name.Reader
 import GHC.Types.Name
@@ -200,6 +203,7 @@ isFieldWildcard :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 #endif
 isFieldWildcard = \case
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906)
+-- Use `Language.Haskell.GhcLibParserEx.GHC.Types.Name.Reader`s `occNameStr` since `HsUnboundVar` now contains a `RdrName` not an `OccName`.
   (L _ HsFieldBind {hfbRHS=(L _ (HsUnboundVar _ s))}) -> occNameStr s == "_"
 #elif defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"

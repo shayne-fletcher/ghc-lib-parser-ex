@@ -24,62 +24,36 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-master      | ghc-9.4.2  |
-    # | windows | ghc-master      | ghc-9.4.2  |
-    # | macOS   | ghc-master      | ghc-9.4.2  |
+    # | linux   | ghc-9.4.4       | ghc-9.4.4  |
+    # | windows | ghc-9.4.4       | ghc-9.4.4  |
+    # | macOS   | ghc-9.4.4       | ghc-9.4.4  |
     # +---------+-----------------+------------+
-    linux-master-9.4.2:
+    linux-9.4.4-9.4.4:
       image: "ubuntu-latest"
       stack: "stack-exact.yaml"
-    windows-master-9.4.2:
+    windows-9.4.4-9.4.4:
       image: "windows-latest"
       stack: "stack-exact.yaml"
-    mac-master-9.4.2:
+    mac-master-9.4.4:
       image: "macOS-latest"
       stack: "stack-exact.yaml"
 
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-master      | ghc-9.2.4  |
-    # | windows | ghc-master      | ghc-9.2.4  |
-    # | macOS   | ghc-master      | ghc-9.2.4  |
+    # | linux   | ghc-9.4.4       | ghc-9.2.4  |
+    # | windows | ghc-9.4.4       | ghc-9.2.4  |
+    # | macOS   | ghc-9.4.4       | ghc-9.2.4  |
     # +---------+-----------------+------------+
-    linux-master-9.2.4:
+    linux-9.4.4-9.2.4:
       image: "ubuntu-latest"
       stack: "stack.yaml"
-    windows-master-9.2.4:
+    windows-9.4.4-9.2.4:
       image: "windows-latest"
       stack: "stack.yaml"
-    mac-master-9.2.4:
+    mac-9.4.4-9.2.4:
       image: "macOS-latest"
       stack: "stack.yaml"
-
-    # +---------+-----------------+------------+
-    # | OS      | ghc-lib flavour | GHC        |
-    # +=========+=================+============+
-    # | linux   | ghc-9.4.4       | ghc-9.0.2  |
-    # | windows | ghc-9.4.4       | ghc-9.0.2  |
-    # | macOS   | ghc-9.4.4       | ghc-9.0.2  |
-    # +---------+-----------------+------------+
-    linux-9.4.4-9.0.2:
-      image: "ubuntu-latest"
-      stack: "stack-944-902.yaml"
-    windows-9.4.4-9.0.2:
-      image: "windows-latest"
-      stack: "stack-944-902.yaml"
-    mac-9.4.4-9.0.9.0.2:
-      image: "macOS-latest"
-      stack: "stack-944-902.yaml"
-
-    # +---------+-----------------+------------+
-    # | OS      | ghc-lib flavour | GHC        |
-    # +=========+=================+============+
-    # | linux   | ghc-9.2.5       | ghc-9.0.2  |
-    # +---------+-----------------+------------+
-    linux-9.2.5-9.0.2:
-      image: "ubuntu-latest"
-      stack: "stack-925-902.yaml"
 
 pool: {vmImage: '$(image)'}
 

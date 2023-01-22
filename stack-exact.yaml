@@ -1,4 +1,4 @@
-resolver: ghc-9.2.4
+resolver: ghc-9.4.4
 
 # workaround:
 allow-newer: true # ghc-flavor ghc-9.6.1 errors with.
@@ -14,28 +14,31 @@ extra-deps:
   # Depedendencies of ghc-lib-parser-ex:
   - alex-3.2.7.1
   - happy-1.20.0
-  - hashable-1.4.0.2
-  - ghc-lib-parser-0.20221101
-  - syb-0.7.2.1
+  - data-array-byte-0.1.0.1
+  - hashable-1.4.2.0
+  - ghc-lib-parser-9.4.4.20221225
+  - syb-0.7.2.2
   - uniplate-1.6.13
   - unordered-containers-0.2.19.1
   # Addtional dependencies for the test:
-  - ansi-terminal-0.11.3
+  - ansi-terminal-0.11.4
   - mintty-0.1.4
   - ansi-wl-pprint-0.6.9
   - call-stack-0.4.0
   - clock-0.8.3
   - colour-2.3.6
-  - extra-1.7.10
+  - extra-1.7.12
   - optparse-applicative-0.17.0.0
   - tagged-0.8.6.1
-  - tasty-1.4.2.3
+  - tasty-1.4.3
   - tasty-hunit-0.10.0.3
-  - transformers-compat-0.7.1
+  - transformers-compat-0.7.2
   - unbounded-delays-0.1.1.1
   - wcwidth-0.0.2
 flags:
-  # Win32 is a compiler lib, the current version is 2.12.0.0.
+  # Win32 is a compiler lib, the current version is 2.12.0.1.
+  ansi-terminal:
+    win32-2-13-1: false
   mintty:
     win32-2-13-1: false
   transformers-compat:

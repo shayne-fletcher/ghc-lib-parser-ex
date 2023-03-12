@@ -7,7 +7,7 @@ extra-deps:
   - data-array-byte-0.1.0.1
   - base-orphans-0.8.7
   - hashable-1.4.2.0
-  - ghc-lib-parser-9.4.4.20221225
+  - ghc-lib-parser-9.6.1.20230312
   - syb-0.7.2.2
   - uniplate-1.6.13
   - unordered-containers-0.2.19.1

@@ -24,34 +24,35 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-9.4.4       | ghc-9.4.4  |
-    # | windows | ghc-9.4.4       | ghc-9.4.4  |
-    # | macOS   | ghc-9.4.4       | ghc-9.4.4  |
+    # | linux   | ghc-9.6.1       | ghc-9.6.1  |
+    # | windows | ghc-9.6.1       | ghc-9.6.1  |
+    # | macOS   | ghc-9.6.1       | ghc-9.6.1  |
     # +---------+-----------------+------------+
-    linux-9.4.4-9.4.4:
-      image: "ubuntu-latest"
-      stack: "stack-exact.yaml"
-    windows-9.4.4-9.4.4:
-      image: "windows-latest"
-      stack: "stack-exact.yaml"
-    mac-master-9.4.4:
-      image: "macOS-latest"
-      stack: "stack-exact.yaml"
+    # waiting on a 9.6.1 resolver to enable.
+    # linux-9.6.1-9.6.1:
+    #   image: "ubuntu-latest"
+    #   stack: "stack-exact.yaml"
+    # windows-9.6.1-9.6.1:
+    #   image: "windows-latest"
+    #   stack: "stack-exact.yaml"
+    # mac-9-6.1-9.6.1:
+    #   image: "macOS-latest"
+    #   stack: "stack-exact.yaml"
 
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-9.4.4       | ghc-9.2.4  |
-    # | windows | ghc-9.4.4       | ghc-9.2.4  |
-    # | macOS   | ghc-9.4.4       | ghc-9.2.4  |
+    # | linux   | ghc-9.6.1       | ghc-9.4.4  |
+    # | windows | ghc-9.6.1       | ghc-9.4.4  |
+    # | macOS   | ghc-9.6.1       | ghc-9.4.4  |
     # +---------+-----------------+------------+
-    linux-9.4.4-9.2.4:
+    linux-9.6.1-9.4.4:
       image: "ubuntu-latest"
       stack: "stack.yaml"
-    windows-9.4.4-9.2.4:
+    windows-9.6.1-9.4.4:
       image: "windows-latest"
       stack: "stack.yaml"
-    mac-9.4.4-9.2.4:
+    mac-9.6.1-9.4.4:
       image: "macOS-latest"
       stack: "stack.yaml"
 

@@ -15,7 +15,9 @@ module Language.Haskell.GhclibParserEx.Fixity(
   , preludeFixities, baseFixities
   , infixr_, infixl_, infix_, fixity
   ) where
-
+#if defined (GHCLIB_API_HEAD)
+import GHC.Data.FastString
+#endif
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Hs
 #if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
@@ -261,8 +263,11 @@ infixl_ = fixity InfixL
 infix_  = fixity InfixN
 
 fixity :: FixityDirection -> Int -> [String] -> [(String, Fixity)]
+#if defined (GHCLIB_API_HEAD)
+fixity a p = map (,Fixity (SourceText (fsLit "")) p a)
+#else
 fixity a p = map (,Fixity (SourceText "") p a)
-
+#endif
 #if defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 fixitiesFromModule :: Located HsModule -> [(String, Fixity)]
 #else

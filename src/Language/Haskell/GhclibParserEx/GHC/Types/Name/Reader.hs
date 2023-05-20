@@ -1,4 +1,4 @@
--- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# LANGUAGE CPP #-}
@@ -9,11 +9,11 @@ module Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader(
  )
 where
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
 import GHC.Parser.Annotation
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Types.SrcLoc
 import GHC.Types.Name
 import GHC.Types.Name.Reader
@@ -27,7 +27,7 @@ import Name
 -- These names may not seem natural here but they work out in
 -- practice. The use of thse two functions is thoroughly ubiquitous.
 occNameStr :: RdrName -> String; occNameStr = occNameString . rdrNameOcc
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
 rdrNameStr :: GHC.Parser.Annotation.LocatedN RdrName -> String
 #else
 rdrNameStr :: Located RdrName -> String
@@ -35,7 +35,7 @@ rdrNameStr :: Located RdrName -> String
 rdrNameStr = occNameStr . unLoc
 
 -- Builtin type or data constructors.
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
 isSpecial :: LocatedN RdrName -> Bool
 #else
 isSpecial :: Located RdrName -> Bool
@@ -45,7 +45,7 @@ isSpecial _ = False
 
 -- Coerce qualified names to unqualified (by discarding the
 -- qualifier).
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
 unqual :: LocatedN RdrName -> LocatedN RdrName
 #else
 unqual :: Located RdrName -> Located RdrName
@@ -54,7 +54,7 @@ unqual (L loc (Qual _ n)) = L loc $ mkRdrUnqual n
 unqual x = x
 
 -- Extract the occ name from a qualified/unqualified reader name.
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined(GHCLIB_API_904) || defined (GHCLIB_API_902)
 fromQual :: LocatedN RdrName -> Maybe OccName
 #else
 fromQual :: Located RdrName -> Maybe OccName

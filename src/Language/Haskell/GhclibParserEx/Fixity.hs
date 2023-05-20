@@ -1,4 +1,4 @@
--- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 --
 -- Adapted from (1) https://github.com/mpickering/apply-refact.git and
@@ -15,12 +15,12 @@ module Language.Haskell.GhclibParserEx.Fixity(
   , preludeFixities, baseFixities
   , infixr_, infixl_, infix_, fixity
   ) where
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908)
 import GHC.Data.FastString
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Hs
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 import GHC.Types.Fixity
 import GHC.Types.SourceText
 #else
@@ -66,7 +66,7 @@ expFix _ e = e
 -- LPat and Pat have gone through a lot of churn. See
 -- https://gitlab.haskell.org/ghc/ghc/merge_requests/1925 for details.
 patFix :: [(String, Fixity)] -> LPat GhcPs -> LPat GhcPs
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 patFix fixities (L loc (ConPat _ op (InfixCon pat1 pat2))) =
   L loc (mkConOpPat (getFixities fixities) op (findFixity' (getFixities fixities) op) pat1 pat2)
 #elif defined (GHCLIB_API_810)
@@ -80,7 +80,7 @@ patFix _ p = p
 
 mkConOpPat ::
   [(String, Fixity)]
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
   -> LocatedN RdrName
 #else
   -> Located RdrName
@@ -88,21 +88,21 @@ mkConOpPat ::
   -> Fixity
   -> LPat GhcPs -> LPat GhcPs
   -> Pat GhcPs
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 mkConOpPat fs op2 fix2 p1@(L loc (ConPat _ op1 (InfixCon p11 p12))) p2
 #elif defined (GHCLIB_API_810)
 mkConOpPat fs op2 fix2 p1@(L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #else
 mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
   | nofix_error = ConPat noAnn op2 (InfixCon p1 p2)
 #elif defined (GHCLIB_API_900)
   | nofix_error = ConPat noExtField op2 (InfixCon p1 p2)
 #else
   | nofix_error = ConPatIn op2 (InfixCon p1 p2)
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
   | associate_right = ConPat noAnn op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
 #elif defined (GHCLIB_API_900)
   | associate_right = ConPat noExtField op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
@@ -111,7 +111,7 @@ mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #else
   | associate_right = ConPatIn op1 (InfixCon p11 (cL loc (mkConOpPat fs op2 fix2 p12 p2)))
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
   | otherwise = ConPat noAnn op2 (InfixCon p1 p2)
 #elif defined (GHCLIB_API_900)
   | otherwise = ConPat noExtField op2 (InfixCon p1 p2)
@@ -121,7 +121,7 @@ mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
   where
     fix1 = findFixity' fs op1
     (nofix_error, associate_right) = compareFixity fix1 fix2
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 mkConOpPat _ op _ p1 p2 = ConPat noAnn op (InfixCon p1 p2)
 #elif defined (GHCLIB_API_900)
 mkConOpPat _ op _ p1 p2 = ConPat noExtField op (InfixCon p1 p2)
@@ -131,7 +131,7 @@ mkConOpPat _ op _ p1 p2 = ConPatIn op (InfixCon p1 p2)
 
 mkOpApp ::
    [(String, Fixity)]
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
    -> SrcSpanAnnA
 #else
    -> SrcSpan
@@ -142,14 +142,14 @@ mkOpApp ::
    -> LHsExpr GhcPs
 --      (e11 `op1` e12) `op2` e2
 mkOpApp fs loc e1@(L _ (OpApp x1 e11 op1 e12)) op2 fix2 e2
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
   | nofix_error = L loc (OpApp noAnn e1 op2 e2)
 #else
   | nofix_error = L loc (OpApp noExt e1 op2 e2)
 #endif
   | associate_right = L loc (OpApp x1 e11 op1 (mkOpApp fs loc' e12 op2 fix2 e2 ))
   where
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
     loc'= combineLocsA e12 e2
 #else
     loc'= combineLocs e12 e2
@@ -158,18 +158,18 @@ mkOpApp fs loc e1@(L _ (OpApp x1 e11 op1 e12)) op2 fix2 e2
     (nofix_error, associate_right) = compareFixity fix1 fix2
 --      (- neg_arg) `op` e2
 mkOpApp fs loc e1@(L _ (NegApp _ neg_arg neg_name)) op2 fix2 e2
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
   | nofix_error = L loc (OpApp noAnn e1 op2 e2)
 #else
   | nofix_error = L loc (OpApp noExt e1 op2 e2)
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
   | associate_right = L loc (NegApp noAnn (mkOpApp fs loc' neg_arg op2 fix2 e2) neg_name)
 #else
   | associate_right = L loc (NegApp noExt (mkOpApp fs loc' neg_arg op2 fix2 e2) neg_name)
 #endif
   where
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
     loc' = combineLocsA neg_arg e2
 #else
     loc' = combineLocs neg_arg e2
@@ -177,7 +177,7 @@ mkOpApp fs loc e1@(L _ (NegApp _ neg_arg neg_name)) op2 fix2 e2
     (nofix_error, associate_right) = compareFixity negateFixity fix2
 --      e1 `op` - neg_arg
 mkOpApp _ loc e1 op1 fix1 e2@(L _ NegApp {}) -- NegApp can occur on the right.
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
   | not associate_right  = L loc (OpApp noAnn e1 op1 e2)-- We *want* right association.
 #else
   | not associate_right  = L loc (OpApp noExt e1 op1 e2)-- We *want* right association.
@@ -185,7 +185,7 @@ mkOpApp _ loc e1 op1 fix1 e2@(L _ NegApp {}) -- NegApp can occur on the right.
   where
     (_, associate_right) = compareFixity fix1 negateFixity
  --     Default case, no rearrangment.
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 mkOpApp _ loc e1 op _fix e2 = L loc (OpApp noAnn e1 op e2)
 #else
 mkOpApp _ loc e1 op _fix e2 = L loc (OpApp noExt e1 op e2)
@@ -202,7 +202,7 @@ getFixities fixities = if null fixities then baseFixities else fixities
 findFixity :: [(String, Fixity)] -> LHsExpr GhcPs -> Fixity
 findFixity fs r = askFix fs (getIdent r) -- Expressions.
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 findFixity' :: [(String, Fixity)] -> LocatedN RdrName -> Fixity
 #else
 findFixity' :: [(String, Fixity)] -> Located RdrName -> Fixity
@@ -263,7 +263,7 @@ infixl_ = fixity InfixL
 infix_  = fixity InfixN
 
 fixity :: FixityDirection -> Int -> [String] -> [(String, Fixity)]
-#if defined (GHCLIB_API_HEAD)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908)
 fixity a p = map (,Fixity (SourceText (fsLit "")) p a)
 #else
 fixity a p = map (,Fixity (SourceText "") p a)
@@ -273,7 +273,7 @@ fixitiesFromModule :: Located HsModule -> [(String, Fixity)]
 #else
 fixitiesFromModule :: Located (HsModule GhcPs) -> [(String, Fixity)]
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906)
 fixitiesFromModule (L _ (HsModule _ _ _ _ decls)) = concatMap f decls
 #elif defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
 fixitiesFromModule (L _ (HsModule _ _ _ _ _ decls _ _)) = concatMap f decls

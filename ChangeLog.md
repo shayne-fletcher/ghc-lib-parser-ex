@@ -2,6 +2,7 @@
 
 # Unreleased
 - Add `&` to `baseFixities`
+- Add support for ghc-9.8 series: `GHCLIB_API_908`
 
 # 9.6.0.0 released
 - Add support for ghc-9.6 series: `GHCLIB_API_906`

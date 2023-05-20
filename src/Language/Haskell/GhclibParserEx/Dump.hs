@@ -1,4 +1,4 @@
--- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 {-
 (c) The University of Glasgow 2006
@@ -13,14 +13,14 @@
 module Language.Haskell.GhclibParserEx.Dump(
     showAstData
   , BlankSrcSpan(..)
-#if defined(GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
   , BlankEpAnnotations(..)
 #endif
 ) where
 
 #if !defined(MIN_VERSION_ghc_lib_parser)
 -- Using native ghc.
-#  if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined(GHCLIB_API_900) || defined (GHCLIB_API_810)
+#  if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined(GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs.Dump
 #  else
 import HsDumpAst
@@ -28,7 +28,7 @@ import HsDumpAst
 #else
 -- Using ghc-lib-parser. Recent versions will include
 -- GHC.Hs.Dump (it got moved in from ghc-lib on 2020-02-05).
-# if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+# if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs.Dump
 #  else
 -- For simplicity, just assume it's missing from 8.8 ghc-lib-parser
@@ -43,7 +43,7 @@ import NameSet
 import Name
 import DataCon
 import SrcLoc
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
 import GHC.Hs
 #else
 import HsSyn

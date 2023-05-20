@@ -1,4 +1,4 @@
--- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020-2023 Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 {-# LANGUAGE CPP #-}
 #include "ghclib_api.h"
@@ -14,13 +14,13 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp(
   )
 where
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906)
 import GHC.Hs.Extension (GhcPs)
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
 import GHC.Hs.ImpExp
-#  if !defined (GHCLIB_API_HEAD) && !defined (GHCLIB_API_906)
+#  if !defined (GHCLIB_API_HEAD) && !defined (GHCLIB_API_908) && !defined (GHCLIB_API_906)
 import GHC.Types.Name.Reader
 #  endif
 #elif defined (GHCLIB_API_810)
@@ -31,7 +31,7 @@ import HsImpExp
 import RdrName
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906)
+#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906)
 isPatSynIE :: IEWrappedName GhcPs -> Bool
 #else
 isPatSynIE :: IEWrappedName RdrName -> Bool

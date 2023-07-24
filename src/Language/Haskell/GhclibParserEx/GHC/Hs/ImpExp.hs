@@ -14,16 +14,16 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp(
   )
 where
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
 import GHC.Hs.Extension (GhcPs)
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)
 import GHC.Hs.ImpExp
-#  if !defined (GHCLIB_API_HEAD) && !defined (GHCLIB_API_908) && !defined (GHCLIB_API_906)
+#  if !defined (GHC_9_10) && !defined (GHC_9_8) && !defined (GHC_9_6)
 import GHC.Types.Name.Reader
 #  endif
-#elif defined (GHCLIB_API_810)
+#elif defined (GHC_8_10)
 import GHC.Hs.ImpExp
 import RdrName
 #else
@@ -31,7 +31,7 @@ import HsImpExp
 import RdrName
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
 isPatSynIE :: IEWrappedName GhcPs -> Bool
 #else
 isPatSynIE :: IEWrappedName RdrName -> Bool

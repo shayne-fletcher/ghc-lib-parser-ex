@@ -7,19 +7,19 @@
 
 module Language.Haskell.GhclibParserEx.GHC.Settings.Config(
     fakeSettings
-#if !defined (GHCLIB_API_HEAD) && !defined (GHCLIB_API_908) && !defined (GHCLIB_API_906)
+#if !defined (GHC_9_10) && !defined (GHC_9_8) && !defined (GHC_9_6)
   , fakeLlvmConfig
 #endif
   )
 where
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0)
 import GHC.Settings.Config
 import GHC.Driver.Session
 import GHC.Utils.Fingerprint
 import GHC.Platform
 import GHC.Settings
-#elif defined (GHCLIB_API_810)
+#elif defined (GHC_8_10)
 import Config
 import DynFlags
 import Fingerprint
@@ -34,12 +34,12 @@ import Platform
 
 fakeSettings :: Settings
 fakeSettings = Settings
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)|| defined (GHC_8_10)
   { sGhcNameVersion=ghcNameVersion
   , sFileSettings=fileSettings
   , sTargetPlatform=platform
   , sPlatformMisc=platformMisc
-#  if !defined(GHCLIB_API_HEAD) && !defined (GHCLIB_API_908) && !defined(GHCLIB_API_906) && !defined(GHCLIB_API_904) && !defined(GHCLIB_API_902)
+#  if !defined(GHC_9_10) && !defined (GHC_9_8) && !defined(GHC_9_6) && !defined(GHC_9_4) && !defined(GHC_9_2)
   , sPlatformConstants=platformConstants
 #  endif
   , sToolSettings=toolSettings
@@ -53,7 +53,7 @@ fakeSettings = Settings
   }
 #endif
   where
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)|| defined (GHC_8_10)
     toolSettings = ToolSettings {
       toolSettings_opt_P_fingerprint=fingerprint0
       }
@@ -65,11 +65,11 @@ fakeSettings = Settings
                     }
 #endif
     platform =
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2)
       genericPlatform
 #else
       Platform{
-#  if defined (GHCLIB_API_900)
+#  if defined (GHC_9_0)
     -- It doesn't matter what values we write here as these fields are
     -- not referenced for our purposes. However the fields are strict
     -- so we must say something.
@@ -82,7 +82,7 @@ fakeSettings = Settings
       , platformTablesNextToCode=False
       ,
 #  endif
-#  if defined (GHCLIB_API_810) || defined (GHCLIB_API_900)
+#  if defined (GHC_8_10) || defined (GHC_9_0)
         platformWordSize=PW8
       , platformMini=PlatformMini {platformMini_arch=ArchUnknown, platformMini_os=OSUnknown}
 #  else
@@ -92,14 +92,14 @@ fakeSettings = Settings
       , platformUnregisterised=True
       }
 #endif
-#if !defined(GHCLIB_API_HEAD) && !defined (GHCLIB_API_908) && !defined(GHCLIB_API_906) && !defined(GHCLIB_API_904) && !defined(GHCLIB_API_902)
+#if !defined(GHC_9_10) && !defined (GHC_9_8) && !defined(GHC_9_6) && !defined(GHC_9_4) && !defined(GHC_9_2)
     platformConstants =
       PlatformConstants{pc_DYNAMIC_BY_DEFAULT=False,pc_WORD_SIZE=8}
 #endif
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
 -- Intentionally empty
-#elif defined(GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)|| defined (GHCLIB_API_810)
+#elif defined(GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)|| defined (GHC_8_10)
 fakeLlvmConfig :: LlvmConfig
 fakeLlvmConfig = LlvmConfig [] []
 #else

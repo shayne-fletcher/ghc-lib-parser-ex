@@ -8,21 +8,21 @@ module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
       readExtension
     , extensionImplications
 -- Landed in https://gitlab.haskell.org/ghc/ghc/merge_requests/2654.
-#if defined (GHCLIB_API_808) || defined (GHCLIB_API_810)
+#if defined (GHC_8_8) || defined (GHC_8_10)
     , TurnOnFlag, turnOn, turnOff, impliedGFlags, impliedOffGFlags, impliedXFlags
 #endif
     , parsePragmasIntoDynFlags
   ) where
 
-#if defined (GHCLIB_API_808) || defined (GHCLIB_API_810)
+#if defined (GHC_8_8) || defined (GHC_8_10)
 import qualified GHC.LanguageExtensions as LangExt
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHCLIB_API_902) || defined (GHC_9_0)
 import GHC.Utils.Panic
 import GHC.Parser.Header
 import GHC.Data.StringBuffer
 import GHC.Driver.Session
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHCLIB_API_902)
 import GHC.Types.SourceError
 #else
 import GHC.Driver.Types
@@ -39,12 +39,12 @@ import Data.List
 import Data.Maybe
 import qualified Data.Map as Map
 -- Landed in https://gitlab.haskell.org/ghc/ghc/merge_requests/2707.
-#if defined (GHCLIB_API_808) || defined (GHCLIB_API_810)
+#if defined (GHC_8_8) || defined (GHC_8_10)
 import Data.Function -- For `compareOn`.
 instance Ord Extension where
   compare = compare `on` fromEnum
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
 import GHC.Driver.Config.Parser
 #endif
 
@@ -65,7 +65,7 @@ extensionImplications = map f $ Map.toList implicationsMap
 -- Landed in
 -- https://gitlab.haskell.org/ghc/ghc/merge_requests/2654. Copied from
 -- 'ghc/compiler/main/DynFlags.hs'.
-#if defined(GHCLIB_API_808) || defined(GHCLIB_API_810)
+#if defined(GHC_8_8) || defined(GHC_8_10)
 
 type TurnOnFlag = Bool   -- True  <=> we are turning the flag on
                          -- False <=> we are turning the flag off
@@ -118,7 +118,7 @@ impliedXFlags
     , (LangExt.TypeInType,       turnOn, LangExt.PolyKinds)
     , (LangExt.TypeInType,       turnOn, LangExt.KindSignatures)
 
-#if defined(GHCLIB_API_810)
+#if defined(GHC_8_10)
     -- Standalone kind signatures are a replacement for CUSKs.
     , (LangExt.StandaloneKindSignatures, turnOff, LangExt.CUSKs)
 #endif
@@ -161,7 +161,7 @@ parsePragmasIntoDynFlags :: DynFlags
                          -> IO (Either String DynFlags)
 parsePragmasIntoDynFlags flags (enable, disable) file str =
   catchErrors $ do
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
     let (_, opts) =
           getOptions (initParserOpts flags) (stringToStringBuffer str) file
 #else

@@ -17,7 +17,7 @@ import Control.Monad
 import Data.List.Extra
 import Data.Maybe
 import Data.Generics.Uniplate.Data
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHCLIB_API_902)
 import GHC.Data.Bag
 #if !defined (GHCLIB_API_902)
 import GHC.Driver.Errors.Types
@@ -47,21 +47,21 @@ import Language.Haskell.GhclibParserEx.GHC.Driver.Flags()
 import Language.Haskell.GhclibParserEx.GHC.Driver.Session
 import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHCLIB_API_902) || defined (GHC_9_0) || defined (GHC_8_10)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHCLIB_API_902) || defined (GHC_9_0)
 import GHC.Types.SrcLoc
 import GHC.Driver.Session
 import GHC.Parser.Lexer
-# if !defined (GHCLIB_API_HEAD) && !defined (GHCLIB_API_906)
+# if !defined (GHC_9_10) && !defined (GHC_9_6)
 import GHC.Utils.Outputable
 #endif
-#  if !defined (GHCLIB_API_900)
+#  if !defined (GHC_9_0)
 import GHC.Driver.Ppr
-#    if !defined (GHCLIB_API_HEAD) && !defined (GHCLIB_API_906) && !defined (GHCLIB_API_904)
+#    if !defined (GHC_9_10) && !defined (GHC_9_6) && !defined (GHC_9_4)
 import GHC.Parser.Errors.Ppr
 #    endif
 #  endif
@@ -78,14 +78,14 @@ import RdrName
 import OccName
 #endif
 import GHC.LanguageExtensions.Type
-#if defined (GHCLIB_API_808)
+#if defined (GHC_8_8)
 import Bag
 #endif
 
 basicDynFlags :: DynFlags
 basicDynFlags =
   defaultDynFlags fakeSettings
-#if !defined (GHCLIB_API_HEAD) && !defined (GHCLIB_API_906)
+#if !defined (GHC_9_10) && !defined (GHC_9_6)
                                 fakeLlvmConfig
 #endif
 
@@ -113,10 +113,10 @@ makeFile relPath contents = do
     writeFile relPath contents
     return relPath
 
-#if defined(GHCLIB_API_HEAD) || defined(GHCLIB_API_906)
+#if defined(GHC_9_10) || defined(GHC_9_6)
 report :: DynFlags -> Bag (MsgEnvelope GhcMessage) -> String
 report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLocDefault msgs ]
-#elif defined (GHCLIB_API_904)
+#elif defined (GHC_9_4)
 report :: DynFlags -> Bag (MsgEnvelope GhcMessage) -> String
 report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLoc msgs ]
 #elif defined (GHCLIB_API_902)
@@ -130,7 +130,7 @@ report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msg
 chkParseResult :: DynFlags -> ParseResult a -> IO ()
 chkParseResult flags = \case
     POk s _ -> do
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4)
       let (wrns, errs) = getPsMessages s
 #elif defined (GHCLIB_API_902)
       let (wrns, errs) = getMessages s
@@ -138,7 +138,7 @@ chkParseResult flags = \case
       let (wrns, errs) = getMessages s flags
 #endif
       when (not (null errs) || not (null wrns)) $
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4)
         assertFailure (
           report flags (getMessages (GhcPsMessage <$> wrns)) ++
           report flags (getMessages (GhcPsMessage <$> errs))
@@ -148,11 +148,11 @@ chkParseResult flags = \case
 #else
         assertFailure (report flags wrns ++ report flags errs)
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4)
     PFailed s -> assertFailure (report flags $ getMessages (GhcPsMessage <$> snd (getPsMessages s)))
 #elif defined (GHCLIB_API_902)
     PFailed s -> assertFailure (report flags $ fmap pprError (snd (getMessages s)))
-#elif defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#elif defined (GHC_9_0) || defined (GHC_8_10)
     PFailed s -> assertFailure (report flags $ snd (getMessages s flags))
 #else
     PFailed _ loc err -> assertFailure (report flags $ unitBag $ mkPlainErrMsg flags loc err)
@@ -223,7 +223,7 @@ parseTests = testGroup "Parse tests"
   where
     flags = basicDynFlags
 
-#if defined (GHCLIB_API_904) || defined (GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_4) || defined (GHCLIB_API_902) || defined (GHC_9_0)
 moduleTest :: String -> DynFlags -> (Located HsModule -> IO ()) -> IO ()
 #else
 moduleTest :: String -> DynFlags -> (Located (HsModule GhcPs) -> IO ()) -> IO ()
@@ -257,7 +257,7 @@ fixityTests = testGroup "Fixity tests"
       exprTest "1 + 2 * 3" flags
         (\e ->
             assertBool "parse tree not affected" $
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHCLIB_API_902)
               showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations e) /=
               showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] e))
 #else
@@ -269,7 +269,7 @@ fixityTests = testGroup "Fixity tests"
       case parseDeclaration "f (1 : 2 :[]) = 1" flags of
         POk _ d ->
           assertBool "parse tree not affected" $
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHCLIB_API_902)
           showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations d) /=
           showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] d))
 #else
@@ -323,12 +323,12 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isDot" $ test "f . g" $ \case L _ (OpApp _ _ op _) -> assert' $ isDot op; _ -> assertFailure "unexpected"
   , testCase "isReturn" $ test "return x" $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
   , testCase "isReturn" $ test "pure x" $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4)
   , testCase "isSection" $ test "(1 +)" $ \case L _ (HsPar _ _ x _) -> assert' $ isSection x; _ -> assertFailure "unexpected"
 #else
   , testCase "isSection" $ test "(1 +)" $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
+#if defined (GHC_9_10) || defined (GHC_9_6) || defined (GHC_9_4)
   , testCase "isSection" $ test "(+ 1)" $ \case L _ (HsPar _ _ x _) -> assert' $ isSection x; _ -> assertFailure "unexpected"
 #else
   , testCase "isSection" $ test "(+ 1)" $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
@@ -355,7 +355,7 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isDotApp" $ test "f . g" $ assert' . isDotApp
   , testCase "isDotApp" $ test "f $ g" $ assert' . not . isDotApp
   , testCase "isTypeApp" $ test "f @Int" $ assert' . isTypeApp
-#if defined (GHCLIB_API_808) || defined (GHCLIB_API_810)
+#if defined (GHC_8_8) || defined (GHC_8_10)
   , testCase "isTypeApp" $ test "f @ Int" $ assert' . isTypeApp
 #else
   , testCase "isTypeApp" $ test "f @ Int" $ assert' . not . isTypeApp

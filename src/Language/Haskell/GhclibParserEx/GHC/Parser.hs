@@ -22,20 +22,20 @@ module Language.Haskell.GhclibParserEx.GHC.Parser(
   )
   where
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900) || defined (GHCLIB_API_810)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHCLIB_API_902) || defined (GHC_9_0) || defined (GHC_8_10)
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHCLIB_API_902)
 #  if defined (GHCLIB_API_902)
 import GHC.Driver.Config
 #  endif
-#  if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904)
+#  if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
 import GHC.Driver.Config.Parser
 #  endif
 #endif
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHCLIB_API_902) || defined (GHC_9_0)
 import GHC.Parser.PostProcess
 import GHC.Driver.Session
 import GHC.Data.StringBuffer
@@ -58,7 +58,7 @@ import BkpSyn
 import PackageConfig
 import RdrName
 #endif
-#if defined (GHCLIB_API_810)
+#if defined (GHC_8_10)
 import RdrHsSyn
 #endif
 
@@ -69,19 +69,19 @@ parse p str flags =
     location = mkRealSrcLoc (mkFastString "<string>") 1 1
     buffer = stringToStringBuffer str
     parseState =
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHCLIB_API_902)
       initParserState (initParserOpts flags) buffer location
 #else
       mkPState flags buffer location
 #endif
-#if defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_4) || defined(GHCLIB_API_902) || defined (GHC_9_0)
 parseModule :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
 parseModule :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
 #endif
 parseModule = parse Parser.parseModule
 
-#if defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_4) || defined(GHCLIB_API_902) || defined (GHC_9_0)
 parseSignature :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
 parseSignature :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
@@ -101,7 +101,7 @@ parseDeclaration :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
 parseDeclaration = parse Parser.parseDeclaration
 
 parseExpression :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHCLIB_API_902)
 parseExpression s flags =
   -- The need for annotations here came about first manifested with
   -- ghc-9.0.1
@@ -112,7 +112,7 @@ parseExpression s flags =
           parser = runPV parser_validator :: P (LHsExpr GhcPs)
       in unP parser state :: ParseResult (LHsExpr GhcPs)
     PFailed ps -> PFailed ps
-#elif defined (GHCLIB_API_810) || defined (GHCLIB_API_900)
+#elif defined (GHC_8_10) || defined (GHC_9_0)
 parseExpression s flags =
   case parse Parser.parseExpression s flags of
     POk s e -> unP (runECP_P e) s
@@ -130,7 +130,7 @@ parseTypeSignature = parse Parser.parseTypeSignature
 parseStmt :: String -> DynFlags -> ParseResult (Maybe (LStmt GhcPs (LHsExpr GhcPs)))
 parseStmt = parse Parser.parseStmt
 
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined (GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHCLIB_API_902)
 parseIdentifier :: String -> DynFlags -> ParseResult (LocatedN RdrName)
 #else
 parseIdentifier :: String -> DynFlags -> ParseResult (Located RdrName)
@@ -140,14 +140,14 @@ parseIdentifier = parse Parser.parseIdentifier
 parseType :: String -> DynFlags -> ParseResult (LHsType GhcPs)
 parseType = parse Parser.parseType
 
-#if defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_4) || defined(GHCLIB_API_902) || defined (GHC_9_0)
 parseHeader :: String -> DynFlags -> ParseResult (Located HsModule)
 #else
 parseHeader :: String -> DynFlags -> ParseResult (Located (HsModule GhcPs))
 #endif
 parseHeader = parse Parser.parseHeader
 
-#if defined (GHCLIB_API_904) || defined(GHCLIB_API_902) || defined (GHCLIB_API_900)
+#if defined (GHC_9_4) || defined(GHCLIB_API_902) || defined (GHC_9_0)
 parseFile :: String
           -> DynFlags
           -> String
@@ -164,7 +164,7 @@ parseFile filename flags str =
     location = mkRealSrcLoc (mkFastString filename) 1 1
     buffer = stringToStringBuffer str
     parseState =
-#if defined (GHCLIB_API_HEAD) || defined (GHCLIB_API_908) || defined (GHCLIB_API_906) || defined (GHCLIB_API_904) || defined(GHCLIB_API_902)
+#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHCLIB_API_902)
       initParserState (initParserOpts flags) buffer location
 #else
       mkPState flags buffer location

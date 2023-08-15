@@ -239,6 +239,12 @@ exprTest s flags test =
         POk _ e -> test e
         _ -> assertFailure "parse error"
 
+stmtTest :: String -> DynFlags -> (LStmt GhcPs (LHsExpr GhcPs) -> IO ()) -> IO ()
+stmtTest s flags test =
+      case parseStatement s flags of
+        POk _ e -> test e
+        _ -> assertFailure "parse error"
+
 typeTest :: String -> DynFlags -> (LHsType GhcPs -> IO ()) -> IO ()
 typeTest s flags test =
       case parseType s flags of
@@ -346,6 +352,8 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isAnyApp" $ test "l `op` r" $ assert' . isAnyApp
   , testCase "isAnyApp" $ test "f x" $ assert' . isAnyApp
   , testCase "isAnyApp" $ test "f x y" $ assert' . isAnyApp
+  , testCase "isDo" $ test "do pure ()" $ assert' . isDo
+  , testCase "isDo" $ test "12" $ assert' . not . isDo
   , testCase "isAnyApp" $ test "(f x y)" $ assert' . not . isAnyApp
   , testCase "isLexeme" $ test "foo" $ assert' . isLexeme
   , testCase "isLexeme" $ test "3" $ assert' . isLexeme
@@ -390,17 +398,23 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isListComp (2)" $ test_with_exts [ MonadComprehensions ] "[ x + y | x <- xs, y <- ys ]" $ assert' . any isMonadComp . universeBi
   , testCase "isMonadComp (0)" $ test_with_exts [ MonadComprehensions ] "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . not . any isListComp . universeBi
   , testCase "isMonadComp (1)" $ test_with_exts [ MonadComprehensions ] "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . any isMonadComp . universeBi
-  , testCase "isMonadComp (2)" $ test_with_exts [] "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . not . any isMonadComp . universeBi
-  , testCase "isMonadComp (3)" $ test_with_exts [] "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . any isListComp . universeBi
+  , testCase "isMonadComp (2)" $ test "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . not . any isMonadComp . universeBi
+  , testCase "isMonadComp (3)" $ test "[ x + y | x <- Just 1, y <- Just 2 ]" $ assert' . any isListComp . universeBi
   , testCase "strToVar" $ assert' . isVar . strToVar $ "foo"
   , testCase "varToStr" $ test "[]" $ assert' . (== "[]") . varToStr
   , testCase "varToStr" $ test "foo" $ assert' . (== "foo") . varToStr
   , testCase "varToStr" $ test "3" $ assert' . null . varToStr
+  , testCase "isLetStmt" $ test_stmt "let x = 12" $ assert' . isLetStmt . unLoc
+  , testCase "isLetStmt" $ test_stmt "x <- pure 12" $ assert' . not . isLetStmt . unLoc
+  , testCase "isRecStmt" $ test_stmt_with_exts [ RecursiveDo ]  "rec { xs <- Just (1:xs) }" $ assert' . isRecStmt . unLoc
+  , testCase "isRecStmt" $ test_stmt_with_exts [ RecursiveDo ]  "xs <- Just (1 : xs)" $ assert' . not . isRecStmt . unLoc
   ]
   where
     assert' = assertBool ""
     test s = exprTest s (flags [])
+    test_stmt s = stmtTest s (flags [])
     test_with_exts exts s = exprTest s (flags exts)
+    test_stmt_with_exts exts s = stmtTest s (flags exts)
     flags exts = foldl' xopt_set basicDynFlags
               (exts ++
                  [ TemplateHaskell

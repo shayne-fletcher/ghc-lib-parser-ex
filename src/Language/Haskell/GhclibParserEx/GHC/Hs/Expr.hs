@@ -7,9 +7,9 @@
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   isTag, isDol, isDot, isReturn, isSection, isRecConstr, isRecUpdate,
-  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isLambda, isQuasiQuote, isQuasiQuoteExpr, isQuasiQuoteSplice,  isOverLabel,
+  isVar, isPar, isApp, isOpApp, isAnyApp, isDo, isLexeme, isLambda, isQuasiQuote, isQuasiQuoteExpr, isQuasiQuoteSplice,  isOverLabel,
   isDotApp, isTypeApp, isWHNF, isLCase,
-  isFieldPun, isFieldPunUpdate, isRecStmt, isParComp, isMDo, isListComp, isMonadComp, isTupleSection, isString, isPrimLiteral,
+  isFieldPun, isFieldPunUpdate, isRecStmt, isLetStmt, isParComp, isMDo, isListComp, isMonadComp, isTupleSection, isString, isPrimLiteral,
   isSpliceDecl, isFieldWildcard, isUnboxed, isWholeFrac, isStrictMatch, isMultiIf, isProc, isTransStmt,
   hasFieldsDotDot,
   varToStr, strToVar,
@@ -48,7 +48,7 @@ isTag :: String -> LHsExpr GhcPs -> Bool
 isTag tag = \case (L _ (HsVar _ (L _ s))) -> occNameString (rdrNameOcc s) == tag; _ -> False
 
 isDot, isDol, isReturn, isSection, isRecConstr, isRecUpdate,
-  isVar, isPar, isApp, isOpApp, isAnyApp, isLexeme, isQuasiQuote, isQuasiQuoteExpr,
+  isVar, isPar, isApp, isOpApp, isAnyApp, isDo, isLexeme, isQuasiQuote, isQuasiQuoteExpr,
   isLambda, isDotApp, isTypeApp, isWHNF, isLCase, isOverLabel :: LHsExpr GhcPs -> Bool
 isDol = isTag "$"
 isDot = isTag "."
@@ -61,6 +61,7 @@ isPar = \case (L _ HsPar{}) -> True; _ -> False
 isApp = \case (L _ HsApp{}) -> True; _ -> False
 isOpApp = \case (L _ OpApp{}) -> True; _ -> False
 isAnyApp x = isApp x || isOpApp x
+isDo = \case (L _ HsDo{}) -> True; _ -> False
 isLexeme = \case (L _ HsVar{}) -> True; (L _ HsOverLit{}) -> True; (L _ HsLit{}) -> True; _ -> False
 isLambda = \case (L _ HsLam{}) -> True; _ -> False
 #if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
@@ -130,6 +131,9 @@ hasFieldsDotDot = \case HsRecFields {rec_dotdot=Just _} -> True; _ -> False
 
 isRecStmt :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isRecStmt = \case RecStmt{} -> True; _ -> False
+
+isLetStmt :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
+isLetStmt = \case LetStmt{} -> True; _ -> False
 
 isParComp :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isParComp = \case ParStmt{} -> True; _ -> False

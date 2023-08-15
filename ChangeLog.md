@@ -1,11 +1,12 @@
 # Changelog for ghc-lib-parser-ex
 
-# Unreleased
+# 9.6.0.1 released
 - Add `&` to `baseFixities`
-- Add support for ghc-9.8 series: `GHCLIB_API_908`
+- Add support for ghc-9.8 series: `GH_9_8`
+- New functions `isLetStmt` and `isDo`
 
 # 9.6.0.0 released
-- Add support for ghc-9.6 series: `GHCLIB_API_906`
+- Add support for ghc-9.6 series: `GHC_9_6`
 
 ## 0.20221201 released
 - Update to `ghc-lib-parser-0.20221201`

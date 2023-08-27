@@ -10,7 +10,12 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   isVar, isPar, isApp, isOpApp, isAnyApp, isDo, isLexeme, isLambda, isQuasiQuote, isQuasiQuoteExpr, isQuasiQuoteSplice,  isOverLabel,
   isDotApp, isTypeApp, isWHNF, isLCase,
   isFieldPun, isFieldPunUpdate, isRecStmt, isLetStmt, isParComp, isMDo, isListComp, isMonadComp, isTupleSection, isString, isPrimLiteral,
-  isSpliceDecl, isFieldWildcard, isUnboxed, isWholeFrac, isStrictMatch, isMultiIf, isProc, isTransStmt,
+  isSpliceDecl,
+#if !( defined(GHC_8_8) || defined(GHC_8_10) || defined (GHC_9_0) || defined (GHC_9_2) || defined(GHC_9_4) )
+  -- ghc api >= 9.6.1
+  isTypedSplice, isUntypedSplice,
+#endif
+  isFieldWildcard, isUnboxed, isWholeFrac, isStrictMatch, isMultiIf, isProc, isTransStmt,
   hasFieldsDotDot,
   varToStr, strToVar,
   fromChar
@@ -180,8 +185,16 @@ isPrimLiteral = \case
   HsDoublePrim{} -> True
   _ -> False
 
+-- Since ghc-9.6.1, `HsTypedSplice` and `HsUntypedSplice` have been
+-- top-level constuctors of `Language.Haskell.Syntax.Expr.HsExpr p`
+#if !( defined(GHC_8_8) || defined(GHC_8_10) || defined (GHC_9_0) || defined (GHC_9_2) || defined(GHC_9_4) )
+isTypedSplice, isUntypedSplice :: HsExpr GhcPs -> Bool
+isTypedSplice = \case HsTypedSplice{} -> True; _ -> False
+isUntypedSplice = \case HsUntypedSplice{} -> True; _ -> False
+#endif
+
 isSpliceDecl :: HsExpr GhcPs -> Bool
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
+#if !( defined(GHC_8_8) || defined(GHC_8_10) || defined (GHC_9_0) || defined (GHC_9_2) || defined(GHC_9_4) )
 isSpliceDecl = \case
   HsTypedSplice{} -> True
   HsUntypedSplice{} -> True

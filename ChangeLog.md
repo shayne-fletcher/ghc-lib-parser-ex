@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+# 9.6.0.2 released
+- New functions `isTypedSplice`, `isUntypedSpice`
+
 # 9.6.0.1 released
 - Add `&` to `baseFixities`
 - Add support for ghc-9.8 series: `GH_9_8`

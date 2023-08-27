@@ -389,6 +389,13 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isSpliceDecl" $ test "$x" $ assert' . isSpliceDecl . unLoc
   , testCase "isSpliceDecl" $ test "f$x" $ assert' . not . isSpliceDecl . unLoc
   , testCase "isSpliceDecl" $ test "$(a + b)" $ assert' . isSpliceDecl . unLoc
+#if !( defined(GHC_8_8) || defined(GHC_8_10) || defined (GHC_9_0) || defined (GHC_9_2) || defined(GHC_9_4) )
+  -- ghc api >= 9.6.1
+  , testCase "isTypedSplice" $ test "$$foo" $ assert' . isTypedSplice . unLoc
+  , testCase "isTypedSplice" $ test "$foo" $ assert' . not . isTypedSplice . unLoc
+  , testCase "isUntypedSplice" $ test "$foo" $ assert' . isUntypedSplice . unLoc
+  , testCase "isUntypedSplice" $ test "$$foo" $ assert' . not . isUntypedSplice . unLoc
+#endif
   , testCase "isQuasiQuoteExpr" $ test "[expr|1 + 2|]" $ assert' . isQuasiQuoteExpr
   , testCase "isQuasiQuoteExpr" $ test "[expr(1 + 2)]" $ assert' . not . isQuasiQuoteExpr
   , testCase "isWholeFrac" $ test "3.2e1" $ assert' . isWholeFrac . unLoc

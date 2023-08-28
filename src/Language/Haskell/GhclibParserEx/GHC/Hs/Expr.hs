@@ -11,7 +11,7 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   isDotApp, isTypeApp, isWHNF, isLCase,
   isFieldPun, isFieldPunUpdate, isRecStmt, isLetStmt, isParComp, isMDo, isListComp, isMonadComp, isTupleSection, isString, isPrimLiteral,
   isSpliceDecl,
-#if !( defined(GHC_8_8) || defined(GHC_8_10) || defined (GHC_9_0) || defined (GHC_9_2) || defined(GHC_9_4) )
+#if !( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
   -- ghc api >= 9.6.1
   isTypedSplice, isUntypedSplice,
 #endif
@@ -21,24 +21,31 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   fromChar
   ) where
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10)
+#if ! ( defined (GHC_8_8) )
+-- ghc api >= 8.10.1
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+
+#if ! ( defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.0.2
+#  if ! ( defined (GHC_9_0) )
+-- ghc api >= 9.2.1
 import GHC.Types.SourceText
-#endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
+#  endif
+#  if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) )
+-- ghc api >= 9.6.1
 import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
-#endif
+#  endif
+-- ghc api >= 9.0.2
 import GHC.Types.SrcLoc
 import GHC.Types.Name.Reader
 import GHC.Types.Name
 import GHC.Types.Basic
 import GHC.Builtin.Types
 #else
+-- ghc api < 9.0.2
 import SrcLoc
 import RdrName
 import OccName
@@ -69,9 +76,11 @@ isAnyApp x = isApp x || isOpApp x
 isDo = \case (L _ HsDo{}) -> True; _ -> False
 isLexeme = \case (L _ HsVar{}) -> True; (L _ HsOverLit{}) -> True; (L _ HsLit{}) -> True; _ -> False
 isLambda = \case (L _ HsLam{}) -> True; _ -> False
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
+#if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.6.1
 isQuasiQuoteExpr = \case (L _ (HsUntypedSplice _ HsQuasiQuote{})) -> True; _ -> False
 #else
+-- ghc api < 9.6.1
 isQuasiQuoteExpr = \case (L _ (HsSpliceE _ HsQuasiQuote{})) -> True; _ -> False
 #endif
 isQuasiQuote = isQuasiQuoteExpr -- Backwards compat.
@@ -83,7 +92,8 @@ isWHNF = \case
   (L _ HsLam{}) -> True
   (L _ ExplicitTuple{}) -> True
   (L _ ExplicitList{}) -> True
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.4.1
   (L _ (HsPar _ _ x _)) -> isWHNF x
 #else
   (L _ (HsPar _ x)) -> isWHNF x
@@ -97,7 +107,8 @@ isWHNF = \case
 isLCase = \case (L _ HsLamCase{}) -> True; _ -> False
 isOverLabel = \case (L _ HsOverLabel{}) -> True; _ -> False
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
+#if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.6.1
 isQuasiQuoteSplice :: HsUntypedSplice GhcPs -> Bool
 #else
 isQuasiQuoteSplice :: HsSplice GhcPs -> Bool
@@ -105,7 +116,7 @@ isQuasiQuoteSplice :: HsSplice GhcPs -> Bool
 isQuasiQuoteSplice = \case HsQuasiQuote{} -> True; _ -> False
 
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHCLIB_API_901)
+#if ! ( defined (GHC_8_10) || defined (GHC_8_8) )
 isStrictMatch :: HsMatchContext GhcPs -> Bool
 #else
 isStrictMatch :: HsMatchContext RdrName -> Bool
@@ -113,7 +124,8 @@ isStrictMatch :: HsMatchContext RdrName -> Bool
 isStrictMatch = \case FunRhs{mc_strictness=SrcStrict} -> True; _ -> False
 
 -- Field is punned e.g. '{foo}'.
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.4.1
 isFieldPun :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 isFieldPun = \case (L _ HsFieldBind {hfbPun=True}) -> True; _ -> False
 #else
@@ -122,7 +134,8 @@ isFieldPun = \case (L _ HsRecField {hsRecPun=True}) -> True; _ -> False
 #endif
 -- Field puns in updates have a different type to field puns in
 -- constructions.
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.4.1
 isFieldPunUpdate :: HsFieldBind (LAmbiguousFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 isFieldPunUpdate = \case HsFieldBind {hfbPun=True} -> True; _ -> False
 #else
@@ -144,14 +157,15 @@ isParComp :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isParComp = \case ParStmt{} -> True; _ -> False
 
 -- TODO: Seems `HsStmtContext (HsDoRn p)` on master right now.
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.4.1
 isMDo :: HsDoFlavour -> Bool
 isMDo = \case MDoExpr _ -> True; _ -> False
 isMonadComp :: HsDoFlavour -> Bool
 isMonadComp = \case MonadComp -> True; _ -> False
 isListComp :: HsDoFlavour -> Bool
 isListComp = \case ListComp -> True; _ -> False
-#elif defined(GHC_9_2) || defined (GHC_9_0)
+#elif defined (GHC_9_2) || defined (GHC_9_0)
 isMDo :: HsStmtContext GhcRn -> Bool
 isMDo = \case MDoExpr _ -> True; _ -> False
 isMonadComp :: HsStmtContext GhcRn -> Bool
@@ -187,14 +201,16 @@ isPrimLiteral = \case
 
 -- Since ghc-9.6.1, `HsTypedSplice` and `HsUntypedSplice` have been
 -- top-level constuctors of `Language.Haskell.Syntax.Expr.HsExpr p`
-#if !( defined(GHC_8_8) || defined(GHC_8_10) || defined (GHC_9_0) || defined (GHC_9_2) || defined(GHC_9_4) )
+#if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= ghc-9.6.1
 isTypedSplice, isUntypedSplice :: HsExpr GhcPs -> Bool
 isTypedSplice = \case HsTypedSplice{} -> True; _ -> False
 isUntypedSplice = \case HsUntypedSplice{} -> True; _ -> False
 #endif
 
 isSpliceDecl :: HsExpr GhcPs -> Bool
-#if !( defined(GHC_8_8) || defined(GHC_8_10) || defined (GHC_9_0) || defined (GHC_9_2) || defined(GHC_9_4) )
+#if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.6.1
 isSpliceDecl = \case
   HsTypedSplice{} -> True
   HsUntypedSplice{} -> True
@@ -213,25 +229,29 @@ isTransStmt :: StmtLR GhcPs GhcPs (LHsExpr GhcPs) -> Bool
 isTransStmt = \case TransStmt{} -> True; _ -> False
 
 -- Field has a '_' as in '{foo=_} or is punned e.g. '{foo}'.
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.4.1
 isFieldWildcard :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 #else
 isFieldWildcard :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 #endif
 isFieldWildcard = \case
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
+
+#if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= ghc-9.6.1
 -- Use `Language.Haskell.GhcLibParserEx.GHC.Types.Name.Reader`s `occNameStr` since `HsUnboundVar` now contains a `RdrName` not an `OccName`.
   (L _ HsFieldBind {hfbRHS=(L _ (HsUnboundVar _ s))}) -> occNameStr s == "_"
 #elif defined (GHC_9_4)
   (L _ HsFieldBind {hfbRHS=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
-#elif defined(GHC_9_2) || defined (GHC_9_0)
+#elif defined (GHC_9_2) || defined (GHC_9_0)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ s))}) -> occNameString s == "_"
 #elif defined (GHC_8_10)
   (L _ HsRecField {hsRecFieldArg=(L _ (HsUnboundVar _ _))}) -> True
 #else
   (L _ HsRecField {hsRecFieldArg=(L _ (EWildPat _))}) -> True
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if ! (defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.4.1
   (L _ HsFieldBind {hfbPun=True}) -> True
   (L _ HsFieldBind {}) -> False
 #else
@@ -244,10 +264,11 @@ isUnboxed = \case Unboxed -> True; _ -> False
 
 isWholeFrac :: HsExpr GhcPs -> Bool
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if ! (defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.4.1
 isWholeFrac (HsLit _ (HsRat _ fl@FL{} _)) = denominator (rationalFromFractionalLit fl) == 1
 isWholeFrac (HsOverLit _ (OverLit _ (HsFractional fl@FL {}) )) = denominator (rationalFromFractionalLit fl) == 1
-#elif defined(GHC_9_2)
+#elif defined (GHC_9_2)
 isWholeFrac (HsLit _ (HsRat _ fl@FL{} _)) = denominator (rationalFromFractionalLit fl) == 1
 isWholeFrac (HsOverLit _ (OverLit _ (HsFractional fl@FL {}) _)) = denominator (rationalFromFractionalLit fl) == 1
 #else
@@ -265,7 +286,8 @@ varToStr (L _ (HsVar _ (L _ n)))
 varToStr _ = ""
 
 strToVar :: String -> LHsExpr GhcPs
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! ( defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.2.1
 strToVar x = noLocA $ HsVar noExtField (noLocA $ mkRdrUnqual (mkVarOcc x))
 #elif defined (GHC_9_0) || defined (GHC_8_10)
 strToVar x = noLoc $ HsVar noExtField (noLoc $ mkRdrUnqual (mkVarOcc x))

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
 
+# Using 'stack-exact.yaml'.
 stack runhaskell --stack-yaml stack-exact.yaml --package extra --package optparse-applicative CI.hs -- \
       --version-tag 9.6.0.2
 
+# Using 'stack.yaml'.
 stack runhaskell --stack-yaml stack.yaml --package extra --package optparse-applicative CI.hs -- \
       --version-tag 9.6.0.2
 

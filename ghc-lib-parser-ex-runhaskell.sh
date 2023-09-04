@@ -4,6 +4,7 @@ set -euo pipefail
 
 # Needs bash >=4. Use '/usr/local/bin/bash'.
 declare -A builds=( \
+   [stack-808-865.yaml]=8.8.0.0
    [stack-810-808.yaml]=8.10.0.0
    [stack-902-8107.yaml]=9.0.0.0
    [stack-926-902.yaml]=9.2.0.0

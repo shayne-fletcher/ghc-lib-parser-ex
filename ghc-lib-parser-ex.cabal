@@ -82,6 +82,7 @@ library
   install-includes:
       cbits/ghclib_api.h
   default-language: Haskell2010
+  default-extensions: CPP
 
 test-suite ghc-lib-parser-ex-test
   type: exitcode-stdio-1.0

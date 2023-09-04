@@ -4,44 +4,51 @@
 -- Adapted from (1) https://github.com/mpickering/apply-refact.git and
 -- (2) https://gitlab.haskell.org/ghc/ghc ('compiler/renamer/RnTypes.hs').
 
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE TupleSections #-}
 #include "ghclib_api.h"
-
 module Language.Haskell.GhclibParserEx.Fixity(
     applyFixities
   , fixitiesFromModule
   , preludeFixities, baseFixities
   , infixr_, infixl_, infix_, fixity
   ) where
-#if defined (GHC_9_10) || defined (GHC_9_8)
-import GHC.Data.FastString
-#endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)
-import GHC.Hs
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
-import GHC.Types.Fixity
-import GHC.Types.SourceText
-#else
-import GHC.Types.Basic
-#endif
-import GHC.Types.Name.Reader
-import GHC.Types.Name
-import GHC.Types.SrcLoc
+
+#if defined (GHC_8_8)
+import HsSyn
+import BasicTypes
+import RdrName
+import OccName
+import SrcLoc
 #elif defined (GHC_8_10)
 import GHC.Hs
 import BasicTypes
 import RdrName
 import OccName
 import SrcLoc
+#elif defined  (GHC_9_0)
+import GHC.Hs
+import GHC.Types.Basic
+import GHC.Types.Name.Reader
+import GHC.Types.Name
+import GHC.Types.SrcLoc
+#elif defined (GHC_9_2) || defined (GHC_9_4) || defined (GHC_9_6)
+import GHC.Hs
+import GHC.Types.Fixity
+import GHC.Types.SourceText
+import GHC.Types.Name.Reader
+import GHC.Types.Name
+import GHC.Types.SrcLoc
 #else
-import HsSyn
-import BasicTypes
-import RdrName
-import OccName
-import SrcLoc
+import GHC.Hs
+import GHC.Types.Fixity
+import GHC.Types.SourceText
+import GHC.Types.Name.Reader
+import GHC.Types.Name
+import GHC.Types.SrcLoc
+import GHC.Data.FastString
 #endif
+
 import Data.Maybe
 import Data.Data hiding (Fixity)
 import Data.Generics.Uniplate.Data
@@ -66,7 +73,7 @@ expFix _ e = e
 -- LPat and Pat have gone through a lot of churn. See
 -- https://gitlab.haskell.org/ghc/ghc/merge_requests/1925 for details.
 patFix :: [(String, Fixity)] -> LPat GhcPs -> LPat GhcPs
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)
+#if ! ( defined (GHC_8_10) || defined (GHC_8_8) )
 patFix fixities (L loc (ConPat _ op (InfixCon pat1 pat2))) =
   L loc (mkConOpPat (getFixities fixities) op (findFixity' (getFixities fixities) op) pat1 pat2)
 #elif defined (GHC_8_10)
@@ -80,7 +87,7 @@ patFix _ p = p
 
 mkConOpPat ::
   [(String, Fixity)]
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   -> LocatedN RdrName
 #else
   -> Located RdrName
@@ -88,21 +95,21 @@ mkConOpPat ::
   -> Fixity
   -> LPat GhcPs -> LPat GhcPs
   -> Pat GhcPs
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)
+#if ! ( defined (GHC_8_10) || defined (GHC_8_8) )
 mkConOpPat fs op2 fix2 p1@(L loc (ConPat _ op1 (InfixCon p11 p12))) p2
 #elif defined (GHC_8_10)
 mkConOpPat fs op2 fix2 p1@(L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #else
 mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   | nofix_error = ConPat noAnn op2 (InfixCon p1 p2)
 #elif defined (GHC_9_0)
   | nofix_error = ConPat noExtField op2 (InfixCon p1 p2)
 #else
   | nofix_error = ConPatIn op2 (InfixCon p1 p2)
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   | associate_right = ConPat noAnn op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
 #elif defined (GHC_9_0)
   | associate_right = ConPat noExtField op1 (InfixCon p11 (L loc (mkConOpPat fs op2 fix2 p12 p2)))
@@ -111,7 +118,7 @@ mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
 #else
   | associate_right = ConPatIn op1 (InfixCon p11 (cL loc (mkConOpPat fs op2 fix2 p12 p2)))
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   | otherwise = ConPat noAnn op2 (InfixCon p1 p2)
 #elif defined (GHC_9_0)
   | otherwise = ConPat noExtField op2 (InfixCon p1 p2)
@@ -121,7 +128,7 @@ mkConOpPat fs op2 fix2 p1@(dL->L loc (ConPatIn op1 (InfixCon p11 p12))) p2
   where
     fix1 = findFixity' fs op1
     (nofix_error, associate_right) = compareFixity fix1 fix2
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
 mkConOpPat _ op _ p1 p2 = ConPat noAnn op (InfixCon p1 p2)
 #elif defined (GHC_9_0)
 mkConOpPat _ op _ p1 p2 = ConPat noExtField op (InfixCon p1 p2)
@@ -131,7 +138,7 @@ mkConOpPat _ op _ p1 p2 = ConPatIn op (InfixCon p1 p2)
 
 mkOpApp ::
    [(String, Fixity)]
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
    -> SrcSpanAnnA
 #else
    -> SrcSpan
@@ -142,14 +149,14 @@ mkOpApp ::
    -> LHsExpr GhcPs
 --      (e11 `op1` e12) `op2` e2
 mkOpApp fs loc e1@(L _ (OpApp x1 e11 op1 e12)) op2 fix2 e2
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   | nofix_error = L loc (OpApp noAnn e1 op2 e2)
 #else
   | nofix_error = L loc (OpApp noExt e1 op2 e2)
 #endif
   | associate_right = L loc (OpApp x1 e11 op1 (mkOpApp fs loc' e12 op2 fix2 e2 ))
   where
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
     loc'= combineLocsA e12 e2
 #else
     loc'= combineLocs e12 e2
@@ -158,18 +165,18 @@ mkOpApp fs loc e1@(L _ (OpApp x1 e11 op1 e12)) op2 fix2 e2
     (nofix_error, associate_right) = compareFixity fix1 fix2
 --      (- neg_arg) `op` e2
 mkOpApp fs loc e1@(L _ (NegApp _ neg_arg neg_name)) op2 fix2 e2
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   | nofix_error = L loc (OpApp noAnn e1 op2 e2)
 #else
   | nofix_error = L loc (OpApp noExt e1 op2 e2)
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   | associate_right = L loc (NegApp noAnn (mkOpApp fs loc' neg_arg op2 fix2 e2) neg_name)
 #else
   | associate_right = L loc (NegApp noExt (mkOpApp fs loc' neg_arg op2 fix2 e2) neg_name)
 #endif
   where
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
     loc' = combineLocsA neg_arg e2
 #else
     loc' = combineLocs neg_arg e2
@@ -177,7 +184,7 @@ mkOpApp fs loc e1@(L _ (NegApp _ neg_arg neg_name)) op2 fix2 e2
     (nofix_error, associate_right) = compareFixity negateFixity fix2
 --      e1 `op` - neg_arg
 mkOpApp _ loc e1 op1 fix1 e2@(L _ NegApp {}) -- NegApp can occur on the right.
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   | not associate_right  = L loc (OpApp noAnn e1 op1 e2)-- We *want* right association.
 #else
   | not associate_right  = L loc (OpApp noExt e1 op1 e2)-- We *want* right association.
@@ -185,7 +192,7 @@ mkOpApp _ loc e1 op1 fix1 e2@(L _ NegApp {}) -- NegApp can occur on the right.
   where
     (_, associate_right) = compareFixity fix1 negateFixity
  --     Default case, no rearrangment.
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
 mkOpApp _ loc e1 op _fix e2 = L loc (OpApp noAnn e1 op e2)
 #else
 mkOpApp _ loc e1 op _fix e2 = L loc (OpApp noExt e1 op e2)
@@ -202,7 +209,7 @@ getFixities fixities = if null fixities then baseFixities else fixities
 findFixity :: [(String, Fixity)] -> LHsExpr GhcPs -> Fixity
 findFixity fs r = askFix fs (getIdent r) -- Expressions.
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
 findFixity' :: [(String, Fixity)] -> LocatedN RdrName -> Fixity
 #else
 findFixity' :: [(String, Fixity)] -> Located RdrName -> Fixity
@@ -263,7 +270,7 @@ infixl_ = fixity InfixL
 infix_  = fixity InfixN
 
 fixity :: FixityDirection -> Int -> [String] -> [(String, Fixity)]
-#if defined (GHC_9_10) || defined (GHC_9_8)
+#if ! (defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
 fixity a p = map (,Fixity (SourceText (fsLit "")) p a)
 #else
 fixity a p = map (,Fixity (SourceText "") p a)
@@ -273,7 +280,7 @@ fixitiesFromModule :: Located HsModule -> [(String, Fixity)]
 #else
 fixitiesFromModule :: Located (HsModule GhcPs) -> [(String, Fixity)]
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
+#if ! (defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
 fixitiesFromModule (L _ (HsModule _ _ _ _ decls)) = concatMap f decls
 #elif defined (GHC_9_4) || defined(GHC_9_2)
 fixitiesFromModule (L _ (HsModule _ _ _ _ _ decls _ _)) = concatMap f decls

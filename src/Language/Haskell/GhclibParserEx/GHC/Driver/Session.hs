@@ -1,9 +1,8 @@
 -- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
-{-# LANGUAGE CPP #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
 #include "ghclib_api.h"
+{-# OPTIONS_GHC -Wno-orphans #-}
 module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
       readExtension
     , extensionImplications
@@ -14,37 +13,45 @@ module Language.Haskell.GhclibParserEx.GHC.Driver.Session(
     , parsePragmasIntoDynFlags
   ) where
 
-#if defined (GHC_8_8) || defined (GHC_8_10)
+#if defined (GHC_8_8)
 import qualified GHC.LanguageExtensions as LangExt
-#endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)
-import GHC.Utils.Panic
-import GHC.Parser.Header
-import GHC.Data.StringBuffer
-import GHC.Driver.Session
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
-import GHC.Types.SourceError
-#else
-import GHC.Driver.Types
-#endif
-#else
 import Panic
 import HeaderInfo
 import StringBuffer
 import DynFlags
 import HscTypes
+#elif defined (GHC_8_10)
+import qualified GHC.LanguageExtensions as LangExt
+import Panic
+import HeaderInfo
+import StringBuffer
+import DynFlags
+import HscTypes
+#elif defined (GHC_9_0)
+import GHC.Utils.Panic
+import GHC.Parser.Header
+import GHC.Data.StringBuffer
+import GHC.Driver.Session
+import GHC.Driver.Types
+#else
+import GHC.Utils.Panic
+import GHC.Parser.Header
+import GHC.Data.StringBuffer
+import GHC.Driver.Session
+import GHC.Types.SourceError
 #endif
 import GHC.LanguageExtensions.Type
 import Data.List
 import Data.Maybe
 import qualified Data.Map as Map
+
 -- Landed in https://gitlab.haskell.org/ghc/ghc/merge_requests/2707.
 #if defined (GHC_8_8) || defined (GHC_8_10)
 import Data.Function -- For `compareOn`.
 instance Ord Extension where
   compare = compare `on` fromEnum
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if ! (defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined(GHC_8_8) )
 import GHC.Driver.Config.Parser
 #endif
 
@@ -161,7 +168,7 @@ parsePragmasIntoDynFlags :: DynFlags
                          -> IO (Either String DynFlags)
 parsePragmasIntoDynFlags flags (enable, disable) file str =
   catchErrors $ do
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if ! (defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
     let (_, opts) =
           getOptions (initParserOpts flags) (stringToStringBuffer str) file
 #else

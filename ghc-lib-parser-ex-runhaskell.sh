@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
 
 # Using 'stack-exact.yaml'.
 stack runhaskell --stack-yaml stack-exact.yaml --package extra --package optparse-applicative CI.hs -- \

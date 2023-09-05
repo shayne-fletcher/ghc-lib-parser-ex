@@ -1,18 +1,18 @@
--- Copyright (c) 2020-203, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
-{-# LANGUAGE CPP #-}
+
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.Binds(
   isPatSynBind
   )
 where
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10)
-import GHC.Hs.Binds
-import GHC.Hs.Extension
-#else
+#if defined (GHC_8_8)
 import HsBinds
 import HsExtension
+#else
+import GHC.Hs.Binds
+import GHC.Hs.Extension
 #endif
 
 isPatSynBind :: HsBind GhcPs -> Bool

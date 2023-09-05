@@ -1,7 +1,6 @@
 -- Copyright (c) 2021-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE LambdaCase #-}
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.Type (
@@ -9,15 +8,15 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Type (
   , isTyQuasiQuote, isUnboxedTuple, isKindTyApp
 ) where
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10)
-import GHC.Hs
-#else
+#if defined (GHC_8_8)
 import HsSyn
-#endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0)
-import GHC.Types.SrcLoc
 #else
+import GHC.Hs
+#endif
+#if defined (GHC_8_8) || defined (GHC_8_10)
 import SrcLoc
+#else
+import GHC.Types.SrcLoc
 #endif
 
 isKindTyApp :: LHsType GhcPs -> Bool

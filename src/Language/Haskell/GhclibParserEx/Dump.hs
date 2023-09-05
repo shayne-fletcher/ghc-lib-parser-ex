@@ -12,26 +12,29 @@
 module Language.Haskell.GhclibParserEx.Dump(
     showAstData
   , BlankSrcSpan(..)
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
   , BlankEpAnnotations(..)
 #endif
 ) where
 
 #if !defined(MIN_VERSION_ghc_lib_parser)
--- Using native ghc.
-#  if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined(GHC_9_0) || defined (GHC_8_10)
-import GHC.Hs.Dump
-#  else
+-- Pay attenion: This is the native GHC case.
+
+#  if defined (GHC_8_8)
 import HsDumpAst
+#  else
+import GHC.Hs.Dump
 #  endif
+
 #else
--- Using ghc-lib-parser. Recent versions will include
--- GHC.Hs.Dump (it got moved in from ghc-lib on 2020-02-05).
-# if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10)
+-- Once again, attenion please. This is the ghc-lib-parser case.
+
+#  if !defined (GHC_8_8)
 import GHC.Hs.Dump
 #  else
--- For simplicity, just assume it's missing from 8.8 ghc-lib-parser
--- builds and reproduce the implementation.
+-- In the 8.8 case reproduce the implementation (the original ended up
+-- in ghc-lib).
+
 import Prelude as X hiding ((<>))
 
 import Data.Data hiding (Fixity)
@@ -42,11 +45,7 @@ import NameSet
 import Name
 import DataCon
 import SrcLoc
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10)
-import GHC.Hs
-#else
 import HsSyn
-#endif
 import OccName hiding (occName)
 import Var
 import Module

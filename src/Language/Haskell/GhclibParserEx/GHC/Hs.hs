@@ -1,27 +1,27 @@
--- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
-{-# LANGUAGE CPP #-}
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs(
    modName
  )
 where
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0)
-import GHC.Hs
-#  if !defined (GHC_9_10) && !defined (GHC_9_8) && !defined (GHC_9_6)
-import GHC.Unit.Module
-#  endif
-import GHC.Types.SrcLoc
+#if defined (GHC_8_8)
+import HsSyn
+import Module
+import SrcLoc
 #elif defined (GHC_8_10)
 import GHC.Hs
 import Module
 import SrcLoc
+#elif defined (GHC_9_0) || defined (GHC_9_2) || defined (GHC_9_4)
+import GHC.Hs
+import GHC.Unit.Module
+import GHC.Types.SrcLoc
 #else
-import HsSyn
-import Module
-import SrcLoc
+import GHC.Hs
+import GHC.Types.SrcLoc
 #endif
 
 #if defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0)

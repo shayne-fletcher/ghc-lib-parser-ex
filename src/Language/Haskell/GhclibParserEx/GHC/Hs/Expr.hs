@@ -2,7 +2,6 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# OPTIONS_GHC -Wno-missing-fields #-}
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE LambdaCase #-}
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
@@ -21,37 +20,46 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Expr(
   fromChar
   ) where
 
-#if ! ( defined (GHC_8_8) )
--- ghc api >= 8.10.1
-import GHC.Hs
-#else
+#if defined (GHC_8_8)
 import HsSyn
-#endif
-
-#if ! ( defined (GHC_8_10) || defined (GHC_8_8) )
--- ghc api >= 9.0.2
-#  if ! ( defined (GHC_9_0) )
--- ghc api >= 9.2.1
-import GHC.Types.SourceText
-#  endif
-#  if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) )
--- ghc api >= 9.6.1
-import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
-#  endif
--- ghc api >= 9.0.2
-import GHC.Types.SrcLoc
-import GHC.Types.Name.Reader
-import GHC.Types.Name
-import GHC.Types.Basic
-import GHC.Builtin.Types
-#else
--- ghc api < 9.0.2
 import SrcLoc
 import RdrName
 import OccName
 import Name
 import BasicTypes
 import TysWiredIn
+#elif defined (GHC_8_10)
+import GHC.Hs
+import SrcLoc
+import RdrName
+import OccName
+import Name
+import BasicTypes
+import TysWiredIn
+#elif defined (GHC_9_0)
+import GHC.Hs
+import GHC.Types.SrcLoc
+import GHC.Types.Name.Reader
+import GHC.Types.Name
+import GHC.Types.Basic
+import GHC.Builtin.Types
+#elif defined (GHC_9_2) || defined (GHC_9_4)
+import GHC.Hs
+import GHC.Types.SourceText
+import GHC.Types.SrcLoc
+import GHC.Types.Name.Reader
+import GHC.Types.Name
+import GHC.Types.Basic
+import GHC.Builtin.Types
+#else
+import GHC.Hs
+import GHC.Types.SourceText
+import GHC.Types.SrcLoc
+import GHC.Types.Name.Reader
+import GHC.Types.Name
+import GHC.Types.Basic
+import GHC.Builtin.Types
+import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
 #endif
 import Data.Ratio
 

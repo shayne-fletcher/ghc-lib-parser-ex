@@ -14,8 +14,7 @@ declare -A builds=( \
 )
 
 for stack_yaml in "${!builds[@]}"; do
-  version="${builds[$stack_yaml]}"
   set -x
-  stack runhaskell --stack-yaml "$stack_yaml" --package extra --package optparse-applicative CI.hs -- --stack-yaml "$stack_yaml" --version-tag "$version"
+  stack runhaskell --stack-yaml "$stack_yaml" --package extra --package optparse-applicative CI.hs -- --stack-yaml "$stack_yaml" --version-tag "${builds[$stack_yaml]}"
   set +x
 done

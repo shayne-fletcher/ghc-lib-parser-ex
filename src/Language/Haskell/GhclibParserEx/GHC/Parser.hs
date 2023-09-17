@@ -1,7 +1,7 @@
 -- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
-{-# LANGUAGE CPP #-}
+
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Parser(
     parseFile
@@ -22,20 +22,45 @@ module Language.Haskell.GhclibParserEx.GHC.Parser(
   )
   where
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10)
-import GHC.Hs
-#else
+#if defined (GHC_8_8)
 import HsSyn
-#endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
-#  if defined (GHC_9_2)
+import DynFlags
+import StringBuffer
+import Lexer
+import qualified Parser
+import FastString
+import SrcLoc
+import BkpSyn
+import PackageConfig
+import RdrName
+#elif defined (GHC_8_10)
+import GHC.Hs
+import DynFlags
+import StringBuffer
+import Lexer
+import qualified Parser
+import FastString
+import SrcLoc
+import BkpSyn
+import PackageConfig
+import RdrName
+import RdrHsSyn
+#elif defined (GHC_9_0)
+import GHC.Hs
+import GHC.Parser.PostProcess
+import GHC.Driver.Session
+import GHC.Data.StringBuffer
+import GHC.Parser.Lexer
+import qualified GHC.Parser.Lexer as Lexer
+import qualified GHC.Parser as Parser
+import GHC.Data.FastString
+import GHC.Types.SrcLoc
+import GHC.Driver.Backpack.Syntax
+import GHC.Unit.Info
+import GHC.Types.Name.Reader
+#elif defined (GHC_9_2)
+import GHC.Hs
 import GHC.Driver.Config
-#  endif
-#  if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
-import GHC.Driver.Config.Parser
-#  endif
-#endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)
 import GHC.Parser.PostProcess
 import GHC.Driver.Session
 import GHC.Data.StringBuffer
@@ -48,18 +73,19 @@ import GHC.Driver.Backpack.Syntax
 import GHC.Unit.Info
 import GHC.Types.Name.Reader
 #else
-import DynFlags
-import StringBuffer
-import Lexer
-import qualified Parser
-import FastString
-import SrcLoc
-import BkpSyn
-import PackageConfig
-import RdrName
-#endif
-#if defined (GHC_8_10)
-import RdrHsSyn
+import GHC.Hs
+import GHC.Driver.Config.Parser
+import GHC.Parser.PostProcess
+import GHC.Driver.Session
+import GHC.Data.StringBuffer
+import GHC.Parser.Lexer
+import qualified GHC.Parser.Lexer as Lexer
+import qualified GHC.Parser as Parser
+import GHC.Data.FastString
+import GHC.Types.SrcLoc
+import GHC.Driver.Backpack.Syntax
+import GHC.Unit.Info
+import GHC.Types.Name.Reader
 #endif
 
 parse :: P a -> String -> DynFlags -> ParseResult a
@@ -69,7 +95,7 @@ parse p str flags =
     location = mkRealSrcLoc (mkFastString "<string>") 1 1
     buffer = stringToStringBuffer str
     parseState =
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
       initParserState (initParserOpts flags) buffer location
 #else
       mkPState flags buffer location
@@ -101,10 +127,8 @@ parseDeclaration :: String -> DynFlags -> ParseResult (LHsDecl GhcPs)
 parseDeclaration = parse Parser.parseDeclaration
 
 parseExpression :: String -> DynFlags -> ParseResult (LHsExpr GhcPs)
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
 parseExpression s flags =
-  -- The need for annotations here came about first manifested with
-  -- ghc-9.0.1
   case parse Parser.parseExpression s flags of
     POk state e ->
       let e' = e :: ECP
@@ -130,7 +154,7 @@ parseTypeSignature = parse Parser.parseTypeSignature
 parseStmt :: String -> DynFlags -> ParseResult (Maybe (LStmt GhcPs (LHsExpr GhcPs)))
 parseStmt = parse Parser.parseStmt
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
 parseIdentifier :: String -> DynFlags -> ParseResult (LocatedN RdrName)
 #else
 parseIdentifier :: String -> DynFlags -> ParseResult (Located RdrName)
@@ -164,7 +188,7 @@ parseFile filename flags str =
     location = mkRealSrcLoc (mkFastString filename) 1 1
     buffer = stringToStringBuffer str
     parseState =
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2)
+#if ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
       initParserState (initParserOpts flags) buffer location
 #else
       mkPState flags buffer location

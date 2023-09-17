@@ -2,7 +2,6 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE CPP #-}
 #include "ghclib_api.h"
 
 module Language.Haskell.GhclibParserEx.GHC.Hs.ExtendInstances (
@@ -18,7 +17,7 @@ where
 -- representations rather than the terms themselves, leads to
 -- identical results.
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)
+#if !( defined (GHC_8_8) || defined (GHC_8_10))
 import GHC.Utils.Outputable
 #else
 import Outputable
@@ -39,7 +38,7 @@ extendInstances = HsExtendInstances
 -- string representations.
 toStr :: Data a => HsExtendInstances a -> String
 toStr (HsExtendInstances e) =
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2)
+#if !( defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
   showPprUnsafe $ showAstData BlankSrcSpan BlankEpAnnotations e
 #else
   showSDocUnsafe $ showAstData BlankSrcSpan e
@@ -57,7 +56,7 @@ astListEq as bs = length as == length bs && all (uncurry astEq) (zip as bs)
 -- Use 'ppr' for 'Show'.
 instance Outputable a => Show (HsExtendInstances a) where
   show (HsExtendInstances e) =
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined(GHC_9_6) || defined(GHC_9_2)
+#if !( defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
     showPprUnsafe $ ppr e
 #else
     showSDocUnsafe $ ppr e

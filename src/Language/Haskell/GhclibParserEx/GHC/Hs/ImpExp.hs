@@ -1,6 +1,6 @@
 -- Copyright (c) 2020-2023 Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
-{-# LANGUAGE CPP #-}
+
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp(
     isPatSynIE
@@ -14,24 +14,21 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.ImpExp(
   )
 where
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
-import GHC.Hs.Extension (GhcPs)
-#endif
-
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined(GHC_9_2) || defined (GHC_9_0)
-import GHC.Hs.ImpExp
-#  if !defined (GHC_9_10) && !defined (GHC_9_8) && !defined (GHC_9_6)
-import GHC.Types.Name.Reader
-#  endif
+#if defined (GHC_8_8)
+import HsImpExp
+import RdrName
 #elif defined (GHC_8_10)
 import GHC.Hs.ImpExp
 import RdrName
+#elif defined (GHC_9_0) || defined (GHC_9_2) || defined (GHC_9_4)
+import GHC.Hs.ImpExp
+import GHC.Types.Name.Reader
 #else
-import HsImpExp
-import RdrName
+import GHC.Hs.ImpExp
+import GHC.Hs.Extension (GhcPs)
 #endif
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6)
+#if !( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
 isPatSynIE :: IEWrappedName GhcPs -> Bool
 #else
 isPatSynIE :: IEWrappedName RdrName -> Bool

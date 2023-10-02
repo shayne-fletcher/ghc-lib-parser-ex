@@ -112,7 +112,11 @@ isWHNF = \case
   (L _ (HsApp _ (L _ (HsVar _ (L _ x))) _))
     | occNameString (rdrNameOcc x) `elem` ["Just", "Left", "Right"] -> True
   _ -> False
+#if ! ( defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+isLCase = \case (L _ (HsLam _ LamCase _)) -> True; _ -> False
+#else
 isLCase = \case (L _ HsLamCase{}) -> True; _ -> False
+#endif
 isOverLabel = \case (L _ HsOverLabel{}) -> True; _ -> False
 
 #if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )

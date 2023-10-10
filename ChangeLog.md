@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## 9.8.0.0 released
+- Companion to `ghc-lib-parser-9.8.1.20231009`
+
 ## 9.6.0.2 released
 - New functions `isTypedSplice`, `isUntypedSpice`
 

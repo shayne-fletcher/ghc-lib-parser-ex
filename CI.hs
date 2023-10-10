@@ -1,6 +1,8 @@
 -- Copyright (c) 2020, 2021 Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
+{-# OPTIONS_GHC -fno-warn-unused-imports #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -11,7 +13,7 @@
 module CI (main) where
 
 import Control.Monad.Extra
-import Control.Applicative
+import Control.Applicative (liftA2)
 import System.Directory
 import System.FilePath
 import System.IO.Extra

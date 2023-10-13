@@ -359,6 +359,7 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isLexeme" $ test "3" $ assert' . isLexeme
   , testCase "isLexeme" $ test "f x" $ assert' . not . isLexeme
   , testCase "isLambda" $ test "\\x -> 12" $ assert' . isLambda
+  , testCase "isLambda" $ test_with_exts [ LambdaCase ]  "\\case _ -> 12" $ assert' . not . isLambda
   , testCase "isLambda" $ test "foo" $ assert' . not . isLambda
   , testCase "isDotApp" $ test "f . g" $ assert' . isDotApp
   , testCase "isDotApp" $ test "f $ g" $ assert' . not . isDotApp

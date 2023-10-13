@@ -83,7 +83,13 @@ isOpApp = \case (L _ OpApp{}) -> True; _ -> False
 isAnyApp x = isApp x || isOpApp x
 isDo = \case (L _ HsDo{}) -> True; _ -> False
 isLexeme = \case (L _ HsVar{}) -> True; (L _ HsOverLit{}) -> True; (L _ HsLit{}) -> True; _ -> False
+-- 'isLambda' semantics are match form `\p -> e` exclusively
+#if ! ( defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+--ghc api >= 9.8.1
+isLambda = \case (L _ (HsLam _ LamSingle _)) -> True; _ -> False
+#else
 isLambda = \case (L _ HsLam{}) -> True; _ -> False
+#endif
 #if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
 -- ghc api >= 9.6.1
 isQuasiQuoteExpr = \case (L _ (HsUntypedSplice _ HsQuasiQuote{})) -> True; _ -> False

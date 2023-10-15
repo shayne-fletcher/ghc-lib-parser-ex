@@ -24,34 +24,34 @@ strategy:
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-9.8.1       | ghc-9.6.2  |
-    # | windows | ghc-9.8.1       | ghc-9.6.2  |
-    # | macOS   | ghc-9.8.1       | ghc-9.6.2  |
+    # | linux   | ghc-9.8.1       | ghc-9.6.3  |
+    # | windows | ghc-9.8.1       | ghc-9.6.3  |
+    # | macOS   | ghc-9.8.1       | ghc-9.6.3  |
     # +---------+-----------------+------------+
-    linux-9.8.1-9.6.2:
+    linux-9.8.1-9.6.3:
       image: "ubuntu-latest"
       stack: "stack-exact.yaml"
-    windows-9.8.1-9.6.2:
+    windows-9.8.1-9.6.3:
       image: "windows-latest"
       stack: "stack-exact.yaml"
-    mac-9.8.1-9.6.2:
+    mac-9.8.1-9.6.3:
       image: "macOS-latest"
       stack: "stack-exact.yaml"
 
     # +---------+-----------------+------------+
     # | OS      | ghc-lib flavour | GHC        |
     # +=========+=================+============+
-    # | linux   | ghc-9.6.2       | ghc-9.4.5  |
-    # | windows | ghc-9.6.2       | ghc-9.4.5  |
-    # | macOS   | ghc-9.6.2       | ghc-9.4.5  |
+    # | linux   | ghc-9.6.3       | ghc-9.4.5  |
+    # | windows | ghc-9.6.3       | ghc-9.4.5  |
+    # | macOS   | ghc-9.6.3       | ghc-9.4.5  |
     # +---------+-----------------+------------+
-    linux-9.6.2-9.4.5:
+    linux-9.6.3-9.4.5:
       image: "ubuntu-latest"
       stack: "stack.yaml"
-    windows-9.6.2-9.4.5:
+    windows-9.6.3-9.4.5:
       image: "windows-latest"
       stack: "stack.yaml"
-    mac-9.6.2-9.4.5:
+    mac-9.6.3-9.4.5:
       image: "macOS-latest"
       stack: "stack.yaml"
 

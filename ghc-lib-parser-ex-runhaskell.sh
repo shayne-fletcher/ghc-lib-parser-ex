@@ -14,7 +14,6 @@ declare -A builds=( \
    [stack-exact.yaml]=9.8.0.0
 )
 
-set +x
 for stack_yaml in "${!builds[@]}"; do
   delete_stack_yaml=false;
   if [[ "$stack_yaml" != "stack.yaml" ]] && \

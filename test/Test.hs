@@ -17,11 +17,11 @@ import Control.Monad
 import Data.List.Extra
 import Data.Maybe
 import Data.Generics.Uniplate.Data
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2)
+#if !(defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
 import GHC.Data.Bag
-#if !defined (GHC_9_2)
+#  if !defined (GHC_9_2)
 import GHC.Driver.Errors.Types
-#endif
+#  endif
 import GHC.Types.Error
 #endif
 
@@ -47,21 +47,26 @@ import Language.Haskell.GhclibParserEx.GHC.Driver.Flags()
 import Language.Haskell.GhclibParserEx.GHC.Driver.Session
 import Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
 
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10)
+#if !defined (GHC_8_8)
+-- ghc >= 8.10
 import GHC.Hs
 #else
 import HsSyn
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0)
+#if !( defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc >= 9.0
 import GHC.Types.SrcLoc
 import GHC.Driver.Session
 import GHC.Parser.Lexer
-#  if !defined (GHC_9_10) && !defined (GHC_9_8) && !defined (GHC_9_6)
+#  if defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0)
+--   9.0 <= ghc <= 9.4
 import GHC.Utils.Outputable
 #  endif
 #  if !defined (GHC_9_0)
+--   ghc >= 9.2
 import GHC.Driver.Ppr
-#    if !defined (GHC_9_10) && !defined (GHC_9_8) && !defined (GHC_9_6) && !defined (GHC_9_4)
+#    if defined (GHC_9_2)
+--     ghc = 9.2
 import GHC.Parser.Errors.Ppr
 #    endif
 #  endif
@@ -69,6 +74,7 @@ import GHC.Utils.Error
 import GHC.Types.Name.Reader
 import GHC.Types.Name.Occurrence
 #else
+-- ghc < 9.0
 import SrcLoc
 import DynFlags
 import Lexer
@@ -77,15 +83,17 @@ import ErrUtils
 import RdrName
 import OccName
 #endif
-import GHC.LanguageExtensions.Type
 #if defined (GHC_8_8)
+-- ghc = 8.8
 import Bag
 #endif
+import GHC.LanguageExtensions.Type
 
 basicDynFlags :: DynFlags
 basicDynFlags =
   defaultDynFlags fakeSettings
-#if !defined (GHC_9_10) && !defined (GHC_9_8) && !defined (GHC_9_6)
+#if defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8)
+-- ghc <= 9.4
                                 fakeLlvmConfig
 #endif
 

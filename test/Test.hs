@@ -121,7 +121,8 @@ makeFile relPath contents = do
     writeFile relPath contents
     return relPath
 
-#if defined(GHC_9_10) || defined (GHC_9_8) || defined(GHC_9_6)
+#if !(defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+-- ghc >= 9.6
 report :: DynFlags -> Bag (MsgEnvelope GhcMessage) -> String
 report flags msgs = concat [ showSDoc flags msg | msg <- pprMsgEnvelopeBagWithLocDefault msgs ]
 #elif defined (GHC_9_4)
@@ -138,7 +139,8 @@ report flags msgs = concat [ showSDoc flags msg | msg <- pprErrMsgBagWithLoc msg
 chkParseResult :: DynFlags -> ParseResult a -> IO ()
 chkParseResult flags = \case
     POk s _ -> do
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if !(defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+-- ghc >= 9.4
       let (wrns, errs) = getPsMessages s
 #elif defined (GHC_9_2)
       let (wrns, errs) = getMessages s
@@ -146,7 +148,8 @@ chkParseResult flags = \case
       let (wrns, errs) = getMessages s flags
 #endif
       when (not (null errs) || not (null wrns)) $
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if !(defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+-- ghc >= 9.4
         assertFailure (
           report flags (getMessages (GhcPsMessage <$> wrns)) ++
           report flags (getMessages (GhcPsMessage <$> errs))
@@ -156,7 +159,8 @@ chkParseResult flags = \case
 #else
         assertFailure (report flags wrns ++ report flags errs)
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if !(defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+-- ghc >= 9.4
     PFailed s -> assertFailure (report flags $ getMessages (GhcPsMessage <$> snd (getPsMessages s)))
 #elif defined (GHC_9_2)
     PFailed s -> assertFailure (report flags $ fmap pprError (snd (getMessages s)))
@@ -271,7 +275,8 @@ fixityTests = testGroup "Fixity tests"
       exprTest "1 + 2 * 3" flags
         (\e ->
             assertBool "parse tree not affected" $
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2)
+#if !(defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+-- ghc >= 9.2
               showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations e) /=
               showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] e))
 #else
@@ -283,7 +288,8 @@ fixityTests = testGroup "Fixity tests"
       case parseDeclaration "f (1 : 2 :[]) = 1" flags of
         POk _ d ->
           assertBool "parse tree not affected" $
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2)
+#if !(defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+-- ghc >= 9.2
           showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations d) /=
           showSDocUnsafe (showAstData BlankSrcSpan BlankEpAnnotations (applyFixities [] d))
 #else
@@ -337,12 +343,14 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isDot" $ test "f . g" $ \case L _ (OpApp _ _ op _) -> assert' $ isDot op; _ -> assertFailure "unexpected"
   , testCase "isReturn" $ test "return x" $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
   , testCase "isReturn" $ test "pure x" $ \case L _ (HsApp _ f _) -> assert' $ isReturn f; _ -> assertFailure "unexpected"
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if !(defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+-- ghc >= 9.4
   , testCase "isSection" $ test "(1 +)" $ \case L _ (HsPar _ _ x _) -> assert' $ isSection x; _ -> assertFailure "unexpected"
 #else
   , testCase "isSection" $ test "(1 +)" $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
 #endif
-#if defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4)
+#if !(defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+-- ghc >= 9.4
   , testCase "isSection" $ test "(+ 1)" $ \case L _ (HsPar _ _ x _) -> assert' $ isSection x; _ -> assertFailure "unexpected"
 #else
   , testCase "isSection" $ test "(+ 1)" $ \case L _ (HsPar _ x) -> assert' $ isSection x; _ -> assertFailure "unexpected"
@@ -398,7 +406,7 @@ expressionPredicateTests = testGroup "Expression predicate tests"
   , testCase "isSpliceDecl" $ test "$x" $ assert' . isSpliceDecl . unLoc
   , testCase "isSpliceDecl" $ test "f$x" $ assert' . not . isSpliceDecl . unLoc
   , testCase "isSpliceDecl" $ test "$(a + b)" $ assert' . isSpliceDecl . unLoc
-#if !( defined(GHC_8_8) || defined(GHC_8_10) || defined (GHC_9_0) || defined (GHC_9_2) || defined(GHC_9_4) )
+#if !(defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   -- ghc api >= 9.6.1
   , testCase "isTypedSplice" $ test "$$foo" $ assert' . isTypedSplice . unLoc
   , testCase "isTypedSplice" $ test "$foo" $ assert' . not . isTypedSplice . unLoc

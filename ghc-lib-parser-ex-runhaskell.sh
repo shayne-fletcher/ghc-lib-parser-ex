@@ -9,6 +9,7 @@ declare -A builds=( \
    [stack-902-8107.yaml]=9.0.0.0
    [stack-926-902.yaml]=9.2.0.0
    [stack-944-902.yaml]=9.4.0.0
+   [stack-948-902.yaml]=9.4.0.0
    [stack-962-927.yaml]=9.6.0.0
    [stack.yaml]=9.6.0.0
    [stack-exact.yaml]=9.8.0.0

@@ -106,8 +106,12 @@ isWHNF = \case
   (L _ HsLam{}) -> True
   (L _ ExplicitTuple{}) -> True
   (L _ ExplicitList{}) -> True
-#if ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
--- ghc api >= 9.4.1
+
+#if ! ( defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.8
+  (L _ (HsPar _  x )) -> isWHNF x
+#elif ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.4
   (L _ (HsPar _ _ x _)) -> isWHNF x
 #else
   (L _ (HsPar _ x)) -> isWHNF x

@@ -14,6 +14,7 @@ import System.Environment
 import qualified System.FilePath as FilePath
 import System.IO.Extra
 import Control.Monad
+import Data.Data
 import Data.List.Extra
 import Data.Maybe
 import Data.Generics.Uniplate.Data
@@ -109,6 +110,7 @@ tests = testGroup " All tests"
   , fixityTests
   , extendInstancesTests
   , expressionPredicateTests
+  , declarationPredicateTests
   , typePredicateTests
   , patternPredicateTests
   , dynFlagsTests
@@ -169,6 +171,9 @@ chkParseResult flags = \case
 #else
     PFailed _ loc err -> assertFailure (report flags $ unitBag $ mkPlainErrMsg flags loc err)
 #endif
+
+hasS :: (Data x, Data a) => (a -> Bool) -> x -> Bool
+hasS test = any test . universeBi
 
 parseTests :: TestTree
 parseTests = testGroup "Parse tests"
@@ -248,6 +253,12 @@ moduleTest s flags test =
 exprTest :: String -> DynFlags -> (LHsExpr GhcPs -> IO ()) -> IO ()
 exprTest s flags test =
       case parseExpression s flags of
+        POk _ e -> test e
+        _ -> assertFailure "parse error"
+
+declTest :: String -> DynFlags -> (LHsDecl GhcPs -> IO ()) -> IO ()
+declTest s flags test =
+      case parseDeclaration s flags of
         POk _ e -> test e
         _ -> assertFailure "parse error"
 
@@ -333,6 +344,17 @@ typePredicateTests = testGroup "Type predicate tests"
   where
     assert' = assertBool ""
     test_with_exts exts s = typeTest s (flags exts)
+    flags = foldl' xopt_set basicDynFlags
+
+declarationPredicateTests :: TestTree
+declarationPredicateTests = testGroup "Declaration predicate tests"
+  [
+    testCase "isStrictMatch" $ test "x = e" $ assert' . not . hasS isStrictMatch
+  , testCase "isStrictMatch" $ test "!x = e" $ assert' . hasS isStrictMatch
+  ]
+  where
+    assert' = assertBool ""
+    test s = declTest s (flags [])
     flags = foldl' xopt_set basicDynFlags
 
 expressionPredicateTests :: TestTree

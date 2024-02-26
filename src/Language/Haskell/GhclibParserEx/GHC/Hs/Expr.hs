@@ -138,9 +138,9 @@ isQuasiQuoteSplice :: HsSplice GhcPs -> Bool
 isQuasiQuoteSplice = \case HsQuasiQuote{} -> True; _ -> False
 
 #if ( defined (GHC_8_10) || defined (GHC_8_8) )
-isStrictMatch :: HsMatchContext GhcPs -> Bool
-#elif ( defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) )
 isStrictMatch :: HsMatchContext RdrName -> Bool
+#elif ( defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) )
+isStrictMatch :: HsMatchContext GhcPs -> Bool
 #else
 -- ghc > 9.8.1
 isStrictMatch :: HsMatchContext (GenLocated SrcSpanAnnN RdrName) -> Bool

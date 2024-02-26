@@ -1,6 +1,6 @@
 # Changelog for ghc-lib-parser-ex
 
-## Unreleased
+## 9.8.0.1 released
 - New functions `isWildPat`
 
 ## 9.8.0.0 released

@@ -8,6 +8,7 @@ module Language.Haskell.GhclibParserEx.GHC.Hs.Pat(
   , fromPChar
   , hasPFieldsDotDot
   , isPFieldWildcard, isPWildcard, isPFieldPun, isPatTypeSig, isPBangPat, isPViewPat
+  , isWildPat {- alias for 'isPWildcard' -}
   , isSplicePat
  ) where
 
@@ -126,6 +127,9 @@ isPWildcard (dL -> L _ (WildPat _)) = True
 isPWildcard (L _ (WildPat _)) = True
 #endif
 isPWildcard _ = False
+
+isWildPat :: LPat GhcPs -> Bool
+isWildPat = isPWildcard
 
 #if !( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
 isPFieldPun :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LPat GhcPs) -> Bool

@@ -466,6 +466,8 @@ patternPredicateTests = testGroup "Pattern predicate tests"
   , testCase "fromPChar" $ test "'a'" $ assert' . (== Just 'a') . fromPChar
   , testCase "fromPChar" $ test "\"a\"" $ assert' . isNothing . fromPChar
   , testCase "isSplicePat" $ test "$(varP pylonExPtrVarName)" $ assert' . isSplicePat
+  , testCase "isWildPat" $ test "_" $ assert' . isWildPat
+  , testCase "isWildPat" $ test "p@(L _ (VisPat _ pat))" $ assert' . not . isWildPat
   ]
   where
     assert' = assertBool ""

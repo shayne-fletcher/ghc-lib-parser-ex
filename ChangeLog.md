@@ -1,5 +1,8 @@
 # Changelog for ghc-lib-parser-ex
 
+## Unreleased
+- Fix broken cpp in `isStrictMatch`
+
 ## 9.8.0.1 released
 - New functions `isWildPat`
 

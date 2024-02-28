@@ -143,7 +143,7 @@ isStrictMatch :: HsMatchContext RdrName -> Bool
 isStrictMatch :: HsMatchContext GhcPs -> Bool
 #else
 -- ghc > 9.8.1
-isStrictMatch :: HsMatchContext (GenLocated SrcSpanAnnN RdrName) -> Bool
+isStrictMatch :: HsMatchContext (LocatedN RdrName) -> Bool
 #endif
 isStrictMatch = \case FunRhs{mc_strictness=SrcStrict} -> True; _ -> False
 

@@ -1,0 +1,22 @@
+name: stack runhaskell
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  stack-runhaskell:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, macos, windows]
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install automake
+        if: matrix.os == 'macos'
+      - shell: bash
+        run: |-
+          set -euxo pipefail
+          curl -sSL https://get.haskellstack.org/ | sh -s - -f
+          stack runhaskell --stack-yaml="stack-exact.yaml" --package extra --package optparse-applicative CI.hs -- --stack-yaml="stack-exact.yaml"

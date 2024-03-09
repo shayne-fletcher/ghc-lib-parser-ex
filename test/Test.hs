@@ -26,7 +26,7 @@ import GHC.Driver.Errors.Types
 import GHC.Types.Error
 #endif
 
-import Language.Haskell.GhclibParserEx.Dump
+import Language.Haskell.GhclibParserEx.GHC.Hs.Dump
 import Language.Haskell.GhclibParserEx.Fixity
 import Language.Haskell.GhclibParserEx.GHC.Settings.Config
 import Language.Haskell.GhclibParserEx.GHC.Parser

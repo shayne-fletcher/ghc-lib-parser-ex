@@ -1,5 +1,9 @@
 # Changelog for ghc-lib-parser-ex
 
+## unreleased
+- Deprecate `Dump`
+- New module `GHC.Hs.Dump`
+
 ## 9.8.0.2 released
 - Fix broken cpp in `isStrictMatch`
 

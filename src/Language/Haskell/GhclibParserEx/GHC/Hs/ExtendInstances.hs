@@ -24,7 +24,7 @@ import Outputable
 #endif
 import Data.Data
 import Data.Function
-import Language.Haskell.GhclibParserEx.Dump
+import Language.Haskell.GhclibParserEx.GHC.Hs.Dump
 
 newtype HsExtendInstances a =
   HsExtendInstances { unextendInstances :: a }

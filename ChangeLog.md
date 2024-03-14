@@ -3,6 +3,7 @@
 ## unreleased
 - Deprecate `Dump`
 - New module `GHC.Hs.Dump`
+- Add support for ghc-9.10 series: `GHCLIB_API_910`
 
 ## 9.8.0.2 released
 - Fix broken cpp in `isStrictMatch`

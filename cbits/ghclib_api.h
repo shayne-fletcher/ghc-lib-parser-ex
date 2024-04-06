@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2020 - 2023 Shayne Fletcher. All rights reserved.
+Copyright (c) 2020 - 2024 Shayne Fletcher. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause.
 */
 

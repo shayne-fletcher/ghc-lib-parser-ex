@@ -114,7 +114,7 @@ patchCabal version opts = do
   putStrLn "Patching cabal:"
   putStrLn $ "- version " ++ version
   writeFile "ghc-lib-parser-ex.cabal" .
-      replace "version:        0.1.0" ("version:        " ++ version)
+      replace "version: 0.1.0" ("version: " ++ version)
       =<< readFile' "ghc-lib-parser-ex.cabal"
   let series =
         case second (stripInfix ".") <$> stripInfix "." version of

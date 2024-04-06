@@ -1,21 +1,19 @@
-cabal-version:  1.18
-name:           ghc-lib-parser-ex
-version:        0.1.0
-description:    Please see the README on GitHub at <https://github.com/shayne-fletcher/ghc-lib-parser-ex#readme>
-homepage:       https://github.com/shayne-fletcher/ghc-lib-parser-ex#readme
-bug-reports:    https://github.com/shayne-fletcher/ghc-lib-parser-ex/issues
-author:         Shayne Fletcher
-maintainer:     shayne@shaynefletcher.org
-copyright:      Copyright © 2020-2022 Shayne Fletcher. All rights reserved.
-license:        BSD3
+cabal-version: 3.4
+name: ghc-lib-parser-ex
+version: 0.1.0
+description: Please see the README on GitHub at <https://github.com/shayne-fletcher/ghc-lib-parser-ex#readme>
+homepage: https://github.com/shayne-fletcher/ghc-lib-parser-ex#readme
+bug-reports: https://github.com/shayne-fletcher/ghc-lib-parser-ex/issues
+author: Shayne Fletcher
+maintainer: shayne@shaynefletcher.org
+copyright: Copyright © 2020-2024 Shayne Fletcher. All rights reserved.
+license: BSD-3-Clause
 license-file:   LICENSE
-category:       Development
-synopsis:       Algorithms on GHC parse trees
-build-type:     Simple
+category: Development
+synopsis: Programming with GHC parse trees
+build-type: Simple
 extra-source-files:
-    README.md
-    ChangeLog.md
-    cbits/ghclib_api.h
+    README.md ChangeLog.md cbits/ghclib_api.h
 
 source-repository head
   type: git
@@ -29,9 +27,48 @@ flag auto
 flag no-ghc-lib
   default: False
   manual: True
-  description: Force dependency on native ghc-libs
+  description: Do not link ghc-lib. Use the native GHC libs
+
+common base
+  default-language: Haskell2010
+  ghc-options:
+    -Wall -Wincomplete-record-updates
+    -Wredundant-constraints -Widentities
+    -Wno-simplifiable-class-constraints
+  build-depends:
+      base >=4.7 && <5
+
+common ghc_libs
+  include-dirs: cbits
+  default-extensions: CPP
+  if flag(auto) && impl(ghc >= 9.0.0) && impl(ghc < 9.1.0)
+    build-depends:
+      ghc == 9.0.*,
+      ghc-boot-th,
+      ghc-boot
+  else
+    if flag(auto)
+      build-depends:
+        ghc-lib-parser == 9.0.*
+    else
+      if flag(no-ghc-lib)
+        build-depends:
+          ghc == 9.0.*,
+          ghc-boot-th,
+          ghc-boot
+      else
+        build-depends:
+          ghc-lib-parser == 9.0.*
+
+common lib
+  import: base, ghc_libs
+  build-depends:
+      uniplate >= 1.5,
+      bytestring >= 0.10.8.2,
+      containers >= 0.5.8.1
 
 library
+  import: lib
   exposed-modules:
       Language.Haskell.GhclibParserEx.Dump
       Language.Haskell.GhclibParserEx.Fixity
@@ -51,76 +88,20 @@ library
       Language.Haskell.GhclibParserEx.GHC.Parser
       Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
       Language.Haskell.GhclibParserEx.GHC.Utils.Outputable
-  other-modules:
-      Paths_ghc_lib_parser_ex
-  hs-source-dirs:
-      src
+  autogen-modules: Paths_ghc_lib_parser_ex
+  other-modules: Paths_ghc_lib_parser_ex
+  hs-source-dirs: src
+
+common test
+  import: lib
   build-depends:
-      base >=4.7 && <5,
-      uniplate >= 1.5,
-      bytestring >= 0.10.8.2,
-      containers >= 0.5.8.1
-  if flag(auto) && impl(ghc >= 9.0.0) && impl(ghc < 9.1.0)
-    build-depends:
-      ghc == 9.0.*,
-      ghc-boot-th,
-      ghc-boot
-  else
-    if flag(auto)
-      build-depends:
-        ghc-lib-parser == 9.0.*
-    else
-      if flag(no-ghc-lib)
-        build-depends:
-          ghc == 9.0.*,
-          ghc-boot-th,
-          ghc-boot
-      else
-        build-depends:
-          ghc-lib-parser == 9.0.*
-  include-dirs:
-      cbits
-  install-includes:
-      cbits/ghclib_api.h
-  default-language: Haskell2010
-  default-extensions: CPP
+    tasty >= 1.2, tasty-hunit >= 0.10.0, directory >= 1.3.3,
+    filepath >= 1.4.2, extra >=1.6, uniplate >= 1.6.12,
+    ghc-lib-parser-ex
 
 test-suite ghc-lib-parser-ex-test
+  import: test
   type: exitcode-stdio-1.0
-  main-is:
-      Test.hs
-  other-modules:
-      Paths_ghc_lib_parser_ex
-  hs-source-dirs:
-      test
-  include-dirs:
-      cbits
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      base >=4.7 && <5
-    , tasty >= 1.2
-    , tasty-hunit >= 0.10.0
-    , directory >= 1.3.3
-    , filepath >= 1.4.2
-    , extra >=1.6
-    , uniplate >= 1.6.12
-    , ghc-lib-parser-ex
-  if flag(auto) && impl(ghc >= 9.0.0) && impl(ghc < 9.1.0)
-    build-depends:
-      ghc == 9.0.*,
-      ghc-boot-th,
-      ghc-boot
-  else
-    if flag(auto)
-      build-depends:
-        ghc-lib-parser == 9.0.*
-    else
-      if flag(no-ghc-lib)
-        build-depends:
-          ghc == 9.0.*,
-          ghc-boot-th,
-          ghc-boot
-      else
-        build-depends:
-          ghc-lib-parser == 9.0.*
-  default-language: Haskell2010
+  main-is: Test.hs
+  hs-source-dirs: test

@@ -13,10 +13,27 @@ jobs:
         os: [ubuntu, macos, windows]
     steps:
       - uses: actions/checkout@v4
-      - run: brew install automake
-        if: matrix.os == 'macos'
-      - shell: bash
+      - uses: haskell-actions/setup@v2
+        with:
+          enable-stack: true
+          stack-version: 'latest'
+      #   run: |-
+      #     set -euxo pipefail
+      #     curl -sSL https://get.haskellstack.org/ | sh -s - -f
+      - name: Upgrade stack from git
         run: |-
-          set -euxo pipefail
-          curl -sSL https://get.haskellstack.org/ | sh -s - -f
-          stack runhaskell --stack-yaml="stack-exact.yaml" --package extra --package optparse-applicative CI.hs -- --stack-yaml="stack-exact.yaml"
+           stack upgrade --git
+           echo "$HOME/.local/bin" >> $GITHUB_PATH
+           which stack
+           stack --version
+        shell: bash
+      - name: Install build tools
+        run: brew install automake
+        if: matrix.os == 'macos'
+      - name: Configure
+        shell: bash
+        # e.g. Don't recursively delete '.stack-work' (`stack clean --full`
+        run: echo "GHCLIB_AZURE='1'" >> $GITHUB_ENV
+      - name: Run CI.hs
+        shell: bash
+        run: stack runhaskell --stack-yaml stack-exact.yaml --resolver ghc-9.8.2 --package extra --package optparse-applicative CI.hs -- --stack-yaml stack-exact.yaml --resolver ghc-9.8.2

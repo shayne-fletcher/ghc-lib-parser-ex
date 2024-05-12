@@ -1,5 +1,5 @@
-resolver: ghc-9.6.3
-
+resolver: ghc-9.8.2
+allow-newer: true
 extra-deps:
   # Depedendencies of ghc-lib-parser-ex:
   - ansi-terminal-types-0.11.5
@@ -7,11 +7,14 @@ extra-deps:
   - happy-1.20.1.1
   - data-array-byte-0.1.0.1
   - base-orphans-0.9.1
-  - hashable-1.4.3.0
   - ghc-lib-parser-9.10.1.20240511
+  - hashable-1.4.4.0
+  - os-string-2.0.2.2
   - syb-0.7.2.4
   - uniplate-1.6.13
-  - unordered-containers-0.2.19.1
+  # - unordered-containers-0.2.19.1
+  - github: shayne-fletcher/unordered-containers
+    commit: "qualify-foldl"
   # Addtional dependencies for the test:
   - ansi-terminal-1.0
   - mintty-0.1.4
@@ -19,7 +22,7 @@ extra-deps:
   - call-stack-0.4.0
   - clock-0.8.4
   - colour-2.3.6
-  - extra-1.7.14
+  - extra-1.7.16
   - optparse-applicative-0.18.1.0
   - prettyprinter-1.7.1
   - prettyprinter-ansi-terminal-1.1.3

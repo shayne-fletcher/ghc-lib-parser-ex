@@ -39,7 +39,7 @@ import GHC.Types.SourceText
 import GHC.Types.Name.Reader
 import GHC.Types.Name
 import GHC.Types.SrcLoc
-#else
+#elif defined (GHC_9_8) || defined (GHC_9_10)
 import GHC.Hs
 import GHC.Types.Fixity
 import GHC.Types.SourceText
@@ -47,6 +47,12 @@ import GHC.Types.Name.Reader
 import GHC.Types.Name
 import GHC.Types.SrcLoc
 import GHC.Data.FastString
+#else
+import GHC.Hs
+import GHC.Types.Fixity
+import GHC.Types.Name.Reader
+import GHC.Types.Name
+import GHC.Types.SrcLoc
 #endif
 
 import Data.Maybe
@@ -270,7 +276,9 @@ infixl_ = fixity InfixL
 infix_  = fixity InfixN
 
 fixity :: FixityDirection -> Int -> [String] -> [(String, Fixity)]
-#if ! (defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+# if ! (defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+fixity a p = map (,Fixity p a)
+#elif ! (defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
 fixity a p = map (,Fixity (SourceText (fsLit "")) p a)
 #else
 fixity a p = map (,Fixity (SourceText "") p a)
@@ -291,6 +299,10 @@ fixitiesFromModule (L _ (HsModule _ _ _ decls _ _)) = concatMap f decls
 #endif
   where
     f :: LHsDecl GhcPs -> [(String, Fixity)]
+# if ! (defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+    f (L _ (SigD _ (FixSig _ (FixitySig _ ops (Fixity p dir))))) =
+#else
     f (L _ (SigD _ (FixSig _ (FixitySig _ ops (Fixity _ p dir))))) =
+#endif
           fixity dir p (map (occNameString. rdrNameOcc . unLoc) ops)
     f _ = []

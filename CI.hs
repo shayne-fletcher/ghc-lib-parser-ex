@@ -10,8 +10,6 @@
 {-# LANGUAGE CPP #-}
 
 -- CI script, compatible with all of Travis, Appveyor and Azure.
-module CI (main) where
-
 import Control.Monad.Extra
 import Control.Applicative (liftA2)
 import System.Directory
@@ -102,10 +100,7 @@ parseStackOptions = StackOptions
         ))
 
 buildDist :: StackOptions -> Bool -> IO ()
-buildDist opts noBuilds = do
-    when isWindows $
-      stack' opts "exec -- pacman -S autoconf automake-wrapper make patch python tar --noconfirm"
-    isolatedBuild opts noBuilds
+buildDist opts noBuilds = isolatedBuild opts noBuilds
 
 patchCabal :: String -> StackOptions -> IO ()
 patchCabal version opts = do
@@ -138,16 +133,7 @@ patchCabal version opts = do
         replace "9.0.*" family
         =<< readFile' "ghc-lib-parser-ex.cabal"
     Nothing -> do
-      -- If version is of the form 0.x, depend strictly on
-      -- ghc-lib-parser and don't constrain its bounds.
-      out <- dropSuffix "\n" <$> systemOutput_ (
-        stackWithOpts opts ++ " ls dependencies --depth 1"
-        )
-      let ls = filter ("ghc-lib-parser " `isPrefixOf`) $ map trim (lines out)
-      let ghcLibParserVersion =
-            case map (stripPrefix "ghc-lib-parser ") ls of
-              [Just version] -> version
-              _ -> fail "Couldn't determine ghc-lib-parser version"
+      let ghcLibParserVersion = version
       putStrLn $ "- ghc-lib-parser " ++ ghcLibParserVersion
       writeFile "ghc-lib-parser-ex.cabal" .
         replace section (
@@ -193,40 +179,21 @@ patchCabal version opts = do
 isolatedBuild :: StackOptions -> Bool -> IO ()
 isolatedBuild opts@StackOptions {..} noBuilds = do
   version <- tag
-  stackYaml <- pure $ fromMaybe "stack.yaml" stackYaml
   let pkg_ghclib_parser_ex = "ghc-lib-parser-ex-" ++ version
-  rootDir <- getCurrentDirectory
-  withTempDir $ \tmpDir -> do
-    copyFilesWith copyFile tmpDir $ map (rootDir,)
-      [ "LICENSE", "README.md", "ChangeLog.md", "ghc-lib-parser-ex.cabal", "Setup.hs", stackYaml ]
-    copyDirectoryRecursive (rootDir </> "cbits") (tmpDir </> "cbits")
-    copyDirectoryRecursive (rootDir </> "src") (tmpDir </> "src")
-    copyDirectoryRecursive (rootDir </> "test") (tmpDir </> "test")
-    withCurrentDirectory tmpDir $ do
-      patchCabal version opts
-      contents <- readFile' "ghc-lib-parser-ex.cabal"
-      putStrLn contents
-      stack "sdist . --tar-dir=."
-      copyFile (pkg_ghclib_parser_ex <> ".tar.gz") (rootDir </> (pkg_ghclib_parser_ex <> ".tar.gz"))
-
-      when noBuilds exitSuccess
-
-      cmd $ "tar -xvf " <> (pkg_ghclib_parser_ex  <> ".tar.gz")
-      renameDirectory pkg_ghclib_parser_ex "ghc-lib-parser-ex"
-      writeFile stackYaml . replace "- ." "- ghc-lib-parser-ex" =<< readFile' stackYaml
-      -- Build and test the package.
-      stack $ "--no-terminal --interleaved-output " ++ "build " ++ ghcOptionsOpt ghcOptions  ++ " ghc-lib-parser-ex"
-      stack $ "--no-terminal --interleaved-output " ++ "test " ++ ghcOptionsOpt ghcOptions  ++ " ghc-lib-parser-ex"
-#if __GLASGOW_HASKELL__ == 808 && \
-    (__GLASGOW_HASKELL_PATCHLEVEL1__ == 1 || __GLASGOW_HASKELL_PATCHLEVEL1__ == 2) && \
-    defined (mingw32_HOST_OS)
-      -- Skip these tests on ghc-8.8.1 and 8.8.2 (exclusively). See
-      -- https://gitlab.haskell.org/ghc/ghc/issues/17599.
-#else
-      -- Test everything loads in GHCi, see
-      -- https://github.com/digital-asset/ghc-lib/issues/27
-      stack "--no-terminal exec -- ghc -ignore-dot-ghci -package=ghc-lib-parser-ex -e \"print 1\""
-#endif
+  patchCabal version opts
+  contents <- readFile' "ghc-lib-parser-ex.cabal"
+  putStrLn contents
+  system_ "cabal sdist -o ."
+  -- when noBuilds exitSuccess
+  system_ "cabal build lib:ghc-lib-parser-ex --ghc-options=-j"
+  system_ "cabal test test:ghc-lib-parser-ex-test --ghc-options=-j"
+-- #if __GLASGOW_HASKELL__ == 808 && \
+--     (__GLASGOW_HASKELL_PATCHLEVEL1__ == 1 || __GLASGOW_HASKELL_PATCHLEVEL1__ == 2) && \
+--     defined (mingw32_HOST_OS)
+--       -- https://gitlab.haskell.org/ghc/ghc/issues/17599
+-- #else
+--   -- system_ "unset GHC_PACKAGE_PATH && cabal exec -- ghc -ignore-dot-ghci -package=ghc-lib-parser-parser-ex -e \"print 1\""
+-- #endif
     where
       tag :: IO String
       tag = maybe (do UTCTime day _ <- getCurrentTime; pure $ genVersionStr day) pure versionTag
@@ -298,44 +265,3 @@ ghcOptionsOpt = \case
 -- Calculate a version string based on a date and a ghc flavor.
 genVersionStr :: Day -> String
 genVersionStr day = "0." ++ replace "-" "" (showGregorian day)
-
--- The following functions are copied from Cabal
--- 'Distribution.Simple.Utils' to avoid a dependency of this script on
--- that package (it's problematic with the 8.8.1/2 Windows relocation
--- 0 bug).
-
-copyDirectoryRecursive :: FilePath -> FilePath -> IO ()
-copyDirectoryRecursive srcDir destDir = withFrozenCallStack $ do
-  srcFiles <- getDirectoryContentsRecursive srcDir
-  copyFilesWith copyFile destDir [ (srcDir, f) | f <- srcFiles ]
-
-getDirectoryContentsRecursive :: FilePath -> IO [FilePath]
-getDirectoryContentsRecursive topdir = recurseDirectories [""]
-  where
-    recurseDirectories :: [FilePath] -> IO [FilePath]
-    recurseDirectories [] = return []
-    recurseDirectories (dir:dirs) = unsafeInterleaveIO $ do
-      (files, dirs') <- collect [] [] =<< getDirectoryContents (topdir </> dir)
-      files' <- recurseDirectories (dirs' ++ dirs)
-      return (files ++ files')
-      where
-        collect files dirs' [] = return (reverse files, reverse dirs')
-        collect files dirs' (entry:entries) | ignore entry = collect files dirs' entries
-        collect files dirs' (entry:entries) = do
-          let dirEntry = dir </> entry
-          isDirectory <- doesDirectoryExist (topdir </> dirEntry)
-          if isDirectory
-            then collect files (dirEntry:dirs') entries
-            else collect (dirEntry:files) dirs' entries
-        ignore ['.'] = True
-        ignore ['.', '.'] = True
-        ignore _ = False
-
-copyFilesWith :: (FilePath -> FilePath -> IO ()) -> FilePath -> [(FilePath, FilePath)] -> IO ()
-copyFilesWith doCopy targetDir srcFiles = withFrozenCallStack $ do
-  let dirs = map (targetDir </>) . nub . map (takeDirectory . snd) $ srcFiles
-  traverse_ (createDirectoryIfMissing True) dirs
-  sequence_ [ let src = srcBase </> srcFile
-                  dest = targetDir </> srcFile
-               in doCopy src dest
-            | (srcBase, srcFile) <- srcFiles ]

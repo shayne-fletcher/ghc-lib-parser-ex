@@ -105,3 +105,10 @@ test-suite ghc-lib-parser-ex-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   main-is: Test.hs
   hs-source-dirs: test
+
+executable ghc-lib-parser-ex-build-tool
+  import: base
+  build-tool-depends: alex:alex, happy:happy
+  build-depends:
+    ansi-terminal, directory, filepath, time, extra, optparse-applicative
+  main-is: CI.hs

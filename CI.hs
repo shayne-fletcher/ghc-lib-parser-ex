@@ -183,6 +183,8 @@ isolatedBuild opts@StackOptions {..} noBuilds = do
   patchCabal version opts
   contents <- readFile' "ghc-lib-parser-ex.cabal"
   putStrLn contents
+  hFlush stdout
+
   system_ "cabal sdist -o ."
   -- when noBuilds exitSuccess
   system_ "cabal build lib:ghc-lib-parser-ex --ghc-options=-j"

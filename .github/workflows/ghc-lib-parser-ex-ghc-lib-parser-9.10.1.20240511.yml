@@ -1,0 +1,51 @@
+name: ghc-lib-parser-ex-ghc-lib-parser-9.10.1.20240511
+on:
+  push:
+jobs:
+  runhaskell:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, macos, windows]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools (macOS)
+        run: brew install automake
+        if: matrix.os == 'macos'
+      - name: Configure msys2 (windows)
+        shell: bash
+        run: |-
+          echo "MSYSTEM=CLANG64" >> $GITHUB_ENV
+          echo "/c/mingw64/usr/bin" >> $GITHUB_PATH
+          echo "/c/msys64/usr/bin" >> $GITHUB_PATH
+        if: matrix.os == 'windows'
+      - name: Install ghcup (windows)
+        shell: bash
+        run: |-
+          curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_GHC_VERSION=9.10.1 BOOTSTRAP_HASKELL_CABAL_VERSION=latest BOOTSTRAP_HASKELL_INSTALL_NO_STACK=1 BOOTSTRAP_HASKELL_INSTALL_NO_STACK_HOOK=1 BOOTSTRAP_HASKELL_ADJUST_BASHRC=N sh
+          echo "/c/ghcup/bin" >> $GITHUB_PATH
+          echo "/c/ghcup/ghc/9.10.1/bin" >> $GITHUB_PATH
+          echo "/c/cabal/bin" >> $GITHUB_PATH
+        if: matrix.os == 'windows'
+      - name: Install ghcup (unix)
+        shell: bash
+        run: |-
+          curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_GHC_VERSION=9.10.1 BOOTSTRAP_HASKELL_CABAL_VERSION=latest BOOTSTRAP_HASKELL_INSTALL_NO_STACK=1 BOOTSTRAP_HASKELL_INSTALL_NO_STACK_HOOK=1 BOOTSTRAP_HASKELL_ADJUST_BASHRC=N sh
+          ls "$HOME"/.ghcup/bin
+          echo "$HOME/.ghcup/bin" >> $GITHUB_PATH
+          echo "$HOME/.ghcup/ghc/9.10.1/bin" >> $GITHUB_PATH
+          echo "$HOME/.cabal/bin" >> $GITHUB_PATH
+        if: matrix.os == 'ubuntu' || matrix.os ==  'macos'
+      - name: Run CI.hs (windows)
+        shell: C:\msys64\usr\bin\bash.exe --noprofile --norc -e -o pipefail '{0}'
+        run: |-
+          pacman -S autoconf automake-wrapper make patch python tar mintty --noconfirm
+          cabal run exe:ghc-lib-parser-ex-build-tool --allow-newer="ghc-lib-parser-ex:ghc-lib-parser" --constraint="ghc-lib-parser == 9.10.1.20240511" -- --version-tag 9.10.0.1
+        if: matrix.os == 'windows'
+      - name: Run CI.hs (unix)
+        shell: bash
+        run: |-
+          cabal run exe:ghc-lib-parser-ex-build-tool --allow-newer="ghc-lib-parser-ex:ghc-lib-parser" --constraint="ghc-lib-parser == 9.10.1.20240511" -- --version-tag 9.10.0.1
+        if: matrix.os == 'ubuntu' || matrix.os ==  'macos'

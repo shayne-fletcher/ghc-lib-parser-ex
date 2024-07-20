@@ -1,0 +1,21 @@
+name: ghc-lib-parser-ex-ghc-lib-parser-9.2.8.20230729
+on:
+  push:
+jobs:
+  runhaskell:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-13, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: haskell-actions/setup@v2
+        id: setup-haskell
+        with:
+          ghc-version: 9.0.2
+          cabal-version: 'latest'
+      - name: Run CI.hs
+        shell: bash
+        run: cabal test test-suite:ghc-lib-parser-ex-test --allow-newer="ghc-lib-parser-ex:ghc-lib-parser" --constraint="ghc-lib-parser ==  9.2.8.20230729"

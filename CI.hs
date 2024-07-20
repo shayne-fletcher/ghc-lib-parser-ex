@@ -2,7 +2,7 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
-{-# OPTIONS_GHC -fno-warn-unused-imports #-}
+{-# OPTIONS_GHC -fwarn-unused-imports #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -10,34 +10,13 @@
 {-# LANGUAGE CPP #-}
 
 -- CI script, compatible with all of Travis, Appveyor and Azure.
-import Control.Monad.Extra
-import Control.Applicative (liftA2)
-import System.Directory
-import System.FilePath
 import System.IO.Extra
-import System.Info.Extra
 import System.Process.Extra
-import System.Time.Extra
-import System.Console.ANSI
-import System.Exit
 import Data.List.Extra
 import Data.Time.Clock
 import Data.Time.Calendar
-import Data.Foldable
-import Data.Maybe
 import Data.Bifunctor
 import qualified Options.Applicative as Opts
-import GHC.Stack
-import System.IO.Unsafe
-
-enableAnsiColors::Bool
-enableAnsiColors =
-#if __GLASGOW_HASKELL__ == 904 && (__GLASGOW_HASKELL_PATCHLEVEL1__ == 1)
--- Avoid: illegal hardware instruction  stack runhaskell --stack-yaml stack-exact.yaml --resolver ghc-9.4.1 --package extra --package optparse-applicative CI.hs
-  False
-#else
-  True
-#endif
 
 main :: IO ()
 main = do
@@ -103,9 +82,7 @@ buildDist :: StackOptions -> Bool -> IO ()
 buildDist opts noBuilds = isolatedBuild opts noBuilds
 
 patchCabal :: String -> StackOptions -> IO ()
-patchCabal version opts = do
-  when enableAnsiColors $ do
-    setSGR [SetColor Foreground Dull Red]
+patchCabal version _opts = do
   putStrLn "Patching cabal:"
   putStrLn $ "- version " ++ version
   writeFile "ghc-lib-parser-ex.cabal" .
@@ -146,8 +123,6 @@ patchCabal version opts = do
               ])
         =<< readFile' "ghc-lib-parser-ex.cabal"
 
-  when enableAnsiColors $ do
-    setSGR [Reset]
   where
     maybeRead :: String -> Maybe Int
     maybeRead s
@@ -177,9 +152,8 @@ patchCabal version opts = do
       ]
 
 isolatedBuild :: StackOptions -> Bool -> IO ()
-isolatedBuild opts@StackOptions {..} noBuilds = do
+isolatedBuild opts@StackOptions {..} _noBuilds = do
   version <- tag
-  let pkg_ghclib_parser_ex = "ghc-lib-parser-ex-" ++ version
   patchCabal version opts
   contents <- readFile' "ghc-lib-parser-ex.cabal"
   putStrLn contents
@@ -200,70 +174,16 @@ isolatedBuild opts@StackOptions {..} noBuilds = do
       tag :: IO String
       tag = maybe (do UTCTime day _ <- getCurrentTime; pure $ genVersionStr day) pure versionTag
 
-      stack = stack' opts
+      genVersionStr :: Day -> String
+      genVersionStr day = "0." ++ replace "-" "" (showGregorian day)
 
 -- Mitigate against macOS/ghc-9.2.2 failures for lack of this
 -- c-include path. See
 -- https://gitlab.haskell.org/ghc/ghc/-/issues/20592#note_391266.
 -- There are reports that this exhibits with 9.0.2 and 9.2.1 as
 -- well but I haven't observed that.
-prelude :: (String, String) -> String
-#if __GLASGOW_HASKELL__ == 902 && __GLASGOW_HASKELL_PATCHLEVEL1__ == 2
-prelude ("darwin", _) = "C_INCLUDE_PATH=`xcrun --show-sdk-path`/usr/include/ffi "
-#endif
-prelude _ = ""
-
-stack' :: StackOptions -> String -> IO ()
-stack' opts action = cmd $ prelude (os, arch) ++ stackWithOpts opts ++ action
-
-stackWithOpts :: StackOptions -> String
-stackWithOpts StackOptions {stackYaml, resolver, verbosity, cabalVerbose} =
- "stack " ++ concatMap (<> " ")
-  [ stackYamlOpt stackYaml
-  , stackResolverOpt resolver
-  , stackVerbosityOpt verbosity
-  , cabalVerboseOpt cabalVerbose
-  ]
-
-cmd :: String -> IO ()
-cmd x = do
-  when enableAnsiColors $ do
-    setSGR [SetColor Foreground Dull Cyan]
-  putStrLn x
-  hFlush stdout
-  (t, _) <- duration $ system_ x
-  when enableAnsiColors $ do
-    setSGR [SetColor Foreground Dull Cyan]
-  putStrLn $ "Completed " ++ showDuration t ++ ": " ++ x ++ "\n"
-  hFlush stdout
-  when enableAnsiColors $ do
-    setSGR [Reset]
-
--- Command line argument generators.
-
-stackYamlOpt :: Maybe String -> String
-stackYamlOpt = \case
-  Just file -> "--stack-yaml " ++ file
-  Nothing -> ""
-
-stackResolverOpt :: Maybe String -> String
-stackResolverOpt = \case
-  Just resolver -> "--resolver " ++ resolver
-  Nothing -> ""
-
-stackVerbosityOpt :: Maybe String -> String
-stackVerbosityOpt = \case
-  Just verbosity -> "--verbosity=" ++ verbosity
-  Nothing -> ""
-
-cabalVerboseOpt :: Bool -> String
-cabalVerboseOpt True = "--cabal-verbose"; cabalVerboseOpt False = ""
-
-ghcOptionsOpt :: Maybe String -> String
-ghcOptionsOpt = \case
-  Just options -> "--ghc-options=\"" ++ options ++ "\""
-  Nothing -> ""
-
--- Calculate a version string based on a date and a ghc flavor.
-genVersionStr :: Day -> String
-genVersionStr day = "0." ++ replace "-" "" (showGregorian day)
+-- prelude :: (String, String) -> String
+-- #if __GLASGOW_HASKELL__ == 902 && __GLASGOW_HASKELL_PATCHLEVEL1__ == 2
+-- prelude ("darwin", _) = "C_INCLUDE_PATH=`xcrun --show-sdk-path`/usr/include/ffi "
+-- #endif
+-- prelude _ = ""

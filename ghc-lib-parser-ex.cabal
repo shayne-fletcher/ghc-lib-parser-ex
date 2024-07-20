@@ -108,6 +108,5 @@ test-suite ghc-lib-parser-ex-test
 
 executable ghc-lib-parser-ex-build-tool
   import: base
-  build-depends:
-    ansi-terminal, directory, filepath, time, extra, optparse-applicative
+  build-depends: directory, filepath, time, extra, optparse-applicative
   main-is: CI.hs

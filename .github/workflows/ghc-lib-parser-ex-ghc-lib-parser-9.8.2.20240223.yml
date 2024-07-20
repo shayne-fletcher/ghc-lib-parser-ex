@@ -1,21 +1,21 @@
-name: 8.8.1.20191204
+name: 9.8.2.20240223
 on:
   push:
 jobs:
   runhaskell:
     name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-13, windows-latest]
+        os: [ubuntu, macos, windows]
     steps:
       - uses: actions/checkout@v4
       - uses: haskell-actions/setup@v2
         id: setup-haskell
         with:
-          ghc-version: 8.4.3
+          ghc-version: 9.6.6
           cabal-version: 'latest'
       - name: Run CI.hs
         shell: bash
-        run: cabal test test-suite:ghc-lib-parser-ex-test --allow-older="ghc-lib-parser-ex:ghc-lib-parser" --constraint="ghc-lib-parser == 8.8.1.20191204"
+        run: cabal test test-suite:ghc-lib-parser-ex-test --allow-newer="ghc-lib-parser-ex:ghc-lib-parser" --constraint="ghc-lib-parser == 9.8.2.20240223"

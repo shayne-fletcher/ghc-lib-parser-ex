@@ -1,4 +1,4 @@
-name: ghc-lib-parser-ex-ghc-lib-parser-9.10.1.20240511
+name: 9.10.1.20240511
 on:
   push:
 jobs:

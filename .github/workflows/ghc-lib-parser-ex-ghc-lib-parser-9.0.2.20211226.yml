@@ -1,4 +1,4 @@
-name: ghc-lib-parser-ex-ghc-lib-parser-9.0.2.20211226
+name: 9.0.2.20211226
 on:
   push:
 jobs:

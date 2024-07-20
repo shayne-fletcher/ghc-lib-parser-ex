@@ -1,4 +1,5 @@
-# ghc-lib-parser-ex [![License BSD3](https://img.shields.io/badge/license-BSD3-brightgreen.svg)](http://opensource.org/licenses/BSD-3-Clause) [![Hackage version](https://img.shields.io/hackage/v/ghc-lib-parser-ex.svg?label=Hackage)](https://hackage.haskell.org/package/ghc-lib-parser-ex) [![Stackage version](https://www.stackage.org/package/ghc-lib-parser-ex/badge/nightly?label=Stackage)](https://www.stackage.org/package/ghc-lib-parser-ex) [![ghc-lib-parser-ex-ghc-lib-parser-9.10.1.20240511](https://github.com/shayne-fletcher/ghc-lib-parser-ex/actions/workflows/ghc-lib-parser-ex-ghc-lib-parser-9.10.1.20240511.yml/badge.svg)](https://github.com/shayne-fletcher/ghc-lib-parser-ex/actions/workflows/ghc-lib-parser-ex-ghc-lib-parser-9.10.1.20240511.yml)
+# ghc-lib-parser-ex
+ [![License BSD3](https://img.shields.io/badge/license-BSD3-brightgreen.svg)](http://opensource.org/licenses/BSD-3-Clause) [![Hackage version](https://img.shields.io/hackage/v/ghc-lib-parser-ex.svg?label=Hackage)](https://hackage.haskell.org/package/ghc-lib-parser-ex) [![Stackage version](https://www.stackage.org/package/ghc-lib-parser-ex/badge/nightly?label=Stackage)](https://www.stackage.org/package/ghc-lib-parser-ex) [![ghc-lib-parser-ex-ghc-lib-parser-9.10.1.20240511](https://github.com/shayne-fletcher/ghc-lib-parser-ex/actions/workflows/ghc-lib-parser-ex-ghc-lib-parser-9.10.1.20240511.yml/badge.svg)](https://github.com/shayne-fletcher/ghc-lib-parser-ex/actions/workflows/ghc-lib-parser-ex-ghc-lib-parser-9.10.1.20240511.yml)
 
 Copyright © 2020-2024 Shayne Fletcher. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +12,9 @@ Package `ghc-lib-parser-ex` is on [Hackage](https://hackage.haskell.org/package/
 
 ### Versioning policy
 
-Package `ghc-lib-parser-ex` does **not** conform to the [Haskell Package Versioning Policy](https://pvp.haskell.org/). Version numbers are of the form α.β.γ.δ where α.β corresponds to a GHC series and γ.δ are the major and minor parts of the `ghc-lib-ex-parser` package release. Examples:
+Package `ghc-lib-parser-ex` does **not** conform to the [Haskell Package Versioning Policy](https://pvp.haskell.org/).
+
+Version numbers are of the form α.β.γ.δ where α.β corresponds to a GHC series and γ.δ are the major and minor parts of the `ghc-lib-ex-parser` package release. Examples:
 * Version 8.10.1.3 is compatible with any `ghc-lib-parser-8.10.*` (or `ghc-8.10.*`) package;
 * Version 0.20190204.2.0 is compatible with [`ghc-lib-parser-0.20190204`](http://hackage.haskell.org/package/ghc-lib-0.20190204).
 
@@ -21,12 +24,10 @@ The major part γ of the release number indicates an interface breaking change f
 
 Produce and test `ghc-lib-parser-ex` package distributions by executing the CI script:
 ```bash
-# Setup
-git clone git@github.com:shayne-fletcher/ghc-lib-parser-ex.git
-cd ghc-lib-parser-ex
-stack runhaskell --package extra --package optparse-applicative CI.hs
+    git clone git@github.com:shayne-fletcher/ghc-lib-parser-ex.git
+    cd ghc-lib-parser-ex
+    cabal run exe:ghc-lib-parser-ex-build-tool --allow-newer="ghc-lib-parser-ex:ghc-lib-parser" --constraint="ghc-lib-parser == 9.10.1.20240511" -- --version-tag 9.10.0.1
 ```
-Run `stack runhaskell --package extra --package optparse-applicative CI.hs -- --help` for more options.
 
 To run [`hlint`](https://github.com/ndmitchell/hlint) on this repository, `hlint --cpp-include cbits --cpp-define GHC_XXXX .` (where `XXXX` at this time is one of `8_8`, `8_10`, `9_0`, `9_2`, `9_4`, `9_6`, `9_8` or `9_10`).
 

@@ -354,7 +354,7 @@ declarationPredicateTests = testGroup "Declaration predicate tests"
   ]
   where
     assert' = assertBool ""
-    test s = declTest s (flags [])
+    test s = declTest s (flags [ BangPatterns ])
     flags = foldl' xopt_set basicDynFlags
 
 expressionPredicateTests :: TestTree

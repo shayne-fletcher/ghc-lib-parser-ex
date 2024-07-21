@@ -1,15 +1,9 @@
--- Copyright (c) 2020, 2021 Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020, 2024 Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
-{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
-{-# OPTIONS_GHC -fwarn-unused-imports #-}
-{-# LANGUAGE TupleSections #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE CPP #-}
 
--- CI script, compatible with all of Travis, Appveyor and Azure.
 import System.IO.Extra
 import System.Process.Extra
 import Data.List.Extra
@@ -26,63 +20,48 @@ main = do
             <> Opts.progDesc "Build and test ghc-lib-parser-ex."
             <> Opts.header "CI - CI script for ghc-lib-parser-ex"
           )
-    Options { stackOptions, noBuilds } <- Opts.execParser opts
-    buildDist stackOptions noBuilds
+    Options { versionTag } <- Opts.execParser opts
+    buildDist versionTag
 
-data Options = Options
-    { stackOptions :: StackOptions
-    , noBuilds :: Bool
-    } deriving (Show)
+data Options = Options {
+    versionTag :: Maybe String -- If 'Just _' use this as the version (e.g. "8.8.1.20191204")
+  } deriving (Show)
 
-data StackOptions = StackOptions
-    { stackYaml :: Maybe String -- Optional config file
-    , resolver :: Maybe String  -- If 'Just _', override stack.yaml.
-    , verbosity :: Maybe String -- If provided, pass '--verbosity=xxx' to 'stack build'. Valid values are "silent",  "error", "warn", "info" or "debug".
-    , cabalVerbose :: Bool -- If enabled, pass '--cabal-verbose' to 'stack build'.
-    , ghcOptions :: Maybe String -- If 'Just _', pass '--ghc-options="xxx"' to 'stack build' (for ghc verbose, try 'v3').
-    , versionTag :: Maybe String -- If 'Just _' use this as the version (e.g. "8.8.1.20191204")
-    } deriving (Show)
+buildDist :: Maybe String -> IO ()
+buildDist versionTag = do
+  version <- tag
+  patchCabal version
+  contents <- readFile' "ghc-lib-parser-ex.cabal"
+  putStrLn contents
+  hFlush stdout
+
+ -- --test-show-details direct --test-options \"--color always
+  system_ "cabal sdist -o ."
+  system_ "cabal build lib:ghc-lib-parser-ex --ghc-options=-j"
+  system_ "cabal test test:ghc-lib-parser-ex-test --ghc-options=-j --test-show-details=direct --test-options=\"--color always\""
+#if __GLASGOW_HASKELL__ == 808 && \
+    (__GLASGOW_HASKELL_PATCHLEVEL1__ == 1 || __GLASGOW_HASKELL_PATCHLEVEL1__ == 2) && \
+    defined (mingw32_HOST_OS)
+      -- https://gitlab.haskell.org/ghc/ghc/issues/17599
+#else
+  system_ "cabal exec -- ghc -ignore-dot-ghci -package=ghc-lib-parser-ex -e \"print 1\""
+#endif
+
+  where
+    tag :: IO String
+    tag = maybe (do UTCTime day _ <- getCurrentTime; pure $ genVersionStr day) pure versionTag
+
+    genVersionStr :: Day -> String
+    genVersionStr day = "0." ++ replace "-" "" (showGregorian day)
 
 parseOptions :: Opts.Parser Options
 parseOptions = Options
-  <$> parseStackOptions
-  <*> Opts.switch
-  (
-    Opts.long "no-builds" <> Opts.help "If enabled, stop after producing sdists"
-  )
+  <$> Opts.optional ( Opts.strOption (
+        Opts.long "version-tag" <> Opts.help "Set version"
+    ))
 
-parseStackOptions :: Opts.Parser StackOptions
-parseStackOptions = StackOptions
-    <$> Opts.optional ( Opts.strOption
-        ( Opts.long "stack-yaml"
-          <> Opts.help "If specified, the stack-yaml file to use"
-        ))
-    <*> Opts.optional ( Opts.strOption
-        ( Opts.long "resolver"
-       <> Opts.help "If specified, pass '--resolver=xxx' to stack"
-        ))
-    <*> Opts.optional ( Opts.strOption
-        ( Opts.long "verbosity"
-       <> Opts.help "If specified, pass '--verbosity=xxx' to stack"
-        ))
-    <*> Opts.switch
-        ( Opts.long "cabal-verbose"
-       <> Opts.help "If specified, pass '--cabal-verbose' to stack"
-        )
-    <*> Opts.optional ( Opts.strOption
-        ( Opts.long "ghc-options"
-       <> Opts.help "If specified, pass '--ghc-options=\"xxx\"' to stack"
-        ))
-    <*> Opts.optional ( Opts.strOption
-        ( Opts.long "version-tag"
-       <> Opts.help "If specified, set this as the version in ghc-lib-parser-ex.cabal"
-        ))
-
-buildDist :: StackOptions -> Bool -> IO ()
-buildDist opts noBuilds = isolatedBuild opts noBuilds
-
-patchCabal :: String -> StackOptions -> IO ()
-patchCabal version _opts = do
+patchCabal :: String -> IO ()
+patchCabal version = do
   putStrLn "Patching cabal:"
   putStrLn $ "- version " ++ version
   writeFile "ghc-lib-parser-ex.cabal" .
@@ -150,40 +129,3 @@ patchCabal version _opts = do
       , "        build-depends:"
       , "          ghc-lib-parser == 9.0.*"
       ]
-
-isolatedBuild :: StackOptions -> Bool -> IO ()
-isolatedBuild opts@StackOptions {..} _noBuilds = do
-  version <- tag
-  patchCabal version opts
-  contents <- readFile' "ghc-lib-parser-ex.cabal"
-  putStrLn contents
-  hFlush stdout
-
-  system_ "cabal sdist -o ."
-  -- when noBuilds exitSuccess
-  system_ "cabal build lib:ghc-lib-parser-ex --ghc-options=-j"
-  system_ "cabal test test:ghc-lib-parser-ex-test --ghc-options=-j"
--- #if __GLASGOW_HASKELL__ == 808 && \
---     (__GLASGOW_HASKELL_PATCHLEVEL1__ == 1 || __GLASGOW_HASKELL_PATCHLEVEL1__ == 2) && \
---     defined (mingw32_HOST_OS)
---       -- https://gitlab.haskell.org/ghc/ghc/issues/17599
--- #else
---   -- system_ "unset GHC_PACKAGE_PATH && cabal exec -- ghc -ignore-dot-ghci -package=ghc-lib-parser-parser-ex -e \"print 1\""
--- #endif
-    where
-      tag :: IO String
-      tag = maybe (do UTCTime day _ <- getCurrentTime; pure $ genVersionStr day) pure versionTag
-
-      genVersionStr :: Day -> String
-      genVersionStr day = "0." ++ replace "-" "" (showGregorian day)
-
--- Mitigate against macOS/ghc-9.2.2 failures for lack of this
--- c-include path. See
--- https://gitlab.haskell.org/ghc/ghc/-/issues/20592#note_391266.
--- There are reports that this exhibits with 9.0.2 and 9.2.1 as
--- well but I haven't observed that.
--- prelude :: (String, String) -> String
--- #if __GLASGOW_HASKELL__ == 902 && __GLASGOW_HASKELL_PATCHLEVEL1__ == 2
--- prelude ("darwin", _) = "C_INCLUDE_PATH=`xcrun --show-sdk-path`/usr/include/ffi "
--- #endif
--- prelude _ = ""

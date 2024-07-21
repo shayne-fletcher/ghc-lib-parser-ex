@@ -32,9 +32,8 @@ flag no-ghc-lib
 common base
   default-language: Haskell2010
   ghc-options:
-    -Wall -Wincomplete-record-updates
-    -Wredundant-constraints -Widentities
-    -Wno-simplifiable-class-constraints
+    -Wall -Wincomplete-record-updates -Wredundant-constraints -Widentities
+    -Wunused-imports -Wno-name-shadowing
   build-depends:
       base >=4.7 && <5
 

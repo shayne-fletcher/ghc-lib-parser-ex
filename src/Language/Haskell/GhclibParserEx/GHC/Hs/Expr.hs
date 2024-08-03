@@ -1,6 +1,7 @@
--- Copyright (c) 2020, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020-2024, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
+{- ORMOLU_DISABLE -}
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 {-# LANGUAGE LambdaCase #-}
 #include "ghclib_api.h"

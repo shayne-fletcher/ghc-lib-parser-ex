@@ -2,9 +2,13 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 #include "ghclib_api.h"
-module Language.Haskell.GhclibParserEx.GHC.Hs.Decls(
-    isNewType, isForD, isDerivD, isClsDefSig
-  ) where
+module Language.Haskell.GhclibParserEx.GHC.Hs.Decls
+  ( isNewType,
+    isForD,
+    isDerivD,
+    isClsDefSig,
+  )
+where
 
 #if defined(GHC_8_8)
 import HsSyn
@@ -22,8 +26,8 @@ isNewType NewType = True
 isNewType DataType = False
 
 isForD, isDerivD :: LHsDecl GhcPs -> Bool
-isForD (L _ ForD{}) = True; isForD _ = False
-isDerivD (L _ DerivD{}) = True; isDerivD _ = False
+isForD (L _ ForD {}) = True; isForD _ = False
+isDerivD (L _ DerivD {}) = True; isDerivD _ = False
 
 isClsDefSig :: Sig GhcPs -> Bool
 isClsDefSig (ClassOpSig _ True _ _) = True; isClsDefSig _ = False

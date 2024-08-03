@@ -1,6 +1,5 @@
 -- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
-
 {-# OPTIONS_GHC -Wno-orphans #-}
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Driver.Flags () where

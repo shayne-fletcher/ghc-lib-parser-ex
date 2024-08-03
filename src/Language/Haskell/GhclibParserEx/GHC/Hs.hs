@@ -2,9 +2,9 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 #include "ghclib_api.h"
-module Language.Haskell.GhclibParserEx.GHC.Hs(
-   modName
- )
+module Language.Haskell.GhclibParserEx.GHC.Hs
+  ( modName,
+  )
 where
 
 #if defined (GHC_8_8)
@@ -29,5 +29,5 @@ modName :: Located HsModule -> String
 #else
 modName :: Located (HsModule GhcPs) -> String
 #endif
-modName (L _ HsModule {hsmodName=Nothing}) = "Main"
-modName (L _ HsModule {hsmodName=Just (L _ n)}) = moduleNameString n
+modName (L _ HsModule {hsmodName = Nothing}) = "Main"
+modName (L _ HsModule {hsmodName = Just (L _ n)}) = moduleNameString n

@@ -2,8 +2,8 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 #include "ghclib_api.h"
-module Language.Haskell.GhclibParserEx.GHC.Hs.Binds(
-  isPatSynBind
+module Language.Haskell.GhclibParserEx.GHC.Hs.Binds
+  ( isPatSynBind,
   )
 where
 
@@ -16,5 +16,5 @@ import GHC.Hs.Extension
 #endif
 
 isPatSynBind :: HsBind GhcPs -> Bool
-isPatSynBind PatSynBind{} = True
+isPatSynBind PatSynBind {} = True
 isPatSynBind _ = False

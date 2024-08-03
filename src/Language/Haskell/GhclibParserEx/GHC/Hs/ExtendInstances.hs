@@ -1,6 +1,7 @@
 -- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
+{- ORMOLU_DISABLE -}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 #include "ghclib_api.h"
 

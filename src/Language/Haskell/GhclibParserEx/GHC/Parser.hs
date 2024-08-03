@@ -1,7 +1,7 @@
--- Copyright (c) 2020-2023, Shayne Fletcher. All rights reserved.
+-- Copyright (c) 2020-2024, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
 
-
+{- ORMOLU_DISABLE -}
 #include "ghclib_api.h"
 module Language.Haskell.GhclibParserEx.GHC.Parser(
     parseFile

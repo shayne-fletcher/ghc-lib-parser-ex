@@ -2,9 +2,14 @@
 -- SPDX-License-Identifier: BSD-3-Clause.
 
 #include "ghclib_api.h"
-module Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader(
-   occNameStr, rdrNameStr, isSpecial, unqual, fromQual, isSymbolRdrName
- )
+module Language.Haskell.GhclibParserEx.GHC.Types.Name.Reader
+  ( occNameStr,
+    rdrNameStr,
+    isSpecial,
+    unqual,
+    fromQual,
+    isSymbolRdrName,
+  )
 where
 
 #if !( defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )

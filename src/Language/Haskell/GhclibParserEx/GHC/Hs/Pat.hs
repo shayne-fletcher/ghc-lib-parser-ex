@@ -1,16 +1,22 @@
 -- Copyright (c) 2020-203, Shayne Fletcher. All rights reserved.
 -- SPDX-License-Identifier: BSD-3-Clause.
-
 {-# LANGUAGE ViewPatterns #-}
 #include "ghclib_api.h"
-module Language.Haskell.GhclibParserEx.GHC.Hs.Pat(
-    patToStr, strToPat
-  , fromPChar
-  , hasPFieldsDotDot
-  , isPFieldWildcard, isPWildcard, isPFieldPun, isPatTypeSig, isPBangPat, isPViewPat
-  , isWildPat {- alias for 'isPWildcard' -}
-  , isSplicePat
- ) where
+module Language.Haskell.GhclibParserEx.GHC.Hs.Pat
+  ( patToStr,
+    strToPat,
+    fromPChar,
+    hasPFieldsDotDot,
+    isPFieldWildcard,
+    isPWildcard,
+    isPFieldPun,
+    isPatTypeSig,
+    isPBangPat,
+    isPViewPat,
+    isWildPat {- alias for 'isPWildcard' -},
+    isSplicePat,
+  )
+where
 
 #if defined (GHC_8_8)
 import HsSyn
@@ -59,6 +65,7 @@ patToStr _ = ""
 #endif
 
 strToPat :: String -> LPat GhcPs
+
 strToPat z
 #if defined (GHC_8_8)
   | z == "True" = ConPatIn (noLoc true_RDR) (PrefixCon [])
@@ -92,7 +99,7 @@ fromPChar _ = Nothing
 
 -- Contains a '..' as in 'Foo{..}'
 hasPFieldsDotDot :: HsRecFields GhcPs (LPat GhcPs) -> Bool
-hasPFieldsDotDot HsRecFields {rec_dotdot=Just _} = True
+hasPFieldsDotDot HsRecFields {rec_dotdot = Just _} = True
 hasPFieldsDotDot _ = False
 
 -- Field has a '_' as in '{foo=_} or is punned e.g. '{foo}'.

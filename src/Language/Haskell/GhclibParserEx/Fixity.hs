@@ -3,7 +3,7 @@
 --
 -- Adapted from (1) https://github.com/mpickering/apply-refact.git and
 -- (2) https://gitlab.haskell.org/ghc/ghc ('compiler/renamer/RnTypes.hs').
-
+{- ORMOLU_DISABLE -}
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE TupleSections #-}
 #include "ghclib_api.h"
@@ -15,38 +15,38 @@ module Language.Haskell.GhclibParserEx.Fixity(
   ) where
 
 #if defined (GHC_8_8)
-import HsSyn
 import BasicTypes
-import RdrName
+import HsSyn
 import OccName
+import RdrName
 import SrcLoc
 #elif defined (GHC_8_10)
-import GHC.Hs
 import BasicTypes
-import RdrName
+import GHC.Hs
 import OccName
+import RdrName
 import SrcLoc
 #elif defined  (GHC_9_0)
 import GHC.Hs
 import GHC.Types.Basic
-import GHC.Types.Name.Reader
 import GHC.Types.Name
+import GHC.Types.Name.Reader
 import GHC.Types.SrcLoc
 #elif defined (GHC_9_2) || defined (GHC_9_4) || defined (GHC_9_6)
 import GHC.Hs
 import GHC.Types.Fixity
-import GHC.Types.SourceText
-import GHC.Types.Name.Reader
 import GHC.Types.Name
+import GHC.Types.Name.Reader
+import GHC.Types.SourceText
 import GHC.Types.SrcLoc
 #elif defined (GHC_9_8) || defined (GHC_9_10)
+import GHC.Data.FastString
 import GHC.Hs
 import GHC.Types.Fixity
-import GHC.Types.SourceText
-import GHC.Types.Name.Reader
 import GHC.Types.Name
+import GHC.Types.Name.Reader
+import GHC.Types.SourceText
 import GHC.Types.SrcLoc
-import GHC.Data.FastString
 #else
 import GHC.Hs
 import GHC.Types.Fixity
@@ -55,8 +55,8 @@ import GHC.Types.Name
 import GHC.Types.SrcLoc
 #endif
 
-import Data.Maybe
 import Data.Data hiding (Fixity)
+import Data.Maybe
 import Data.Generics.Uniplate.Data
 
 #if defined (GHC_9_0) || defined (GHC_8_10)

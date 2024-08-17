@@ -3,6 +3,7 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
+import Control.Monad.Extra
 #if __GLASGOW_HASKELL__ < 906
 import Control.Applicative (liftA2)
 #endif
@@ -11,6 +12,7 @@ import Data.List.Extra
 import Data.Time.Calendar
 import Data.Time.Clock
 import qualified Options.Applicative as Opts
+import System.Exit
 import System.IO.Extra
 import System.Process.Extra
 
@@ -23,14 +25,15 @@ main = do
               <> Opts.progDesc "Build and test ghc-lib-parser-ex."
               <> Opts.header "CI - CI script for ghc-lib-parser-ex"
           )
-  Options {versionTag} <- Opts.execParser opts
-  buildTestDist versionTag
+  options <- Opts.execParser opts
+  buildTestDist options
 
-buildTestDist :: Maybe String -> IO ()
-buildTestDist userGivenTag = do
+buildTestDist :: Options -> IO ()
+buildTestDist Options {versionTag = userGivenTag, noBuilds} = do
   assignVersionPatchCabal userGivenTag
 
   system_ "cabal sdist -o ."
+  when noBuilds exitSuccess
   system_ "cabal build lib:ghc-lib-parser-ex --ghc-options=-j"
   system_ "cabal test test:ghc-lib-parser-ex-test --ghc-options=-j --test-show-details=direct --test-options=\"--color always\""
 #if __GLASGOW_HASKELL__ == 808 && \
@@ -46,7 +49,8 @@ assignVersionPatchCabal userTag = do
   version <- mkVersion userTag
   patchCabal version
   contents <- readFile' "ghc-lib-parser-ex.cabal"
-  putStrLn contents; hFlush stdout
+  putStrLn contents
+  hFlush stdout
   where
     mkVersion :: Maybe String -> IO String
     mkVersion = maybe (do UTCTime day _ <- getCurrentTime; pure $ genVersionStr day) pure
@@ -129,8 +133,9 @@ patchCabal version = do
         upper' = show major ++ "." ++ show (minor + 1) ++ ".0"
         family' = show major ++ "." ++ show minor ++ ".*"
 
-newtype Options = Options
-  { versionTag :: Maybe String -- If 'Just _' use this as the version (e.g. "8.8.1.20191204")
+data Options = Options
+  { versionTag :: Maybe String, -- If 'Just _' use this as the version (e.g. "8.8.1.20191204")
+    noBuilds :: Bool -- Don't build or run tests
   }
   deriving (Show)
 
@@ -141,3 +146,5 @@ parseOptions =
       ( Opts.strOption
           (Opts.long "version-tag" <> Opts.help "Set version")
       )
+    <*> Opts.switch
+      (Opts.long "no-builds" <> Opts.help "If enabled, stop after producing sdists")

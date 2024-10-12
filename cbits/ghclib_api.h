@@ -6,8 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause.
 #if !defined(GHCLIB_API_H)
 #  define GHCLIB_API_H
 
-#  if !(defined (GHC_9_12) \
-     || defined (GHC_9_10)  \
+#  if !(defined (GHC_9_14) \
+     || defined (GHC_9_12) \
+     || defined (GHC_9_10) \
      || defined (GHC_9_8)  \
      || defined (GHC_9_6)  \
      || defined (GHC_9_4)  \
@@ -17,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause.
      || defined (GHC_8_8))
 #    if defined (MIN_VERSION_ghc_lib_parser)
 #       if !MIN_VERSION_ghc_lib_parser ( 1,  0,  0)
+#         define GHC_9_14
+#       elif MIN_VERSION_ghc_lib_parser (9,  12,  0)
 #         define GHC_9_12
 #       elif MIN_VERSION_ghc_lib_parser (9,  10,  0)
 #         define GHC_9_10
@@ -38,7 +41,9 @@ SPDX-License-Identifier: BSD-3-Clause.
 #         error Unsupported GHC API version
 #      endif
 #    else
-#      if __GLASGOW_HASKELL__   == 911
+#      if __GLASGOW_HASKELL__   == 914
+#        define GHC_9_14
+#      elif __GLASGOW_HASKELL__ == 912
 #        define GHC_9_12
 #      elif __GLASGOW_HASKELL__ == 910
 #        define GHC_9_10

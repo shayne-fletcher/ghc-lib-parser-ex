@@ -103,7 +103,12 @@ isDotApp = \case (L _ (OpApp _ _ op _)) -> isDot op; _ -> False
 isTypeApp = \case (L _ HsAppType{}) -> True; _ -> False
 isWHNF = \case
   (L _ (HsVar _ (L _ x))) -> isRdrDataCon x
+#if ! ( defined(GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined(GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api > 9.12.1
+  (L _ (HsLit _ x)) -> case x of HsString{} -> False; _ -> True
+#else
   (L _ (HsLit _ x)) -> case x of HsString{} -> False; HsInt{} -> False; HsRat{} -> False; _ -> True
+#endif
   (L _ HsLam{}) -> True
   (L _ ExplicitTuple{}) -> True
   (L _ ExplicitList{}) -> True
@@ -159,8 +164,12 @@ isFieldPun = \case (L _ HsRecField {hsRecPun=True}) -> True; _ -> False
 #endif
 -- Field puns in updates have a different type to field puns in
 -- constructions.
-#if ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
--- ghc api >= 9.4.1
+#if ! ( defined(GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined(GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api > 9.12.1
+isFieldPunUpdate :: HsFieldBind (LFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
+isFieldPunUpdate = \case HsFieldBind {hfbPun=True} -> True; _ -> False
+#elif ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api >= 9.4.1 && <= 9.12.1
 isFieldPunUpdate :: HsFieldBind (LAmbiguousFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 isFieldPunUpdate = \case HsFieldBind {hfbPun=True} -> True; _ -> False
 #else
@@ -289,7 +298,10 @@ isUnboxed = \case Unboxed -> True; _ -> False
 
 isWholeFrac :: HsExpr GhcPs -> Bool
 
-#if ! (defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+#if ! ( defined(GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined(GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api > 9.12.1
+isWholeFrac (HsOverLit _ (OverLit _ (HsFractional fl@FL {}) )) = denominator (rationalFromFractionalLit fl) == 1
+#elif ! (defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
 -- ghc api >= 9.4.1
 isWholeFrac (HsLit _ (HsRat _ fl@FL{} _)) = denominator (rationalFromFractionalLit fl) == 1
 isWholeFrac (HsOverLit _ (OverLit _ (HsFractional fl@FL {}) )) = denominator (rationalFromFractionalLit fl) == 1

@@ -155,8 +155,8 @@ mkOpApp ::
    -> LHsExpr GhcPs
 --      (e11 `op1` e12) `op2` e2
 mkOpApp fs loc e1@(L _ (OpApp x1 e11 op1 e12)) op2 fix2 e2
-# if ! (defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
--- ghc > 9.12
+# if ! ( defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc > 9.10
   | nofix_error = L loc (OpApp noExtField e1 op2 e2)
 #elif ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
 -- ghc > 9.0
@@ -176,8 +176,8 @@ mkOpApp fs loc e1@(L _ (OpApp x1 e11 op1 e12)) op2 fix2 e2
     (nofix_error, associate_right) = compareFixity fix1 fix2
 --      (- neg_arg) `op` e2
 mkOpApp fs loc e1@(L _ (NegApp _ neg_arg neg_name)) op2 fix2 e2
-# if ! (defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
--- ghc > 9.12
+# if ! ( defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc > 9.10
   | nofix_error = L loc (OpApp noExtField e1 op2 e2)
 #elif ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
 -- ghc > 9.0
@@ -200,8 +200,8 @@ mkOpApp fs loc e1@(L _ (NegApp _ neg_arg neg_name)) op2 fix2 e2
     (nofix_error, associate_right) = compareFixity negateFixity fix2
 --      e1 `op` - neg_arg
 mkOpApp _ loc e1 op1 fix1 e2@(L _ NegApp {}) -- NegApp can occur on the right.
-# if ! (defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
--- ghc > 9.12
+# if ! ( defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc > 9.10
   | not associate_right  = L loc (OpApp noExtField e1 op1 e2)-- We *want* right association.
 #elif ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
   | not associate_right  = L loc (OpApp noAnn e1 op1 e2)-- We *want* right association.
@@ -211,8 +211,8 @@ mkOpApp _ loc e1 op1 fix1 e2@(L _ NegApp {}) -- NegApp can occur on the right.
   where
     (_, associate_right) = compareFixity fix1 negateFixity
  --     Default case, no rearrangment.
-# if ! (defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
--- ghc > 9.12
+# if ! ( defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc > 9.10
 mkOpApp _ loc e1 op _fix e2 = L loc (OpApp noExtField e1 op e2)
 #elif ! (defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
 mkOpApp _ loc e1 op _fix e2 = L loc (OpApp noAnn e1 op e2)

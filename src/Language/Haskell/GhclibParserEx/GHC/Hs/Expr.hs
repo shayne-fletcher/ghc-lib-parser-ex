@@ -164,8 +164,8 @@ isFieldPun = \case (L _ HsRecField {hsRecPun=True}) -> True; _ -> False
 #endif
 -- Field puns in updates have a different type to field puns in
 -- constructions.
-#if ! ( defined(GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined(GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
--- ghc api > 9.12.1
+#if ! ( defined (GHC_9_10) || defined (GHC_9_8) || defined(GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+-- ghc api > 9.10.1
 isFieldPunUpdate :: HsFieldBind (LFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 isFieldPunUpdate = \case HsFieldBind {hfbPun=True} -> True; _ -> False
 #elif ! ( defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )

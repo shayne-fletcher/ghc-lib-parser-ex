@@ -60,6 +60,7 @@ import GHC.Driver.Config.Parser
 readExtension :: String -> Maybe Extension
 readExtension s = flagSpecFlag <$> find (\(FlagSpec n _ _ _) -> n == s) xFlags
 
+#if (defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined(GHC_8_8) )
 -- | Implicitly enabled/disabled extensions.
 extensionImplications :: [(Extension, ([Extension], [Extension]))]
 extensionImplications = map f $ Map.toList implicationsMap
@@ -68,7 +69,27 @@ extensionImplications = map f $ Map.toList implicationsMap
     implicationsMap :: Map.Map String ([Extension], [Extension])
     implicationsMap = Map.fromListWith (<>)
       [(show a, ([c | b], [c | not b]))
-        | (a, flag, c) <- impliedXFlags, let b = flag == turnOn]
+        | (a, flag, c) <- impliedXFlags,
+          let b = flag == turnOn
+      ]
+#else
+  {- defined (GHC_9_14) -}
+-- | Implicitly enabled/disabled extensions.
+extensionImplications :: [(Extension, ([Extension], [Extension]))]
+extensionImplications = map f $ Map.toList implicationsMap
+  where
+    f (e, ps) = (fromJust (readExtension e), ps)
+    implicationsMap :: Map.Map String ([Extension], [Extension])
+    implicationsMap = Map.fromListWith (<>)
+      [(show a, ([strip c | b], [strip c | not b]))
+        | (a, c) <- impliedXFlags,
+          let b = case c of On _ -> True; Off _ -> False
+      ]
+
+    strip :: OnOff a -> a
+    strip (On e) = e
+    strip (Off e) = e
+#endif
 
 -- Landed in
 -- https://gitlab.haskell.org/ghc/ghc/merge_requests/2654. Copied from
@@ -169,14 +190,13 @@ parsePragmasIntoDynFlags :: DynFlags
                          -> IO (Either String DynFlags)
 parsePragmasIntoDynFlags flags (enable, disable) file str =
   catchErrors $ do
-#if ! (defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
-    let (_, opts) =
-          getOptions (initParserOpts flags) (stringToStringBuffer str) file
+#if (defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+    let opts = getOptions flags (stringToStringBuffer str) file
+#elif (defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4))
+    let (_, opts) = getOptions (initParserOpts flags) (stringToStringBuffer str) file
 #else
-    let opts =
-          getOptions flags (stringToStringBuffer str) file
+    let (_, opts) = getOptions (initParserOpts flags) (supportedLanguagePragmas flags) (stringToStringBuffer str) file
 #endif
-
     -- Important : apply enables, disables *before* parsing dynamic
     -- file pragmas.
     let flags' =  foldl' xopt_set flags enable

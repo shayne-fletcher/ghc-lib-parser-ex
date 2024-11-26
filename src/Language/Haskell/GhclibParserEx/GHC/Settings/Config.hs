@@ -30,6 +30,10 @@ import GHC.Utils.Fingerprint
 import GHC.Platform
 import GHC.Settings
 #endif
+#if ! (defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+{- since 9.14 -}
+import GHC.Unit.Types (stringToUnitId)
+#endif
 
 fakeSettings :: Settings
 fakeSettings = Settings
@@ -48,15 +52,31 @@ fakeSettings = Settings
   , sPlatformConstants=platformConstants
   , sToolSettings=toolSettings
   }
-#else
+#elif (defined (GHC_9_2) || defined (GHC_9_4) || defined (GHC_9_6) || defined (GHC_9_8) || defined (GHC_9_10) || defined (GHC_9_12))
   { sGhcNameVersion=ghcNameVersion
   , sFileSettings=fileSettings
   , sTargetPlatform=platform
   , sPlatformMisc=platformMisc
   , sToolSettings=toolSettings
   }
+#else
+ {- defined (GHC_9_14) -}
+  { sGhcNameVersion=ghcNameVersion
+  , sFileSettings=fileSettings
+  , sTargetPlatform=platform
+  , sPlatformMisc=platformMisc
+  , sToolSettings=toolSettings
+  , sUnitSettings=unitSettings
+  }
 #endif
   where
+#if !(defined (GHC_8_8) || defined (GHC_8_10) || defined (GHC_9_0) || defined (GHC_9_2) || (defined GHC_9_4) || defined (GHC_9_6) || defined (GHC_9_8) || defined (GHC_9_10) || defined (GHC_9_12))
+{- ghc-api>=9.14.1  -}
+    unitSettings = UnitSettings {
+        unitSettings_baseUnitId = stringToUnitId "base"
+      }
+#endif
+
 #if !defined (GHC_8_8)
     toolSettings = ToolSettings {
         toolSettings_opt_P_fingerprint=fingerprint0

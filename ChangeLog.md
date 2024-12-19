@@ -1,9 +1,9 @@
 # Changelog for ghc-lib-parser-ex
 
-# Unreleased
+# 9.12.0.0 released
 - Add support for ghc-9.12 series: `GHCLIB_API_912`
 
-## 9.10.0 released
+## 9.10.0.0 released
 - Deprecate `Dump`
 - New module `GHC.Hs.Dump`
 - Add support for ghc-9.10 series: `GHCLIB_API_910`

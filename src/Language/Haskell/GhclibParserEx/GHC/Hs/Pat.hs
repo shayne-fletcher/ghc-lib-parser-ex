@@ -57,10 +57,15 @@ patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) 
 patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "False" = "False"
 patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "[]" = "[]"
 patToStr _ = ""
-#else
+#elif defined (GHC_9_2) || defined (GHC_9_4) || defined (GHC_9_6) || defined (GHC_9_8) || defined (GHC_9_10) || defined (GHC_9_12)
 patToStr (L _ (ConPat _ (L _ x) (PrefixCon [] []))) | occNameString (rdrNameOcc x) == "True" = "True"
 patToStr (L _ (ConPat _ (L _ x) (PrefixCon [] []))) | occNameString (rdrNameOcc x) == "False" = "False"
 patToStr (L _ (ConPat _ (L _ x) (PrefixCon [] []))) | occNameString (rdrNameOcc x) == "[]" = "[]"
+patToStr _ = ""
+#else
+patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "True" = "True"
+patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "False" = "False"
+patToStr (L _ (ConPat _ (L _ x) (PrefixCon []))) | occNameString (rdrNameOcc x) == "[]" = "[]"
 patToStr _ = ""
 #endif
 
@@ -82,10 +87,15 @@ strToPat z
   | z == "False" = noLoc $ ConPat noExtField (noLoc false_RDR) (PrefixCon [])
   | z == "[]" = noLoc $ ConPat noExtField (noLoc $ nameRdrName nilDataConName) (PrefixCon [])
   | otherwise = noLoc $ VarPat noExtField (noLoc $ mkVarUnqual (fsLit z))
-#else
+#elif defined (GHC_9_2) || defined (GHC_9_4) || defined (GHC_9_6) || defined (GHC_9_8) || defined (GHC_9_10) || defined (GHC_9_12)
   | z == "True" = noLocA $ ConPat noAnn (noLocA true_RDR) (PrefixCon [] [])
   | z == "False" = noLocA $ ConPat noAnn (noLocA false_RDR) (PrefixCon [] [])
   | z == "[]" = noLocA $ ConPat noAnn (noLocA $ nameRdrName nilDataConName) (PrefixCon [] [])
+  | otherwise = noLocA $ VarPat noExtField (noLocA $ mkVarUnqual (fsLit z))
+#else
+  | z == "True" = noLocA $ ConPat noAnn (noLocA true_RDR) (PrefixCon [])
+  | z == "False" = noLocA $ ConPat noAnn (noLocA false_RDR) (PrefixCon [])
+  | z == "[]" = noLocA $ ConPat noAnn (noLocA $ nameRdrName nilDataConName) (PrefixCon [])
   | otherwise = noLocA $ VarPat noExtField (noLocA $ mkVarUnqual (fsLit z))
 #endif
 

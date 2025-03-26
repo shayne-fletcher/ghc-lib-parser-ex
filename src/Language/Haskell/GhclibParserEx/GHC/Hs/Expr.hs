@@ -270,8 +270,11 @@ isFieldWildcard :: LHsFieldBind GhcPs (LFieldOcc GhcPs) (LHsExpr GhcPs) -> Bool
 isFieldWildcard :: LHsRecField GhcPs (LHsExpr GhcPs) -> Bool
 #endif
 isFieldWildcard = \case
-
-#if ! ( defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8) )
+#if !(defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined(GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
+-- ghc api > ghc-9.12
+-- Use `Language.Haskell.GhcLibParserEx.GHC.Types.Name.Reader`s `occNameStr`. `HsHoleVar` has a `RdrName` not an `OccName`.
+  (L _ HsFieldBind {hfbRHS=(L _ (HsHole(HoleVar(L _ s))))}) -> occNameStr s == "_"
+#elif defined(GHC_9_12) || defined(GHC_9_10) || defined (GHC_9_8) || defined(GHC_9_6)
 -- ghc api >= ghc-9.6.1
 -- Use `Language.Haskell.GhcLibParserEx.GHC.Types.Name.Reader`s `occNameStr` since `HsUnboundVar` now contains a `RdrName` not an `OccName`.
   (L _ HsFieldBind {hfbRHS=(L _ (HsUnboundVar _ s))}) -> occNameStr s == "_"

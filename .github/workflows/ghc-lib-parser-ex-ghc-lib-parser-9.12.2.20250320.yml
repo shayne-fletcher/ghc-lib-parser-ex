@@ -1,0 +1,21 @@
+name: 9.12.2.20250320
+on:
+  push:
+jobs:
+  runhaskell:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, macos, windows]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: haskell-actions/setup@v2
+        id: setup-haskell
+        with:
+          ghc-version: 9.10.1
+          cabal-version: 'latest'
+      - name: Run CI.hs
+        shell: bash
+        run: cabal run exe:ghc-lib-parser-ex-build-tool --allow-newer="ghc-lib-parser-ex:ghc-lib-parser" --constraint="ghc-lib-parser == 9.12.2.20250320" -- --version-tag 9.12.0.1

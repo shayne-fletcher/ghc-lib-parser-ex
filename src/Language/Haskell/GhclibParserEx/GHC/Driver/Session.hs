@@ -46,6 +46,11 @@ import Data.List
 import Data.Maybe
 import qualified Data.Map as Map
 
+#if defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8)
+#else
+import GHC.Utils.Logger
+#endif
+
 -- Landed in https://gitlab.haskell.org/ghc/ghc/merge_requests/2707.
 #if defined (GHC_8_8) || defined (GHC_8_10)
 import Data.Function -- For `compareOn`.
@@ -201,7 +206,12 @@ parsePragmasIntoDynFlags flags (enable, disable) file str =
     -- file pragmas.
     let flags' =  foldl' xopt_set flags enable
     let flags'' = foldl' xopt_unset flags' disable
+#if defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4) || defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8)
     (flags, _, _) <- parseDynamicFilePragma flags'' opts
+#else
+    logger <- initLogger
+    (flags, _, _) <- parseDynamicFilePragma logger flags'' opts
+#endif
     return $ Right (flags `gopt_set` Opt_KeepRawTokenStream)
   where
     catchErrors :: IO (Either String DynFlags) -> IO (Either String DynFlags)

@@ -197,8 +197,10 @@ parsePragmasIntoDynFlags flags (enable, disable) file str =
   catchErrors $ do
 #if (defined (GHC_9_2) || defined (GHC_9_0) || defined (GHC_8_10) || defined (GHC_8_8))
     let opts = getOptions flags (stringToStringBuffer str) file
-#elif (defined (GHC_9_14) || defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4))
-    let (_, opts) = getOptions (initParserOpts flags) (stringToStringBuffer str) file
+#elif (defined (GHC_9_12) || defined (GHC_9_10) || defined (GHC_9_8) || defined (GHC_9_6) || defined (GHC_9_4))
+    let (_, opts) = getOptions (initParserOpts flags) (stringToStringBuffer str)
+#elif (defined (GHC_9_14))
+    let (_, opts) = getOptions (initParserOpts flags) (supportedLanguagePragmas flags) (stringToStringBuffer str) file
 #else
     let (_, opts) = getOptions (initParserOpts flags) (initSourceErrorContext flags) (supportedLanguagePragmas flags) (stringToStringBuffer str) file
 #endif
